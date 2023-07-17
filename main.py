@@ -1,18 +1,21 @@
 import pygame
 from player import Player
-from control_handler import player_input
+from input_handler import player_input
+
+# Constant values
+frame_rate = 30
+screen_size = 600
+unit = 20
 
 # Setup
 pygame.init()
-screen = pygame.display.set_mode((600, 600))
+screen = pygame.display.set_mode((screen_size, screen_size))
 clock = pygame.time.Clock()
 running = True
 
-# Values
+# Defaults
 mid_width = screen.get_width() / 2
 mid_height = screen.get_height() / 2
-units = 20
-
 player = Player(mid_width, mid_height, screen)
 
 
@@ -27,16 +30,16 @@ while running:
     screen.fill("black")
 
     # Functionality here
-    player_input(player, units)
+    player_input(player, unit)
 
     # Render last
-    player.draw_player()
+    player.draw_player(unit)
 
     # Flip the display to put stuff on screen
     pygame.display.flip()
 
     # Lock frame rate
-    clock.tick(30)
+    clock.tick(frame_rate)
 
-# Close on 'x' button pressed
+# Close screen
 pygame.quit()

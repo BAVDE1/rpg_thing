@@ -18,5 +18,5 @@ class Player:
     def can_move(self):
         return not self.moving and time.time() - movement_pause > self.last_moved
 
-    def draw_player(self):
-        pygame.draw.circle(self.surface, "yellow", self.position, 10)
+    def draw_player(self, unit):
+        pygame.draw.circle(self.surface, "yellow", self.position, unit / 2)

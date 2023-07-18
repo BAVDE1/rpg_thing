@@ -47,7 +47,7 @@ def render():
     """ Render here (after functionality)
         Render player last """
 
-    renderer.render_level(starting_level, UNIT, screen.get_width(), screen.get_height(), screen)
+    renderer.render_level(starting_level, UNIT, screen)
 
     player.draw_player(UNIT)
 

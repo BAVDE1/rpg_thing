@@ -27,5 +27,3 @@ def movement_input(player, unit, keys):
         player.move(-unit, 0)
     elif keys[right[0]] or keys[right[1]]:
         player.move(unit, 0)
-
-    player.moving = False

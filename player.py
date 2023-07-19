@@ -37,7 +37,6 @@ class Player(pygame.sprite.Sprite):
         return not self.moving and time.time() - movement_pause > self.last_moved
 
     def draw_player(self, unit):
-        pygame.sprite.Group.draw(self, self.surface)
         pygame.draw.circle(self.surface, "yellow", self.position, unit / 2)
 
 

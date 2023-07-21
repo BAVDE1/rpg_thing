@@ -1,6 +1,6 @@
 import pygame
 import input_handler
-import player
+from entity import player
 import rendering.render_handler as renderer
 
 # Constant values
@@ -47,7 +47,7 @@ def render():
     """ Render here (after functionality)
         Render player last """
 
-    renderer.render_level(starting_level, UNIT, screen)
+    renderer.render(starting_level, UNIT, screen)
 
     player.draw_player(UNIT)
 

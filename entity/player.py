@@ -4,13 +4,9 @@ import pygame
 movement_pause = 0.1
 
 
-class Player(pygame.sprite.Sprite):
+class Player:
     def __init__(self, x_pos, y_pos, surface):
         # https://www.pygame.org/docs/tut/SpriteIntro.html
-        pygame.sprite.Sprite.__init__(self)  # Call parent
-        self.image = pygame.Surface([x_pos + 10, y_pos + 10])
-        self.image.fill("blue")
-        self.rect = self.image.get_rect()
 
         self.position = pygame.Vector2(x_pos, y_pos)
         self.surface = surface

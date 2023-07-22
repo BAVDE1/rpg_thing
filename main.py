@@ -2,14 +2,8 @@ import pygame
 import input_handler
 from entity import player
 import rendering.render_handler as renderer
+from constants import *
 
-# Constant values
-FRAME_RATE = 30
-BASE_RES = 288  # 256 + 32 for edges
-BASE_UNIT = 16  # 16 x 16 grid (with one remainder for each edge, player sees 17x17, ascii needs to be 18x18)
-RES_MUL = 2
-RESOLUTION = BASE_RES * RES_MUL
-UNIT = BASE_UNIT * RES_MUL
 
 # Setup
 pygame.init()
@@ -20,12 +14,11 @@ running = True
 # Defaults
 mid_width = screen.get_width() / 2
 mid_height = screen.get_height() / 2
-player = player.Player(mid_width, mid_height, screen)
+player = player.Player(mid_width, mid_height)
 
 # Game values
 current_area = None
 current_level = None
-starting_level = "levels/overworld_0.txt"
 
 
 def events():
@@ -40,16 +33,14 @@ def events():
 def functionality():
     """ Functionality here """
 
-    input_handler.player_input(player, UNIT)
+    input_handler.player_input(player)
 
 
 def render():
     """ Render here (after functionality)
         Render player last """
 
-    renderer.render(starting_level, UNIT, screen)
-
-    player.draw_player(UNIT)
+    renderer.render(player, OVERWORLD_LEVEL_DIR, screen)
 
     # Flip the display to put stuff on screen
     pygame.display.flip()

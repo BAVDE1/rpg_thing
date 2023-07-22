@@ -1,5 +1,7 @@
 import os
+from constants import *
 from rendering.level import render_level
+from entity.player import Player
 
 
 def parse_level(level_source):
@@ -14,5 +16,7 @@ def parse_level(level_source):
     return level_lines
 
 
-def render(level_to_render, unit, surface):
-    render_level(parse_level(level_to_render), unit, surface)
+def render(player, level_to_render, surface):
+    render_level(parse_level(level_to_render), UNIT, surface)
+
+    Player.render_player(player, surface)

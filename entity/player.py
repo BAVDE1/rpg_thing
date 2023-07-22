@@ -1,15 +1,15 @@
 import time
 import pygame
+from constants import *
 
 movement_pause = 0.1
 
 
 class Player:
-    def __init__(self, x_pos, y_pos, surface):
+    def __init__(self, x_pos, y_pos):
         # https://www.pygame.org/docs/tut/SpriteIntro.html
-
+        self.texture = pygame.image.load(PLAYER_TEXTURE)
         self.position = pygame.Vector2(x_pos, y_pos)
-        self.surface = surface
         self.moving = False
         self.last_moved = time.time()
 
@@ -32,7 +32,8 @@ class Player:
         """ Returns true if the player is allowed to move """
         return not self.moving and time.time() - movement_pause > self.last_moved
 
-    def draw_player(self, unit):
-        pygame.draw.circle(self.surface, "yellow", self.position, unit / 2)
-
-
+    def render_player(self, surface):
+        sprite = pygame.transform.scale(self.texture, (UNIT, UNIT))
+        blit_xy = (self.position.x - sprite.get_width() // 2,
+                   self.position.y - sprite.get_height() // 2)
+        surface.blit(sprite, blit_xy)

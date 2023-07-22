@@ -1,4 +1,5 @@
 import pygame
+from constants import *
 
 # Controls
 up = [pygame.K_w, pygame.K_UP]
@@ -7,13 +8,13 @@ left = [pygame.K_a, pygame.K_LEFT]
 right = [pygame.K_d, pygame.K_RIGHT]
 
 
-def player_input(player, unit):
+def player_input(player):
     keys = pygame.key.get_pressed()
     has_active_input = any(keys)
 
     # Movement
     if player.can_move() and has_active_input:
-        movement_input(player, unit, keys)
+        movement_input(player, UNIT, keys)
 
 
 def movement_input(player, unit, keys):

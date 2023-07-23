@@ -1,7 +1,6 @@
-import pygame as pg
-import entity.player
-import input_handler
+from entity.player import Player
 import rendering.render_handler as renderer
+import input_handler
 from constants import *
 
 
@@ -13,7 +12,7 @@ class Game(object):
         self.fps = 30
         self.running = True
         self.keys = pg.key.get_pressed()
-        self.player = entity.player.Player(self.screen_rect.center)
+        self.player = Player(self.screen_rect.center)
 
     def events(self):
         """ loops through all events in event queue """
@@ -32,7 +31,7 @@ class Game(object):
 
     def render(self):
         self.screen.fill("black")
-        renderer.render(self.player, OVERWORLD_LEVEL_DIR, self.screen)
+        renderer.render(self.player, OVERWORLD_00, self.screen)
 
         pg.display.flip()
 

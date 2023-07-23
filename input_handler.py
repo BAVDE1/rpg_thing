@@ -1,24 +1,14 @@
-import pygame
 import time
-import entity.player
+from entity.player import Player
 from constants import *
 
 # Controls
-DIR_DICT = {
-    pygame.K_w: UP,
-    pygame.K_UP: UP,
-    pygame.K_s: DOWN,
-    pygame.K_DOWN: DOWN,
-    pygame.K_a: LEFT,
-    pygame.K_LEFT: LEFT,
-    pygame.K_d: RIGHT,
-    pygame.K_RIGHT: RIGHT
-}
+
 
 held_dir_keys = []
 
 
-def player_key_down(player: entity.player.Player, key):
+def player_key_down(player: Player, key):
 
     # Movement
     if key in DIR_DICT:
@@ -29,24 +19,22 @@ def player_key_down(player: entity.player.Player, key):
             player.move()
 
 
-def sprint_manager(player: entity.player.Player):
+def sprint_manager(player: Player):
     if len(held_dir_keys) > 0:
-        if DIR_DICT.get(held_dir_keys[0]):
-            if player.can_move() and not player.sprinting and time.time() - player.last_moved > HOLD_TIME_TO_SPRINT:
+        if DIR_DICT.get(held_dir_keys[0]) and player.can_move():
+            if not player.sprinting and time.time() - player.last_moved > HOLD_TIME_TO_SPRINT:
                 # start sprint
-                player.movement_pause = SPRINT_MOVEMENT_PAUSE
                 player.sprinting = True
-            elif player.sprinting and player.can_move():
+            elif player.sprinting:
                 # continue sprint
                 player.direction = DIR_DICT[held_dir_keys[0]]
                 player.move()
     elif len(held_dir_keys) == 0 and player.sprinting:
         # stop sprint
-        player.movement_pause = WALK_MOVEMENT_PAUSE
         player.sprinting = False
 
 
-def player_key_up(player: entity.player.Player, key):
+def player_key_up(player: Player, key):
     if key in held_dir_keys:
         held_dir_keys.remove(key)
         if len(held_dir_keys) > 0:

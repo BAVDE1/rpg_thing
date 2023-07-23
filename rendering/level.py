@@ -1,4 +1,3 @@
-import pygame
 from constants import *
 
 
@@ -19,8 +18,8 @@ def render_level(level_lines, unit, surface):
 
 
 def draw_grass(surface, pos_x, pos_y):
-    texture = pygame.image.load(GRASS_TEXTURE)
-    sprite = pygame.transform.scale(texture, (UNIT, UNIT))
+    texture = pg.image.load(GRASS_TEXTURE)
+    sprite = pg.transform.scale(texture, (UNIT, UNIT))
     blit_xy = (pos_x - sprite.get_width() // 2,
                pos_y - sprite.get_height() // 2)
 

@@ -6,7 +6,8 @@ from constants import *
 def main():
     pygame.init()
     pygame.display.set_caption(CAPTION)
-    pygame.display.set_mode([BASE_RES * RES_MUL, BASE_RES * RES_MUL])
+    pygame.display.set_icon(pygame.image.load("assets/textures/player.png"))
+    pygame.display.set_mode([RESOLUTION, RESOLUTION])
     game.Game().main_loop()
     pygame.quit()
 

@@ -24,7 +24,7 @@ class Game(object):
                 # update keys
                 self.keys = pg.key.get_pressed()
                 input_handler.player_key_down(self.player, event.key) if event.type == pg.KEYDOWN else\
-                    input_handler.player_key_up(self.player, event.key)
+                    input_handler.player_key_up(event.key)
 
     def functionality(self):
         input_handler.sprint_manager(self.player)

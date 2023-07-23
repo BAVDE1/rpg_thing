@@ -2,9 +2,6 @@ import time
 from entity.player import Player
 from constants import *
 
-# Controls
-
-
 held_dir_keys = []
 
 
@@ -14,7 +11,6 @@ def player_key_down(player: Player, key):
     if key in DIR_DICT:
         held_dir_keys.append(key)
         if player.can_move():
-            # TODO: send beat event
             player.direction = DIR_DICT[held_dir_keys[0]]
             player.move()
 
@@ -34,8 +30,6 @@ def sprint_manager(player: Player):
         player.sprinting = False
 
 
-def player_key_up(player: Player, key):
+def player_key_up(key):
     if key in held_dir_keys:
         held_dir_keys.remove(key)
-        if len(held_dir_keys) > 0:
-            player.direction = DIR_DICT[held_dir_keys[0]]

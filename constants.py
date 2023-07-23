@@ -14,10 +14,17 @@ PLAYER_TEXTURE = "assets/textures/player.png"
 MOVEMENT_PAUSE = 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 
-UP = "n"
-DOWN = "s"
-LEFT = "w"
-RIGHT = "e"
+UP = "u"
+DOWN = "d"
+LEFT = "l"
+RIGHT = "r"
+
+OPP_DIR = {
+    UP: DOWN,
+    DOWN: UP,
+    LEFT: RIGHT,
+    RIGHT: LEFT
+}
 
 DIR_DICT = {
     **dict.fromkeys([pg.K_w, pg.K_UP], UP),
@@ -35,9 +42,9 @@ DIRECTION_MOV = {
 }
 
 # Levels
-OVERWORLD = "levels/overworld.txt"
-OVERWORLD_00 = "levels/overworld_0.txt"
-OVERWORLD_01 = "levels/overworld_1.txt"
+OVERWORLD = "assets/levels/overworld.txt"
+OVERWORLD_00 = "assets/levels/overworld_0.txt"
+OVERWORLD_01 = "assets/levels/overworld_1.txt"
 
 # Textures
 GRASS_TEXTURE = "assets/textures/grass.png"

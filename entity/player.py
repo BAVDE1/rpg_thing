@@ -19,6 +19,8 @@ class Player:
         """ Moves player from user input """
         self.moving = True
 
+        # TODO: send beat event
+
         x = DIRECTION_MOV[self.direction][0]
         y = DIRECTION_MOV[self.direction][1]
         self.position = pg.Vector2(self.position.x + x, self.position.y + y)

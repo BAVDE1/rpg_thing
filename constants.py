@@ -11,7 +11,7 @@ UNIT = BASE_UNIT * RES_MUL
 
 # Player
 PLAYER_TEXTURE = "assets/textures/player_new.png"
-MOVEMENT_PAUSE = 0.05  # 0.15
+MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 
 UP = "u"
@@ -41,10 +41,10 @@ DIRECTION_MOV = {
     RIGHT: (UNIT, 0)
 }
 
-# Levels
-OVERWORLD = "assets/levels/overworld.txt"
-OVERWORLD_00 = "assets/levels/overworld_0.txt"
-OVERWORLD_01 = "assets/levels/overworld_1.txt"
+# Render
+SHADOW_ALPHA = 50  # 0 - 255
+SHADOW_WIDTH = 0.6  # %
+SHADOW_HEIGHT = 0.4  # %
 
 # Textures
 GRASS_TEXTURE = "assets/textures/grass.png"
@@ -52,3 +52,8 @@ GRASS_01_TEXTURE = "assets/textures/grass_1.png"
 GRASS_02_TEXTURE = "assets/textures/grass_2.png"
 GRASS_03_TEXTURE = "assets/textures/grass_3.png"
 GRASS_04_TEXTURE = "assets/textures/grass_4.png"
+
+# Levels
+OVERWORLD = "assets/levels/overworld.txt"
+OVERWORLD_00 = "assets/levels/overworld_0.txt"
+OVERWORLD_01 = "assets/levels/overworld_1.txt"

@@ -22,6 +22,9 @@ def render(player, level_to_render, surface):
     Player.render_player(player, surface)
 
 
+
+
+
 def split_sheet(image, size, columns, rows):
     """ Returns list of rectangles for each frame """
     pass

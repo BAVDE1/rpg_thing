@@ -1,7 +1,9 @@
 import time
 from constants import *
 from rendering.shadow import render_shadow
-from tweener import *
+from utility.tweening import LinearTween
+
+twe = None
 
 
 class Player:
@@ -22,8 +24,6 @@ class Player:
         """ Moves player from user input """
         self.moving = True
 
-        # TODO: send beat event
-
         x = DIRECTION_MOV[self.direction][0]
         y = DIRECTION_MOV[self.direction][1]
         self.position = pg.Vector2(self.position.x + x, self.position.y + y)
@@ -37,6 +37,8 @@ class Player:
 
         self.sprite_pos = self.position
 
+        # TODO: send beat event (after player movement)
+
         self.moving = False
 
     def set_pos(self, x, y):
@@ -44,6 +46,8 @@ class Player:
         self.moving = True
         self.position.x = x
         self.position.y = y
+        self.sprite_pos.x = x
+        self.sprite_pos.y = y
         self.last_moved = time.time()
         self.moving = False
 

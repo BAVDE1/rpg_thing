@@ -19,7 +19,11 @@ class LinearTween:
         if not self.has_reached_goal():
             self.value = self.start_value + (self.end_value * self.get_percent())
         else:
-            self.value = self.end_value
+            self.value = self.start_value + self.end_value
+
+    def get_value(self):
+        self.update()
+        return self.value
 
     def has_reached_goal(self):
         return self.end_time < self.current_time

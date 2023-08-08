@@ -9,7 +9,7 @@ class Game(object):
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
-        self.fps = 30
+        self.fps = 60
         self.running = True
         self.keys = pg.key.get_pressed()
         self.player = Player(self.screen_rect.center)

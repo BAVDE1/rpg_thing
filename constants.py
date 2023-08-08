@@ -11,7 +11,7 @@ UNIT = BASE_UNIT * RES_MUL
 
 # Player
 PLAYER_TEXTURE = "assets/textures/player_new.png"
-MOVEMENT_PAUSE = 1  # 0.15
+MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 
 UP = "u"

@@ -12,7 +12,10 @@ class Game(object):
         self.fps = 60
         self.running = True
         self.keys = pg.key.get_pressed()
-        self.player = Player(self.screen_rect.center)
+
+        self.player = Player(self, self.screen_rect.center)
+
+        self.bpm = 120
 
     def events(self):
         """ loops through all events in event queue """

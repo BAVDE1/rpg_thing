@@ -1,6 +1,11 @@
 from constants import *
 
 
+def split_sheet(image, size: tuple, columns, rows):
+    """ Returns list of rectangles for each frame """
+    pass
+
+
 def render_shadow(sprite, player_blit_xy, surface: pg.Surface):
     width = sprite.get_width() * SHADOW_WIDTH
     height = sprite.get_height() * SHADOW_HEIGHT

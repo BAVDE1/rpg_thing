@@ -1,17 +1,20 @@
 import time
 from constants import *
-from rendering.shadow import render_shadow
+from rendering.rendering_other import render_shadow
+from rendering.rendering_other import split_sheet
 
 
 class Player:
-    def __init__(self, centre_screen):
-        # https://www.pg.org/docs/tut/SpriteIntro.html
+    def __init__(self, gm, centre_screen):
+        self.game = gm
         self.direction = UP
-        self.texture = pg.image.load(PLAYER_TEXTURE).convert_alpha()
-
         self.position = pg.Vector2(centre_screen[0], centre_screen[1])
         self.sprite_pos = self.position
         self.flipped = False
+
+        self.texture_idle = pg.image.load(PLAYER_TEXTURE_IDLE).convert_alpha()
+        self.ss_idle = split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)
+        self.current_texture = self.texture_idle  # make first frame of ss_idle
 
         self.moving = False
         self.sprinting = False
@@ -26,12 +29,7 @@ class Player:
         self.position = pg.Vector2(self.position.x + x, self.position.y + y)
         self.last_moved = time.time()
 
-        # sprite pos animation / movement here
-        if self.direction == LEFT and not self.flipped:
-            self.flipped = True
-        elif self.direction == RIGHT and self.flipped:
-            self.flipped = False
-
+        self.flipped = True if self.direction == LEFT else False if self.direction == RIGHT else self.flipped
         self.sprite_pos = self.position
 
         # TODO: send beat event (after player movement)
@@ -52,8 +50,13 @@ class Player:
         """ Returns true if the player is allowed to move """
         return not self.moving and time.time() - MOVEMENT_PAUSE > self.last_moved
 
+    def animate_player(self):
+        pass
+
     def render_player(self, surface: pg.Surface):
-        sprite = pg.transform.scale(self.texture, (UNIT, UNIT))
+        self.animate_player()
+
+        sprite = pg.transform.scale(self.current_texture, (UNIT, UNIT))
         if self.flipped:
             sprite = pg.transform.flip(sprite, 1, 0)
 

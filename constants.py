@@ -10,7 +10,7 @@ RESOLUTION = BASE_RES * RES_MUL
 UNIT = BASE_UNIT * RES_MUL
 
 # Player
-PLAYER_TEXTURE = "assets/textures/player_new.png"
+PLAYER_TEXTURE_IDLE = "assets/textures/player_new.png"
 MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 

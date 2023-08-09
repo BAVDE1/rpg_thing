@@ -2,6 +2,7 @@ import time
 from constants import *
 from rendering.rendering_other import render_shadow
 from rendering.rendering_other import split_sheet
+from rendering.animator import Animator
 
 
 class Player:
@@ -13,8 +14,10 @@ class Player:
         self.flipped = False
 
         self.texture_idle = pg.image.load(PLAYER_TEXTURE_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)
-        self.current_texture = self.texture_idle  # make first frame of ss_idle
+        self.ss_idle = [self.texture_idle, split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)]
+
+        self.current_texture = self.texture_idle  # make first frame of ss_idle for the init (will change around depending on Animator)
+        self.animator = Animator(current_texture_obj=self.current_texture, idle_ss=self.ss_idle)
 
         self.moving = False
         self.sprinting = False

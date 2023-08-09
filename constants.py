@@ -4,7 +4,7 @@ import pygame as pg
 # Screen
 CAPTION = "rpg thing"
 BASE_RES = 288  # 256 + 32 for edges
-BASE_UNIT = 16  # ascii files need to be 19x19
+BASE_UNIT = 20  # ascii level files need to be 19x19
 RES_MUL = 2
 RESOLUTION = BASE_RES * RES_MUL
 UNIT = BASE_UNIT * RES_MUL
@@ -43,7 +43,7 @@ DIRECTION_MOV = {
 
 # Render
 SHADOW_ALPHA = 50  # 0 - 255
-SHADOW_WIDTH = 0.6  # %
+SHADOW_WIDTH = 0.8  # %
 SHADOW_HEIGHT = 0.4  # %
 
 # Textures

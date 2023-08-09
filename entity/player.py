@@ -1,10 +1,6 @@
 import time
 from constants import *
 from rendering.shadow import render_shadow
-from utility.tweening import LinearTween
-
-tween_x = None
-tween_y = None
 
 
 class Player:
@@ -23,8 +19,6 @@ class Player:
 
     def move(self):
         """ Moves player from user input """
-        global tween_x
-        global tween_y
         self.moving = True
 
         x = DIRECTION_MOV[self.direction][0]
@@ -38,17 +32,14 @@ class Player:
         elif self.direction == RIGHT and self.flipped:
             self.flipped = False
 
-        if x:
-            tween_x = LinearTween(self.sprite_pos.x, self.position.x, MOVEMENT_PAUSE)
-        elif y:
-            tween_y = LinearTween(self.sprite_pos.y, self.position.y, MOVEMENT_PAUSE)
+        self.sprite_pos = self.position
 
         # TODO: send beat event (after player movement)
 
         self.moving = False
 
     def set_pos(self, x, y):
-        """ Sets player position instantly """
+        """ Sets player position & sprite pos instantly """
         self.moving = True
         self.position.x = x
         self.position.y = y
@@ -62,19 +53,6 @@ class Player:
         return not self.moving and time.time() - MOVEMENT_PAUSE > self.last_moved
 
     def render_player(self, surface: pg.Surface):
-        global tween_x
-        global tween_y
-
-        if isinstance(tween_x, LinearTween):
-            self.sprite_pos.x = tween_x.get_value()
-            if tween_x.has_reached_goal():
-                tween_x = None
-
-        if isinstance(tween_y, LinearTween):
-            self.sprite_pos.y = tween_y.get_value()
-            if tween_y.has_reached_goal():
-                tween_y = None
-
         sprite = pg.transform.scale(self.texture, (UNIT, UNIT))
         if self.flipped:
             sprite = pg.transform.flip(sprite, 1, 0)

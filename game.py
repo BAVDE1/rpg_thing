@@ -15,20 +15,19 @@ class Game(object):
         self.running = True
         self.keys = pg.key.get_pressed()
 
-        self.player = Player(self, self.screen_rect.center)
-
         self.bpm = 120
         self.song_start_time = time.time()
+
+        # set after requirements
+        self.player = Player(self, self.screen_rect.center)
 
     def events(self):
         """ loops through all events in event queue """
         for event in pg.event.get():
             if event.type == pg.QUIT or self.keys[pg.K_ESCAPE]:
-                # close game
-                self.running = False
+                self.running = False  # close game
             if event.type in (pg.KEYDOWN, pg.KEYUP):
-                # update keys
-                self.keys = pg.key.get_pressed()
+                self.keys = pg.key.get_pressed()  # update keys
                 input_handler.player_key_down(self.player, event.key) if event.type == pg.KEYDOWN else\
                     input_handler.player_key_up(event.key)
 

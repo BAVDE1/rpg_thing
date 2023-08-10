@@ -13,7 +13,7 @@ class Player:
         self.flipped = False
 
         self.texture_idle = pg.image.load(PLAYER_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)
+        self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4, 1)[0]
 
         # todo: make first frame of ss_idle for the init (will change around depending on Animator obviously)
         self.current_texture = self.texture_idle  # texture_idle is a PLACEHOLDER

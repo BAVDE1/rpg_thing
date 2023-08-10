@@ -15,9 +15,8 @@ class Player:
         self.texture_idle = pg.image.load(PLAYER_IDLE).convert_alpha()
         self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4)
 
-        # todo: make first frame of ss_idle for the init (will change around depending on Animator obviously)
         self.current_texture = None
-        self.animator = Animator(self.game, self.current_texture, [PLAYER_IDLE, self.ss_idle], False)
+        self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], False)
 
         self.moving = False
         self.sprinting = False
@@ -33,7 +32,7 @@ class Player:
         self.last_moved = time.time()
 
         self.flipped = True if self.direction == LEFT else False if self.direction == RIGHT else self.flipped
-        self.sprite_pos = self.position
+        self.sprite_pos = self.position  # will need to be changed based on one time animation
 
         # TODO: send beat event (after player movement)
 
@@ -53,14 +52,11 @@ class Player:
         """ Returns true if the player is allowed to move """
         return not self.moving and time.time() - MOVEMENT_PAUSE > self.last_moved
 
-    def animate_player(self):
+    def render_player(self, surface: pg.Surface):
         self.animator.update()
         self.current_texture = self.animator.texture_obj
 
-    def render_player(self, surface: pg.Surface):
-        self.animate_player()
-
-        if self.current_texture:
+        if self.player_loaded():
             sprite = pg.transform.scale(self.current_texture, (UNIT, UNIT))
             if self.flipped:
                 sprite = pg.transform.flip(sprite, 1, 0)
@@ -69,3 +65,6 @@ class Player:
                        self.sprite_pos.y - sprite.get_height() // 2)
 
             surface.blit(sprite, blit_xy)
+
+    def player_loaded(self):
+        return self.current_texture

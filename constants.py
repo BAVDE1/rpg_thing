@@ -5,12 +5,12 @@ import pygame as pg
 CAPTION = "rpg thing"
 BASE_UNIT = 20  # ascii level files need to be 19x19
 BASE_RES = BASE_UNIT * (12 + 2)  # 12 for whole lvl; +2 to include level edges
-RES_MUL = 3
+RES_MUL = 2
 RESOLUTION = BASE_RES * RES_MUL
 UNIT = BASE_UNIT * RES_MUL
 
 # Player
-PLAYER_IDLE = "assets/textures/player_idle_2.png"
+PLAYER_IDLE = "assets/textures/player_idle.png"
 MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 

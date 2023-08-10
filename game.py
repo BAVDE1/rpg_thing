@@ -4,9 +4,10 @@ from entity.player import Player
 import rendering.render_handler as renderer
 import input_handler
 from constants import *
+import rendering
 
 
-class Game(object):
+class Game:
     def __init__(self):
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
@@ -15,7 +16,7 @@ class Game(object):
         self.running = True
         self.keys = pg.key.get_pressed()
 
-        self.bpm = 150
+        self.bpm = 120
         self.song_start_time = time.time()
 
         # set after requirements
@@ -28,7 +29,13 @@ class Game(object):
                 self.running = False  # close game
             if event.type in (pg.KEYDOWN, pg.KEYUP):
                 self.keys = pg.key.get_pressed()  # update keys
-                input_handler.player_key_down(self.player, event.key) if event.type == pg.KEYDOWN else\
+
+                if event.type == pg.KEYDOWN:
+                    input_handler.player_key_down(self.player, event.key)
+
+                    if self.keys[pg.K_p]:
+                        self.bpm = 60 if self.bpm == 120 else 120
+                elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 
     def functionality(self):

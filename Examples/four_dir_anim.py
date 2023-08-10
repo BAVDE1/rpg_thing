@@ -49,6 +49,7 @@ class Player(object):
         self.image = None
         self.walkframes = None
         self.walkframe_dict = self.make_frame_dict()
+        print(self.make_frame_dict())
         self.adjust_images()
         self.rect = self.image.get_rect(center=pos)
 

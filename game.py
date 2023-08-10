@@ -15,7 +15,7 @@ class Game(object):
         self.running = True
         self.keys = pg.key.get_pressed()
 
-        self.bpm = 120
+        self.bpm = 150
         self.song_start_time = time.time()
 
         # set after requirements

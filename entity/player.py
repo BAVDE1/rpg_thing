@@ -13,11 +13,11 @@ class Player:
         self.flipped = False
 
         self.texture_idle = pg.image.load(PLAYER_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4, 1)[0]
+        self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4)
 
         # todo: make first frame of ss_idle for the init (will change around depending on Animator obviously)
-        self.current_texture = self.texture_idle  # texture_idle is a PLACEHOLDER
-        self.animator = Animator(self.game, self.current_texture, [PLAYER_IDLE, self.ss_idle], True)
+        self.current_texture = None
+        self.animator = Animator(self.game, self.current_texture, [PLAYER_IDLE, self.ss_idle], False)
 
         self.moving = False
         self.sprinting = False
@@ -55,16 +55,17 @@ class Player:
 
     def animate_player(self):
         self.animator.update()
+        self.current_texture = self.animator.texture_obj
 
     def render_player(self, surface: pg.Surface):
         self.animate_player()
 
-        sprite = pg.transform.scale(self.current_texture, (UNIT, UNIT))
-        if self.flipped:
-            sprite = pg.transform.flip(sprite, 1, 0)
+        if self.current_texture:
+            sprite = pg.transform.scale(self.current_texture, (UNIT, UNIT))
+            if self.flipped:
+                sprite = pg.transform.flip(sprite, 1, 0)
 
-        blit_xy = (self.sprite_pos.x - sprite.get_width() // 2,
-                   self.sprite_pos.y - sprite.get_height() // 2)
+            blit_xy = (self.sprite_pos.x - sprite.get_width() // 2,
+                       self.sprite_pos.y - sprite.get_height() // 2)
 
-        #render_shadow(sprite, blit_xy, surface)
-        surface.blit(sprite, blit_xy)
+            surface.blit(sprite, blit_xy)

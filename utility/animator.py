@@ -10,7 +10,6 @@ class Animator:
         self.idling = True
         self.idle_ss = idle_ss
         if not idle_ss[1]:
-            #idle_ss[1] = [None, None, None]  # DEBUGGING EXAMPLE until actual is ss working
             raise IndexError(f"Error in loading '{idle_ss[0]}', idle sprite sheet '{idle_ss[1]}', something has gone wrong with creation of sprite sheet")
         self.idle_len = len(idle_ss[1]) - 1
         self.prev_idle_beat = game.song_start_time
@@ -24,13 +23,14 @@ class Animator:
         self.currently_animating = None
         self.current_anim_frame = None
 
+        self.update()
+
     def update(self):
         """ Should be called every frame """
         if self.idling:
-            if time.time() > self.prev_idle_beat + ((60 / self.game.bpm)):  # 60 secs in a min
+            if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs in a min
                 self.advance_idle_animation_frame()
-                self.texture_obj = self.idle_ss[1][0][self.idle_frame]
-                # set current sprite (based on idle_frame) here
+                self.texture_obj = self.idle_ss[1][self.idle_frame]
         else:
             # one time animations here
             self.finish_animating()

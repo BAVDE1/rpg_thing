@@ -1,3 +1,5 @@
+import time
+
 from entity.player import Player
 import rendering.render_handler as renderer
 import input_handler
@@ -16,6 +18,7 @@ class Game(object):
         self.player = Player(self, self.screen_rect.center)
 
         self.bpm = 120
+        self.song_start_time = time.time()
 
     def events(self):
         """ loops through all events in event queue """

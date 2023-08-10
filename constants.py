@@ -3,14 +3,14 @@ import pygame as pg
 
 # Screen
 CAPTION = "rpg thing"
-BASE_RES = 288  # 256 + 32 for edges
 BASE_UNIT = 20  # ascii level files need to be 19x19
+BASE_RES = BASE_UNIT * (16 + 2)  # 16 for whole lvl; +2 to include level edges
 RES_MUL = 2
 RESOLUTION = BASE_RES * RES_MUL
 UNIT = BASE_UNIT * RES_MUL
 
 # Player
-PLAYER_TEXTURE_IDLE = "assets/textures/player_new.png"
+PLAYER_IDLE = "assets/textures/player_new.png"
 MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5
 

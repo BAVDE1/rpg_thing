@@ -13,11 +13,12 @@ class Player:
         self.sprite_pos = self.position
         self.flipped = False
 
-        self.texture_idle = pg.image.load(PLAYER_TEXTURE_IDLE).convert_alpha()
-        self.ss_idle = [self.texture_idle, split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)]
+        self.texture_idle = pg.image.load(PLAYER_IDLE).convert_alpha()
+        self.ss_idle = split_sheet(self.texture_idle, (self.texture_idle.get_width(), self.texture_idle.get_height()), 4, 1)
 
-        self.current_texture = self.texture_idle  # make first frame of ss_idle for the init (will change around depending on Animator)
-        self.animator = Animator(current_texture_obj=self.current_texture, idle_ss=self.ss_idle)
+        # todo: make first frame of ss_idle for the init (will change around depending on Animator obviously)
+        self.current_texture = self.texture_idle  # texture_idle is a PLACEHOLDER
+        self.animator = Animator(self.game, self.current_texture, [PLAYER_IDLE, self.ss_idle], True)
 
         self.moving = False
         self.sprinting = False
@@ -54,7 +55,7 @@ class Player:
         return not self.moving and time.time() - MOVEMENT_PAUSE > self.last_moved
 
     def animate_player(self):
-        pass
+        self.animator.update()
 
     def render_player(self, surface: pg.Surface):
         self.animate_player()
@@ -66,7 +67,5 @@ class Player:
         blit_xy = (self.sprite_pos.x - sprite.get_width() // 2,
                    self.sprite_pos.y - sprite.get_height() // 2)
 
-        render_shadow(sprite, blit_xy, surface)
+        #render_shadow(sprite, blit_xy, surface)
         surface.blit(sprite, blit_xy)
-
-# https://github.com/nobrelli/tweener

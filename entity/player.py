@@ -1,8 +1,7 @@
 import time
 from constants import *
-from rendering.rendering_other import render_shadow
 from rendering.rendering_other import split_sheet
-from rendering.animator import Animator
+from utility.animator import Animator
 
 
 class Player:

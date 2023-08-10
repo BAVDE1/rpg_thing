@@ -4,7 +4,7 @@ import pygame as pg
 # Screen
 CAPTION = "rpg thing"
 BASE_UNIT = 20  # ascii level files need to be 19x19
-BASE_RES = BASE_UNIT * (16 + 2)  # 16 for whole lvl; +2 to include level edges
+BASE_RES = BASE_UNIT * (12 + 2)  # 12 for whole lvl; +2 to include level edges
 RES_MUL = 2
 RESOLUTION = BASE_RES * RES_MUL
 UNIT = BASE_UNIT * RES_MUL

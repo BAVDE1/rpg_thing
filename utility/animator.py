@@ -32,16 +32,19 @@ class Animator:
         self.anim_frame_speed = None
         self.last_anim_frame_time = None
 
-        self.update()
+        self.update()  # init
 
     def change_idle_anim(self, set_to_default, new_idle_ss=None, boomerang_idle=False):
-        """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored. """
-        if set_to_default:
+        """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored later. """
+        if set_to_default and self.idle_ss[0] != self.default_idle_ss[0]:
             self.idle_ss = self.default_idle_ss
-        elif new_idle_ss:
+            self.restart_idle()
+        elif new_idle_ss and self.idle_ss[0] != new_idle_ss[0]:
             self.bmrng_idle = boomerang_idle
             self.idle_ss = new_idle_ss
+            self.restart_idle()
 
+    def restart_idle(self):
         try:
             self.idle_len = len(self.idle_ss[1]) - 1
         except IndexError:
@@ -81,6 +84,7 @@ class Animator:
             self.finish_animating()
 
     def do_animation(self, anim, duration):
+        """ Call to execute a registered animation (does not loop) """
         if self.one_time_ss:
             if anim not in self.one_time_ss:
                 raise IndexError(missing_anim_error.format(anim, self.one_time_ss))

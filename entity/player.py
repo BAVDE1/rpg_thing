@@ -32,9 +32,9 @@ class Player:
         self.last_moved = time.time()
 
         self.flipped = True if self.direction == LEFT else False if self.direction == RIGHT else self.flipped
-        self.sprite_pos = self.position  # will need to be changed based on 'one time' animation
+        self.sprite_pos = self.position  # will need to be changed based on animation
 
-        # TODO: send beat event (after player movement)
+        # todo: send beat event (after player movement)
 
         self.moving = False
 

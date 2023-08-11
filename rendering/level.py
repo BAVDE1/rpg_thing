@@ -19,41 +19,30 @@ class Level:
     def __init__(self, level_source, surface):
         self.is_initialised = False
         self.surface = surface
-        self.level_lines = parse_level(level_source)
-        self.tiles = []
+        self.ground_layer_lines = parse_level(level_source)
+        self.ground_layer = []
 
         self.initialise_level()
 
     def initialise_level(self):
         self.is_initialised = False
-        line_num = 0
-        for line in self.level_lines:
+        for line in self.ground_layer_lines:
             row = []
-            char_num = 0
-            line = line.strip("]")[1:]  # strips square brackets
             for char in line:
-                pos_x = UNIT * char_num
-                pos_y = UNIT * line_num
-
-                if char in ASCII:
-                    row.append(ASCII[char])
-                else:
-                    row.append("")
-                char_num += 1
-            self.tiles.append(row)
-            line_num += 1
+                row.append(ASCII[char] if char in ASCII else None)
+            self.ground_layer.append(row)
         self.is_initialised = True
 
     def draw_level(self):
         if self.is_initialised:
-            self.draw_tile()
+            self.draw_layer(self.ground_layer)
 
-    def draw_tile(self):
+    def draw_layer(self, layer):
         r = 0
-        for column in self.tiles:
+        for column in layer:
             c = 0
             for sprite in column:
-                print(self.tiles)
-                self.surface.blit(sprite, [c - ASCII[sprite].get_width() // 2, r - sprite.get_height() // 2])
+                if sprite:
+                    self.surface.blit(sprite, [(c * UNIT) - sprite.get_width() // 2, (r * UNIT) - sprite.get_height() // 2])
                 c += 1
             r += 1

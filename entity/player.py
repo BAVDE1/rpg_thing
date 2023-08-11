@@ -32,7 +32,7 @@ class Player:
         self.last_moved = time.time()
 
         self.flipped = True if self.direction == LEFT else False if self.direction == RIGHT else self.flipped
-        self.sprite_pos = self.position  # will need to be changed based on one time animation
+        self.sprite_pos = self.position  # will need to be changed based on 'one time' animation
 
         # TODO: send beat event (after player movement)
 
@@ -56,7 +56,7 @@ class Player:
         self.animator.update()
         self.current_texture = self.animator.texture_obj
 
-        if self.player_loaded():
+        if self.is_player_loaded():
             sprite = pg.transform.scale(self.current_texture, (UNIT, UNIT))
             if self.flipped:
                 sprite = pg.transform.flip(sprite, 1, 0)
@@ -66,5 +66,6 @@ class Player:
 
             surface.blit(sprite, blit_xy)
 
-    def player_loaded(self):
+    def is_player_loaded(self):
+        """ Returns whether player has fully loaded in (add more checks later) """
         return self.current_texture

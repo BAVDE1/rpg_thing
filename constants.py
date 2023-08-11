@@ -26,7 +26,7 @@ OPP_DIR = {
     RIGHT: LEFT
 }
 
-DIR_DICT = {
+DIRECTION_DICT = {
     **dict.fromkeys([pg.K_w, pg.K_UP], UP),
     **dict.fromkeys([pg.K_s, pg.K_DOWN], DOWN),
     **dict.fromkeys([pg.K_a, pg.K_LEFT], LEFT),
@@ -41,10 +41,13 @@ DIRECTION_MOV = {
     RIGHT: (UNIT, 0)
 }
 
-# Render
+# Rendering
 SHADOW_ALPHA = 50  # 0 - 255
 SHADOW_WIDTH = 0.8  # %
 SHADOW_HEIGHT = 0.4  # %
+
+# ASCII
+GRASS_ASCII = "."
 
 # Textures
 GRASS_TEXTURE = "assets/textures/grass.png"

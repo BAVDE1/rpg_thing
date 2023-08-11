@@ -21,16 +21,19 @@ class Animator:
         self.idle_frame = 0
         self.bmrng_idle = boomerang_idle
 
+        self.one_time_ss = None
         if one_time_ss:
             self.one_time_ss = {ss[0]: ss[1] for ss in one_time_ss if ss[0] and ss[1]}
         self.animation_queue = {}
         self.current_anim_ss = None
-        self.anim_frame_speed = None
         self.current_anim_frame = None
+        self.anim_frame_speed = None
+        self.last_anim_frame_time = None
 
         self.update()
 
     def change_idle_anim(self, set_to_default, new_idle_ss=None, boomerang_idle=False):
+        """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored. """
         if set_to_default:
             self.idle_ss = self.default_idle_ss
         elif new_idle_ss:
@@ -47,11 +50,13 @@ class Animator:
     def update(self):
         """ Should be called every frame """
         if self.idling:
-            if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs in a min
+            if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
                 self.advance_idle_animation_frame()
-                self.texture_obj = self.idle_ss[1][self.idle_frame]
-        else:
-            self.advance_one_time_anim_frame()
+                self.texture_obj = self.idle_ss[1][self.idle_frame]  # set idle image
+        elif self.current_anim_ss:
+            if time.time() > self.last_anim_frame_time + self.anim_frame_speed:
+                self.advance_one_time_anim_frame()
+                self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
 
     def advance_idle_animation_frame(self):
         im_frame = self.idle_frame
@@ -67,7 +72,11 @@ class Animator:
         self.prev_idle_beat = time.time()
 
     def advance_one_time_anim_frame(self):
-        self.finish_animating()
+        if self.current_anim_frame < len(self.current_anim_ss[1]):
+            self.current_anim_frame += 1
+            self.last_anim_frame_time = time.time()
+        else:
+            self.finish_animating()
 
     def do_animation(self, anim, duration):
         if self.one_time_ss:
@@ -77,20 +86,23 @@ class Animator:
             if not self.current_anim_ss:
                 self.idling = False
                 self.current_anim_ss = [anim, self.one_time_ss[anim]]
-                self.anim_frame_speed = None
                 self.current_anim_frame = 0
-                # do stuff here
+                self.anim_frame_speed = duration / len(self.current_anim_ss[1])
+                self.last_anim_frame_time = time.time()
             else:
                 self.animation_queue[anim] = duration  # add item to queue
         else:
-            raise IndexError(f"Cannot animate {anim} because there are no animations registered. Was the Animator, or the one_time_ss args initialised properly?")
+            raise IndexError(f"Cannot animate '{anim}' because there are no animations registered. Was the Animator, or the one_time_ss args initialised properly?")
 
     def finish_animating(self):
         if len(self.animation_queue) == 0:
             self.current_anim_ss = None
+            self.current_anim_frame = None
+            self.anim_frame_speed = None
+            self.last_anim_frame_time = None
             self.idling = True
         else:
             self.current_anim_ss = None
             first_key = list(self.animation_queue.keys())[0]
-            self.do_animation(first_key, self.animation_queue[first_key])  # play next animation in queue
+            self.do_animation(first_key, self.animation_queue[first_key])  # play next animation in queue & remove
             self.animation_queue.pop(first_key)

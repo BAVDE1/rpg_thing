@@ -2,7 +2,6 @@ from constants import *
 
 
 def render_level(level_lines, unit, surface):
-
     line_num = 0
     for line in level_lines:
         char_num = 0
@@ -11,7 +10,7 @@ def render_level(level_lines, unit, surface):
             pos_x = unit * char_num
             pos_y = unit * line_num
 
-            if char == ".":
+            if char == GRASS_ASCII:
                 draw_grass(surface, pos_x, pos_y)
             char_num += 1
         line_num += 1

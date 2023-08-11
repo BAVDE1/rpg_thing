@@ -17,6 +17,8 @@ def parse_level(level_source):
 
 
 def render(player, level_to_render, surface):
-    render_level(parse_level(level_to_render), UNIT, surface)
+    while not player.is_player_loaded():
+        player.render_player(surface)
 
-    Player.render_player(player, surface)
+    render_level(parse_level(level_to_render), UNIT, surface)
+    player.render_player(surface)

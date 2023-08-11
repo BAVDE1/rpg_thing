@@ -1,6 +1,8 @@
 import time
 
 idle_error = "Error in loading '{}' idle sprite sheet.\n Something has gone wrong with creation of sprite sheet, or sheet was not added to list."
+missing_anim_error = "The animation {} does not exist in animation dict: {}"
+no_anim_error = "Cannot animate '{}' because there are no animations registered. Was the Animator, or the one_time_ss args initialised properly?"
 
 
 class Animator:
@@ -81,7 +83,7 @@ class Animator:
     def do_animation(self, anim, duration):
         if self.one_time_ss:
             if anim not in self.one_time_ss:
-                raise IndexError(f"The animation {anim} does not exist in animation dict: {self.one_time_ss}")
+                raise IndexError(missing_anim_error.format(anim, self.one_time_ss))
 
             if not self.current_anim_ss:
                 self.idling = False
@@ -92,7 +94,7 @@ class Animator:
             else:
                 self.animation_queue[anim] = duration  # add item to queue
         else:
-            raise IndexError(f"Cannot animate '{anim}' because there are no animations registered. Was the Animator, or the one_time_ss args initialised properly?")
+            raise IndexError(no_anim_error.format(anim))
 
     def finish_animating(self):
         if len(self.animation_queue) == 0:

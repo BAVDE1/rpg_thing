@@ -34,7 +34,7 @@ class Game:
                     input_handler.player_key_down(self.player, event.key)
 
                     if self.keys[pg.K_p]:
-                        self.bpm = 60 if self.bpm == 120 else 120 if self.bpm == 220 else 220
+                        self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 

@@ -46,17 +46,21 @@ SHADOW_ALPHA = 50  # 0 - 255
 SHADOW_WIDTH = 0.8  # %
 SHADOW_HEIGHT = 0.4  # %
 
-# ASCII
-GRASS_ASCII = "."
-
-# Textures
-GRASS_TEXTURE = "assets/textures/grass.png"
-GRASS_01_TEXTURE = "assets/textures/grass_1.png"
-GRASS_02_TEXTURE = "assets/textures/grass_2.png"
-GRASS_03_TEXTURE = "assets/textures/grass_3.png"
-GRASS_04_TEXTURE = "assets/textures/grass_4.png"
-
 # Levels
 OVERWORLD = "assets/levels/overworld.txt"
 OVERWORLD_00 = "assets/levels/overworld_0.txt"
 OVERWORLD_01 = "assets/levels/overworld_1.txt"
+
+
+# -------------------->
+# Texture Loader
+# -------------------->
+
+GRASS_TEXTURE = "assets/textures/grass.png"
+GRASS_SPRITE = pg.transform.scale(pg.image.load(GRASS_TEXTURE), (UNIT, UNIT))
+
+
+# ASCII
+ASCII = {
+    ".": GRASS_SPRITE
+}

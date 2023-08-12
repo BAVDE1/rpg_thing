@@ -49,7 +49,7 @@ class Game:
         input_handler.sprint_manager(self.player)
 
     def render(self):
-        self.screen.fill("black")
+        self.screen.fill([0, 5, 5])
         renderer.render(self.player, OVERWORLD_00, self.screen)
 
         pg.display.flip()

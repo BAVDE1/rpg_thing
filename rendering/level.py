@@ -22,7 +22,7 @@ def parse_level(level_source):
     level_lines = []
     with open(level_source) as file:
         for line in file:
-            level_lines.append(line)
+            level_lines.append(line.strip().replace("[", "").replace("]", ""))
     return level_lines
 
 
@@ -55,8 +55,8 @@ def outline_chooser(straight_args, corner_args):
 def store_layer(layer: list, layer_lines):
     for line in layer_lines:
         row = []
-        for char in line.strip():
-            row.append(ASCII_TO_SPRITE[char] if char in ASCII_TO_SPRITE else "None!!!!")
+        for char in line:
+            row.append(ASCII_TO_SPRITE[char] if char in ASCII_TO_SPRITE else None)
         layer.append(row)
 
 
@@ -88,27 +88,17 @@ class Level:
                 e = min(len(column) - 1, col_num + 1)
                 w = max(0, col_num - 1)
 
-                try:
-                    di = {
-                        TILE: sprite,
-                        NORTH: self.ground_layer[n][col_num],
-                        SOUTH: self.ground_layer[s][col_num],
-                        EAST: self.ground_layer[row_num][e],
-                        WEST: self.ground_layer[row_num][w],
-                        NORTH_EAST: self.ground_layer[n][e],
-                        NORTH_WEST: self.ground_layer[n][w],
-                        SOUTH_EAST: self.ground_layer[s][e],
-                        SOUTH_WEST: self.ground_layer[s][w]}
-                except IndexError:
-                    st = ""
-                    num = 0
-                    for l in self.ground_layer[n]:
-                        st += str(num) + ": " + str(l)
-                        num += 1
-                    raise IndexError(n, s, e, w, st, self.ground_layer)
-
-                row.append(outline_decider(di))
-
+                row.append(outline_decider({
+                    TILE: sprite,
+                    NORTH: self.ground_layer[n][col_num],
+                    SOUTH: self.ground_layer[s][col_num],
+                    EAST: self.ground_layer[row_num][e],
+                    WEST: self.ground_layer[row_num][w],
+                    NORTH_EAST: self.ground_layer[n][e],
+                    NORTH_WEST: self.ground_layer[n][w],
+                    SOUTH_EAST: self.ground_layer[s][e],
+                    SOUTH_WEST: self.ground_layer[s][w]
+                }))
                 col_num += 1
             self.outline_layer.append(row)
             row_num += 1

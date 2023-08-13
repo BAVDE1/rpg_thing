@@ -11,7 +11,8 @@ def render(player, level_to_render, surface):
         level = Level(level_to_render, surface)
 
     while not player.is_player_loaded():
-        player.render_player(surface)
+        player.render_player()
 
-    level.draw_level()
-    player.render_player(surface)
+    level.render_level()
+    player.render_player()
+    level.render_level_foreground()

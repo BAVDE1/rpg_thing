@@ -20,7 +20,7 @@ class Game:
         self.song_start_time = time.time()
 
         # set after requirements
-        self.player = Player(self, self.screen_rect.center)
+        self.player = Player(self, self.screen, self.screen_rect.center)
 
     def events(self):
         """ For events in event queue """

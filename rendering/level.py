@@ -101,10 +101,14 @@ class Level:
             self.outline_layer.append(row)
             row_num += 1
 
-    def draw_level(self):
+    def render_level(self):
         """ Called every frame """
         if self.is_initialised:
             self.draw_layer(self.ground_layer)
+
+    def render_level_foreground(self):
+        """ Called every frame (after other things have been rendered) """
+        if self.is_initialised:
             self.draw_layer(self.outline_layer)
 
     def draw_layer(self, layer):

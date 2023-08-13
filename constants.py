@@ -57,7 +57,7 @@ OVERWORLD_01 = "assets/levels/overworld_1.txt"
 # Texture Loader
 # -------------------->
 
-GRASS_TEXTURE = "assets/textures/tiles/grass.png"
+GRASS_TEXTURE = "assets/textures/tiles/grass_border.png"
 GRASS_SPRITE = pg.transform.scale(pg.image.load(GRASS_TEXTURE), (UNIT, UNIT))
 
 EDGE_STRAIGHT_DEVART = "assets/textures/tiles/edge_straight.png"
@@ -69,8 +69,8 @@ EDGE_CORNER_DEVART_SPRITE = pg.transform.scale(pg.image.load(EDGE_CORNER_DEVART)
 EDGE_ICORNER_DEVART = "assets/textures/tiles/edge_icorner.png"
 EDGE_ICORNER_DEVART_SPRITE = pg.transform.scale(pg.image.load(EDGE_ICORNER_DEVART), (UNIT, UNIT))
 
-EDGE_STRAIGHT_LEAVES = "assets/textures/tiles/edge_straight_leaves.png"
-EDGE_STRAIGHT_LEAVES_SPRITE = pg.transform.scale(pg.image.load(EDGE_STRAIGHT_LEAVES), (UNIT, UNIT))
+EDGE_STRAIGHT_LEAVES = "assets/textures/tiles/edge_straight_leaves_as_border.png"
+EDGE_STRAIGHT_LEAVES_SPRITE = pg.transform.scale(pg.image.load(EDGE_STRAIGHT_LEAVES), (UNIT, UNIT * 2))
 # EDGE_SINGLE_LEAVES = "assets/textures/tiles/edge_single_leaves.png"
 # EDGE_SINGLE_LEAVES_SPRITE = pg.transform.scale(pg.image.load(EDGE_SINGLE_LEAVES), (UNIT, UNIT))
 EDGE_CORNER_LEAVES = "assets/textures/tiles/edge_corner_leaves.png"
@@ -93,15 +93,19 @@ OUTLINES_STRAIGHT = {
 }
 
 OUTLINES_CORNER = {
-    EDGE_CORNER_LEAVES_SPRITE: [True, True, False, True],
-    pg.transform.flip(EDGE_CORNER_LEAVES_SPRITE, 0, 1): [False, True, True, True],
-    pg.transform.rotate(EDGE_CORNER_LEAVES_SPRITE, -90): [True, True, True, False],
-    pg.transform.rotate(EDGE_CORNER_LEAVES_SPRITE, 180): [True, False, True, True]
+    # EDGE_CORNER_LEAVES_SPRITE: [True, True, False, True],
+    # pg.transform.flip(EDGE_CORNER_LEAVES_SPRITE, 0, 1): [False, True, True, True],
+    # pg.transform.rotate(EDGE_CORNER_LEAVES_SPRITE, -90): [True, True, True, False],
+    # pg.transform.rotate(EDGE_CORNER_LEAVES_SPRITE, 180): [True, False, True, True]
 }
 
 OUTLINES_ICORNER = {
-    EDGE_ICORNER_LEAVES_SPRITE: [True, False, False, True],
-    pg.transform.flip(EDGE_ICORNER_LEAVES_SPRITE, 0, 1): [False, True, False, True],
-    pg.transform.rotate(EDGE_ICORNER_LEAVES_SPRITE, -90): [True, False, True, False],
-    pg.transform.rotate(EDGE_ICORNER_LEAVES_SPRITE, 180): [False, True, True, False]
+    # EDGE_ICORNER_LEAVES_SPRITE: [True, False, False, True],
+    # pg.transform.flip(EDGE_ICORNER_LEAVES_SPRITE, 0, 1): [False, True, False, True],
+    # pg.transform.rotate(EDGE_ICORNER_LEAVES_SPRITE, -90): [True, False, True, False],
+    # pg.transform.rotate(EDGE_ICORNER_LEAVES_SPRITE, 180): [False, True, True, False]
+    EDGE_STRAIGHT_LEAVES_SPRITE: [True, False, False, True],
+    pg.transform.flip(EDGE_STRAIGHT_LEAVES_SPRITE, 0, 1): [False, True, False, True],
+    pg.transform.rotate(EDGE_STRAIGHT_LEAVES_SPRITE, -90): [True, False, True, False],
+    pg.transform.rotate(EDGE_STRAIGHT_LEAVES_SPRITE, 180): [False, True, True, False]
 }

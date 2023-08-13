@@ -5,8 +5,9 @@ from utility.animator import Animator
 
 
 class Player:
-    def __init__(self, gm, centre_screen):
-        self.game = gm
+    def __init__(self, game, screen: pg.Surface, centre_screen):
+        self.game = game
+        self.surface = screen
         self.direction = UP
         self.position = pg.Vector2(centre_screen[0], centre_screen[1])
         self.sprite_pos = self.position
@@ -52,7 +53,7 @@ class Player:
         """ Returns true if the player is allowed to move """
         return not self.moving and time.time() - MOVEMENT_PAUSE > self.last_moved
 
-    def render_player(self, surface: pg.Surface):
+    def render_player(self):
         self.animator.update()
         self.current_texture = self.animator.texture_obj
 
@@ -64,7 +65,7 @@ class Player:
             blit_xy = (self.sprite_pos.x - sprite.get_width() // 2,
                        self.sprite_pos.y - sprite.get_height() // 2)
 
-            surface.blit(sprite, blit_xy)
+            self.surface.blit(sprite, blit_xy)
 
     def is_player_loaded(self):
         """ Returns whether player has fully loaded in (add more checks later) """

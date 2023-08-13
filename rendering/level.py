@@ -31,9 +31,7 @@ def outline_decider(dic: dict):
     if dic[TILE] is not None:
         all_args = [bool(dic[NORTH]), bool(dic[SOUTH]), bool(dic[EAST]), bool(dic[WEST]),
                     bool(dic[NORTH_EAST]), bool(dic[NORTH_WEST]), bool(dic[SOUTH_EAST]), bool(dic[SOUTH_WEST])]
-        straight_args = all_args[:4]
-        corner_args = all_args[4:]
-        outline_data = outline_chooser(straight_args, corner_args)
+        outline_data = outline_chooser(all_args[:4], all_args[4:])
 
         if outline_data and outline_data[0] in outline_data[1].values():
             for key in outline_data[1].keys():
@@ -43,7 +41,7 @@ def outline_decider(dic: dict):
 
 
 def outline_chooser(straight_args, corner_args):
-    """ Returns [0]: arguments, [1]: constant dict to use """
+    """ Returns [0]: arguments to use (n s e w OR ne nw se sw), [1]: constant dict to use """
     if straight_args in OUTLINES_STRAIGHT.values():
         return straight_args, OUTLINES_STRAIGHT
     if straight_args in OUTLINES_ICORNER.values():

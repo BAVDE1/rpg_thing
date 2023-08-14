@@ -1,6 +1,7 @@
 import time
 
 import input_handler
+import dev_mode
 import rendering.render_handler as renderer
 from constants import *
 from entity.player import Player
@@ -9,6 +10,8 @@ from rendering.rendering_other import split_sheet
 
 class Game:
     def __init__(self):
+        self.dev_mode = False
+
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
@@ -33,15 +36,14 @@ class Game:
                 if event.type == pg.KEYDOWN:
                     input_handler.player_key_down(self.player, event.key)
 
-                    # COOL DEBUGGING CHECKS    (p: change bpm, m: switch idle, n: restore idle)
-                    if self.keys[pg.K_p]:
-                        self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
-                    if self.keys[pg.K_m]:
-                        texture_idle = pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha()
-                        ss_idle = split_sheet(texture_idle, (BASE_UNIT, BASE_UNIT), 4)
-                        self.player.animator.change_idle_anim(False, new_idle_ss=[PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
-                    if self.keys[pg.K_n]:
-                        self.player.animator.change_idle_anim(set_to_default=True)
+                    # dev mode
+                    if self.keys[pg.K_BACKSLASH]:
+                        self.dev_mode = not self.dev_mode
+                        if self.dev_mode:
+                            dev_mode.activate_dev_mode(self.screen)
+                        print("DEV MODE: " + str(self.dev_mode))
+                    if self.dev_mode:
+                        dev_mode.player_key_down(self, self.player, self.keys)
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 
@@ -50,7 +52,7 @@ class Game:
 
     def render(self):
         self.screen.fill([0, 5, 5])
-        renderer.render(self.player, OVERWORLD_00, self.screen)
+        renderer.render(self, self.player, OVERWORLD_00, self.screen)
 
         pg.display.flip()
 
@@ -62,4 +64,7 @@ class Game:
 
             self.clock.tick(self.fps)
 
-            pg.display.set_caption("{} - FPS: {:.2f}".format(CAPTION, self.clock.get_fps()))
+            if self.dev_mode:
+                dev_mode.dev_mode_loop(self)
+            else:
+                pg.display.set_caption(CAPTION)

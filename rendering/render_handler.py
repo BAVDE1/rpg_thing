@@ -4,7 +4,7 @@ from rendering.level import Level
 level = None
 
 
-def render(player, level_to_render, surface):
+def render(game, player, level_to_render, surface):
     global level
 
     if not level:
@@ -16,3 +16,6 @@ def render(player, level_to_render, surface):
     level.render_level()
     player.render_player()
     level.render_level_foreground()
+
+    if game.dev_mode:
+        level.render_dev_mode()

@@ -1,7 +1,6 @@
 import time
 
 import input_handler
-import dev_mode
 import rendering.render_handler as renderer
 from constants import *
 from entity.player import Player
@@ -37,13 +36,14 @@ class Game:
                     input_handler.player_key_down(self.player, event.key)
 
                     # dev mode
-                    if self.keys[pg.K_BACKSLASH]:
-                        self.dev_mode = not self.dev_mode
-                        if self.dev_mode:
-                            dev_mode.activate_dev_mode(self.screen)
-                        print("DEV MODE: " + str(self.dev_mode))
-                    if self.dev_mode:
-                        dev_mode.player_key_down(self, self.player, self.keys)
+                    if self.keys[pg.K_p]:
+                        self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
+                    if self.keys[pg.K_m]:
+                        texture_idle = pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha()
+                        ss_idle = split_sheet(texture_idle, (BASE_UNIT, BASE_UNIT), 4)
+                        self.player.animator.change_idle_anim(False, new_idle_ss=[PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
+                    if self.keys[pg.K_n]:
+                        self.player.animator.change_idle_anim(set_to_default=True)
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 
@@ -64,7 +64,4 @@ class Game:
 
             self.clock.tick(self.fps)
 
-            if self.dev_mode:
-                dev_mode.dev_mode_loop(self)
-            else:
-                pg.display.set_caption(CAPTION)
+            pg.display.set_caption("{} - FPS: {:.2f}".format(CAPTION, self.clock.get_fps()))

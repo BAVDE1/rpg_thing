@@ -58,13 +58,22 @@ OVERWORLD_01 = "assets/levels/overworld_1.txt"
 # Texture Loader
 # -------------------->
 
+TILE = "t"
+NORTH = "n"
+SOUTH = "s"
+EAST = "e"
+WEST = "w"
+NORTH_EAST = "ne"
+NORTH_WEST = "nw"
+SOUTH_EAST = "se"
+SOUTH_WEST = "sw"
+
 GRASS_TEXTURE = "assets/textures/tiles/grass.png"
 GRASS_SPRITE = pg.transform.scale(pg.image.load(GRASS_TEXTURE), (UNIT, UNIT))
 
 LEAVES_TILESET = "assets/textures/tiles/leaves_tileset.png"
 LEAVES_TILESET_SPRITE = pg.image.load(LEAVES_TILESET)
-LEAVES_TILESET_SPRITES = split_sheet(LEAVES_TILESET_SPRITE, (20, 20), 9, 5)
-print(LEAVES_TILESET_SPRITES)
+LEAVES_TILESET_SPRITES = split_sheet(LEAVES_TILESET_SPRITE, (20, 20), 5, 5)
 
 # ASCII
 ASCII_TO_SPRITE = {
@@ -73,48 +82,35 @@ ASCII_TO_SPRITE = {
 
 
 def get_outline_tileset_dict(tileset_sprites):
-    """ Requirements orders (True=not empty tile, False=empty tile):
-    [tile,      north, south, east, west,       north-east, north-west, south-east, south-west] """
+    """ MUST be in order from the longest amount of requirements to least (True=has tile, False=empty tile)"""
     return {
-        pg.transform.scale(tileset_sprites[0],   (UNIT, UNIT)): [True,   True, True, True, True,         True, True, False, True],
-        pg.transform.scale(tileset_sprites[1],   (UNIT, UNIT)): [True,   True, False, True, True,        True, True, False, True],
-        pg.transform.scale(tileset_sprites[2],   (UNIT, UNIT)): [True,   True, False, True, True,        True, True, False, False],
-        pg.transform.scale(tileset_sprites[3],   (UNIT, UNIT)): [True,   True, False, True, True,        True, True, True, False],
-        pg.transform.scale(tileset_sprites[4],   (UNIT, UNIT)): [True,   True, True, True, True,         True, True, True, False],
-        pg.transform.scale(tileset_sprites[5],   (UNIT, UNIT)): [False,  False, False, False, False,     False, False, True, False],
-        pg.transform.scale(tileset_sprites[6],   (UNIT, UNIT)): [False,  False, True, False, False,      False, False, True, False],
-        pg.transform.scale(tileset_sprites[7],   (UNIT, UNIT)): [False,  False, True, False, False,      False, False, False, True],
-        pg.transform.scale(tileset_sprites[8],   (UNIT, UNIT)): [False,  False, False, False, False,     False, False, False, True],
-        pg.transform.scale(tileset_sprites[9],   (UNIT, UNIT)): [True,   True, True, False, True,        True, True, False, True],
-        pg.transform.scale(tileset_sprites[10],  (UNIT, UNIT)): [False,  True, False, False, True,       True, True, False, True],
-        pg.transform.scale(tileset_sprites[11],  (UNIT, UNIT)): [False,  True, False, False, False,      True, True, False, False],
-        pg.transform.scale(tileset_sprites[12],  (UNIT, UNIT)): [False,  True, False, True, False,       True, True, True, False],
-        pg.transform.scale(tileset_sprites[13],  (UNIT, UNIT)): [True,   True, True, True, False,        True, True, True, False],
-        pg.transform.scale(tileset_sprites[14],  (UNIT, UNIT)): [False,  False, False, True, False,      False, False, True, False],
-        pg.transform.scale(tileset_sprites[15],  (UNIT, UNIT)): [True,   False, True, True, False,      False, False, True, False],
-        pg.transform.scale(tileset_sprites[16],  (UNIT, UNIT)): [True,   False, True, False, True,      False, False, False, True],
-        pg.transform.scale(tileset_sprites[17],  (UNIT, UNIT)): [False,  False, False, False, True,      False, False, False, True],
-        pg.transform.scale(tileset_sprites[18],  (UNIT, UNIT)): [True,   True, True, False, True,       False, True, False, True],
-        pg.transform.scale(tileset_sprites[19],  (UNIT, UNIT)): [False,  False, False, False, True,     False, True, False, True],
-        #pg.transform.scale(tileset_sprites[20],  (UNIT, UNIT)): [True,   False, False, False, False,       False, False, False, False],
-        pg.transform.scale(tileset_sprites[21],  (UNIT, UNIT)): [False,  False, False, True, False,     True, False, True, False],
-        pg.transform.scale(tileset_sprites[22],  (UNIT, UNIT)): [True,   True, True, True, False,       True, False, True, False],
-        pg.transform.scale(tileset_sprites[23],  (UNIT, UNIT)): [False,  False, False, True, False,     True, False, False, False],
-        pg.transform.scale(tileset_sprites[24],  (UNIT, UNIT)): [True,   True, False, True, False,      True, False, False, False],
-        pg.transform.scale(tileset_sprites[25],  (UNIT, UNIT)): [True,   True, False, False, True,      False, True, False, False],
-        pg.transform.scale(tileset_sprites[26],  (UNIT, UNIT)): [False,  False, False, False, True,     False, True, False, False],
-        pg.transform.scale(tileset_sprites[27],  (UNIT, UNIT)): [True,   True, True, False, True,       False, True, True, True],
-        pg.transform.scale(tileset_sprites[28],  (UNIT, UNIT)): [False,  False, True, False, True,       False, True, True, True],
-        pg.transform.scale(tileset_sprites[29],  (UNIT, UNIT)): [False,  False, True, False, False,     False, False, True, True],
-        pg.transform.scale(tileset_sprites[30],  (UNIT, UNIT)): [False,  False, True, True, False,       True, False, True, True],
-        pg.transform.scale(tileset_sprites[31],  (UNIT, UNIT)): [True,   True, True, True, False,         True, False, True, True],
-        pg.transform.scale(tileset_sprites[32],  (UNIT, UNIT)): [False,  False, False, False, False,     True, False, False, False],
-        pg.transform.scale(tileset_sprites[33],  (UNIT, UNIT)): [False,  True, False, False, False,      True, False, False, False],
-        pg.transform.scale(tileset_sprites[34],  (UNIT, UNIT)): [False,  True, False, False, False,      False, True, False, False],
-        pg.transform.scale(tileset_sprites[35],  (UNIT, UNIT)): [False, False, False, False, False,      False, True, False, False],
-        pg.transform.scale(tileset_sprites[36], (UNIT, UNIT)): [True,   True, True, True, True,         False, True, True, True],
-        pg.transform.scale(tileset_sprites[37], (UNIT, UNIT)): [True,  False, True, True, True,         False, True, True, True],
-        pg.transform.scale(tileset_sprites[38], (UNIT, UNIT)): [True,   False, True, True, True,         False, False, True, True],
-        pg.transform.scale(tileset_sprites[39], (UNIT, UNIT)): [True,   False, True, True, True,         True, False, True, True],
-        pg.transform.scale(tileset_sprites[40], (UNIT, UNIT)): [True,   True, True, True, True,         True, False, True, True],
+        # corner
+        pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)): {TILE: True, SOUTH: True, EAST: True, SOUTH_EAST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)), -90): {TILE: True, SOUTH: True, WEST: True, SOUTH_WEST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)), 180): {TILE: True, NORTH: True, WEST: True, NORTH_WEST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)), 90): {TILE: True, NORTH: True, EAST: True, NORTH_EAST: False},
+        pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)): {TILE: False, NORTH: False, WEST: False, NORTH_WEST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)), -90): {TILE: False, NORTH: False, EAST: False, NORTH_EAST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)), 180): {TILE: False, SOUTH: False, EAST: False, SOUTH_EAST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)), 90): {TILE: False, SOUTH: False, WEST: False, SOUTH_WEST: True},
+
+        # inside corner
+        pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)): {TILE: True, SOUTH: False, EAST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)), -90): {TILE: True, SOUTH: False, WEST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)), 180): {TILE: True, NORTH: False, WEST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)), 90): {TILE: True, NORTH: False, EAST: False},
+        pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)): {TILE: False, NORTH: True, WEST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)), -90): {TILE: False, NORTH: True, EAST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)), 180): {TILE: False, SOUTH: True, EAST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)), 90): {TILE: False, SOUTH: True, WEST: True},
+
+        # straight
+        pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)): {TILE: True, SOUTH: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)), -90): {TILE: True, WEST: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)), 180): {TILE: True, NORTH: False},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)), 90): {TILE: True, EAST: False},
+        pg.transform.scale(tileset_sprites[10], (UNIT, UNIT)): {TILE: False, NORTH: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[10], (UNIT, UNIT)), -90): {TILE: False, EAST: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[10], (UNIT, UNIT)), 180): {TILE: False, SOUTH: True},
+        pg.transform.rotate(pg.transform.scale(tileset_sprites[10], (UNIT, UNIT)), 90): {TILE: False, WEST: True},
     }

@@ -1,17 +1,6 @@
 from constants import *
 import os
 
-TILE = "t"
-
-NORTH = "n"
-SOUTH = "s"
-EAST = "e"
-WEST = "w"
-NORTH_EAST = "ne"
-NORTH_WEST = "nw"
-SOUTH_EAST = "se"
-SOUTH_WEST = "sw"
-
 
 def parse_level(level_source):
     """ Returns list of lines in level file """
@@ -27,16 +16,16 @@ def parse_level(level_source):
 
 
 def outline_decider(dic: dict):
-    add = None
-    all_args = [bool(dic[TILE]),
-                bool(dic[NORTH]), bool(dic[SOUTH]), bool(dic[EAST]), bool(dic[WEST]),
-                bool(dic[NORTH_EAST]), bool(dic[NORTH_WEST]), bool(dic[SOUTH_EAST]), bool(dic[SOUTH_WEST])]
-
     outlines = get_outline_tileset_dict(LEAVES_TILESET_SPRITES)
-    if all_args in outlines.values():
-        for key in outlines.keys():
-            if outlines[key] == all_args:
-                add = key
+
+    add = None
+    for key in outlines.keys():
+        should = True
+        for k in outlines[key]:
+            should = False if bool(dic[k]) != outlines[key][k] else should
+        if should:
+            add = key
+            break
     return add
 
 

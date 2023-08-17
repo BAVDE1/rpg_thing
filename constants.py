@@ -4,10 +4,11 @@ from rendering.rendering_other import split_sheet
 # Screen
 CAPTION = "rpg thing"
 BASE_UNIT = 20  # ascii level files need to be 19x19
-LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge
+LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
 BASE_RES = BASE_UNIT * LVL_SIZE
-RES_MUL = 3  # should be whole number
-RESOLUTION = BASE_RES * RES_MUL
+RES_MUL = 2  # should be whole number
+RESOLUTION_X = BASE_RES * RES_MUL
+RESOLUTION_Y = RESOLUTION_X + (RESOLUTION_X * 0.5)
 UNIT = BASE_UNIT * RES_MUL
 
 # Player

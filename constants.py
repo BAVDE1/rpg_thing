@@ -51,8 +51,8 @@ SHADOW_HEIGHT = 0.4  # %
 
 # Levels
 OVERWORLD = "assets/levels/overworld.txt"
-OVERWORLD_00 = "assets/levels/overworld_0.txt"
-OVERWORLD_01 = "assets/levels/overworld_1.txt"
+OVERWORLD_00 = "assets/levels/overworld_00.txt"
+OVERWORLD_01 = "assets/levels/overworld_01.txt"
 
 
 # -------------------->
@@ -78,7 +78,7 @@ LEAVES_TILESET_SPRITES = split_sheet(LEAVES_TILESET_SPRITE, (20, 20), 5, 5)
 
 # ASCII
 ASCII_TO_SPRITE = {
-    ".": GRASS_SPRITE
+    "Gr": GRASS_SPRITE
 }
 
 

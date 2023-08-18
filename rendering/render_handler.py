@@ -1,4 +1,4 @@
-from rendering.level import Level
+from level.level import Level
 
 
 level = None

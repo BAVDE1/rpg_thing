@@ -32,8 +32,8 @@ def outline_decider(dic: dict):
 def store_layer(layer: list, layer_lines):
     for line in layer_lines:
         row = []
-        for char in line:
-            row.append(ASCII_TO_SPRITE[char] if char in ASCII_TO_SPRITE else None)
+        for chars in line.split(","):
+            row.append(ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None)
         layer.append(row)
 
 

@@ -56,13 +56,13 @@ class Animator:
         """ Should be called every frame """
         if self.idling:
             if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
+                self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
                 self.advance_idle_animation_frame()
-                self.texture_obj = self.idle_ss[1][self.idle_frame]  # set idle image
         elif self.current_anim_ss:
             if time.time() > self.last_anim_frame_time + self.anim_frame_speed:
-                print(self.current_anim_frame)
-                self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
                 self.advance_one_time_anim_frame()
+                if self.current_anim_ss:  # check incase animation finished in the advance
+                    self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set image
 
     def advance_idle_animation_frame(self):
         im_frame = self.idle_frame
@@ -79,10 +79,10 @@ class Animator:
 
     def advance_one_time_anim_frame(self):
         self.current_anim_frame += 1
-        if self.current_anim_frame < len(self.current_anim_ss[1]):
-            self.last_anim_frame_time = time.time()
-        else:
+        if self.current_anim_frame == len(self.current_anim_ss[1]):
             self.finish_animating()
+        else:
+            self.last_anim_frame_time = time.time()
 
     def do_animation(self, anim, duration):
         """ Call to execute a registered animation (does not loop) """
@@ -96,6 +96,7 @@ class Animator:
                 self.current_anim_frame = 0
                 self.anim_frame_speed = duration / len(self.current_anim_ss[1])
                 self.last_anim_frame_time = time.time()
+                self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
             else:
                 self.animation_queue[anim] = duration  # add item to queue
         else:

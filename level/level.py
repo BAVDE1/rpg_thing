@@ -25,7 +25,7 @@ def outline_decider(dic: dict):
             should = False if bool(dic[k]) != outlines[key][k] else should
         if should:
             add = key
-            break
+            break  # stop loop
     return add
 
 
@@ -99,8 +99,6 @@ class Level:
             for sprite in column:
                 if sprite:
                     self.surface.blit(sprite,
-                                      [(c * UNIT) - sprite.get_width() // 2, (r * UNIT) - sprite.get_height() // 2])
+                                      [((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - sprite.get_height() // 2])
                 c += 1
             r += 1
-
-

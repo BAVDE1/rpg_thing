@@ -60,8 +60,9 @@ class Animator:
                 self.texture_obj = self.idle_ss[1][self.idle_frame]  # set idle image
         elif self.current_anim_ss:
             if time.time() > self.last_anim_frame_time + self.anim_frame_speed:
-                self.advance_one_time_anim_frame()
+                print(self.current_anim_frame)
                 self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
+                self.advance_one_time_anim_frame()
 
     def advance_idle_animation_frame(self):
         im_frame = self.idle_frame
@@ -77,8 +78,8 @@ class Animator:
         self.prev_idle_beat = time.time()
 
     def advance_one_time_anim_frame(self):
+        self.current_anim_frame += 1
         if self.current_anim_frame < len(self.current_anim_ss[1]):
-            self.current_anim_frame += 1
             self.last_anim_frame_time = time.time()
         else:
             self.finish_animating()

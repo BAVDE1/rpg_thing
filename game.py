@@ -9,8 +9,6 @@ from rendering.rendering_other import split_sheet
 
 class Game:
     def __init__(self):
-        self.dev_mode = False
-
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
@@ -38,12 +36,14 @@ class Game:
                     # dev mode
                     if self.keys[pg.K_p]:
                         self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
-                    if self.keys[pg.K_m]:
+                    if self.keys[pg.K_m]:  # set idle anim
                         texture_idle = pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha()
                         ss_idle = split_sheet(texture_idle, (BASE_UNIT, BASE_UNIT), 4)
                         self.player.animator.change_idle_anim(False, new_idle_ss=[PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
-                    if self.keys[pg.K_n]:
+                    if self.keys[pg.K_n]:  # reset idle anim
                         self.player.animator.change_idle_anim(set_to_default=True)
+                    if self.keys[pg.K_b]:  # play one time anim
+                        self.player.animator.do_animation(PLAYER_IDLE_DEBUG, 2)
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 
@@ -52,7 +52,7 @@ class Game:
 
     def render(self):
         self.screen.fill([0, 5, 5])
-        renderer.render(self, self.player, OVERWORLD_00, self.screen)
+        renderer.render(self.player, OVERWORLD_00, self.screen)
 
         pg.display.flip()
 

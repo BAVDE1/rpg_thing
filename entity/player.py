@@ -17,7 +17,8 @@ class Player:
         self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4)
 
         self.current_texture = None
-        self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], False)
+        self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], False,
+                                 [PLAYER_IDLE_DEBUG, split_sheet(pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha(), (BASE_UNIT, BASE_UNIT), 4)])
 
         self.moving = False
         self.sprinting = False

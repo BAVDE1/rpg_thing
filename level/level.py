@@ -90,15 +90,19 @@ class Level:
     def render_level_foreground(self):
         """ Called every frame (after other things have been rendered) """
         if self.is_initialised:
-            self.draw_layer(self.outline_layer)
+            self.draw_layer(self.outline_layer, True)
 
-    def draw_layer(self, layer):
+    def draw_layer(self, layer, has_fade=False):
         r = 0
         for column in layer:
             c = 0
             for sprite in column:
                 if sprite:
-                    self.surface.blit(sprite,
-                                      [((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - sprite.get_height() // 2])
+                    self.surface.blit(sprite, [((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - sprite.get_height() // 2])
+
+                # add fade
+                if has_fade and c == 0 or c == len(column) - 1:
+                    f_s = pg.transform.flip(FADE_SPRITE, 1, 0) if c == 0 else FADE_SPRITE
+                    self.surface.blit(f_s, [((c * UNIT) - f_s.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - f_s.get_height() // 2])
                 c += 1
             r += 1

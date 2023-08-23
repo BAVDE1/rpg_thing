@@ -72,6 +72,9 @@ NORTH_WEST = "nw"
 SOUTH_EAST = "se"
 SOUTH_WEST = "sw"
 
+FADE_TEXTURE = "assets/textures/tiles/fade_tile.png"
+FADE_SPRITE = pg.transform.scale(pg.image.load(FADE_TEXTURE), (UNIT, UNIT))
+
 GRASS_TEXTURE = "assets/textures/tiles/grass.png"
 GRASS_SPRITE = pg.transform.scale(pg.image.load(GRASS_TEXTURE), (UNIT, UNIT))
 
@@ -86,9 +89,9 @@ ASCII_TO_SPRITE = {
 
 
 def get_outline_tileset_dict(tileset_sprites):
-    """ MUST be in order from the longest amount of requirements to least (True=has tile, False=empty tile)"""
+    """ MUST be in order from the most amount of requirements to least (True=has tile, False=empty tile)"""
     return {
-        # corner
+        # corner (3r)
         pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)): {TILE: True, SOUTH: True, EAST: True, SOUTH_EAST: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)), -90): {TILE: True, SOUTH: True, WEST: True, SOUTH_WEST: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[0], (UNIT, UNIT)), 180): {TILE: True, NORTH: True, WEST: True, NORTH_WEST: False},
@@ -98,7 +101,7 @@ def get_outline_tileset_dict(tileset_sprites):
         pg.transform.rotate(pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)), 180): {TILE: False, SOUTH: False, EAST: False, SOUTH_EAST: True},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[11], (UNIT, UNIT)), 90): {TILE: False, SOUTH: False, WEST: False, SOUTH_WEST: True},
 
-        # inside corner
+        # inside corner (2r)
         pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)): {TILE: True, SOUTH: False, EAST: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)), -90): {TILE: True, SOUTH: False, WEST: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[5], (UNIT, UNIT)), 180): {TILE: True, NORTH: False, WEST: False},
@@ -108,7 +111,7 @@ def get_outline_tileset_dict(tileset_sprites):
         pg.transform.rotate(pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)), 180): {TILE: False, SOUTH: True, EAST: True},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[6], (UNIT, UNIT)), 90): {TILE: False, SOUTH: True, WEST: True},
 
-        # straight
+        # straight (1r)
         pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)): {TILE: True, SOUTH: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)), -90): {TILE: True, WEST: False},
         pg.transform.rotate(pg.transform.scale(tileset_sprites[1], (UNIT, UNIT)), 180): {TILE: True, NORTH: False},

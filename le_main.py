@@ -23,6 +23,10 @@ class LevelEditor:
 
         self.buttons = []  # type: list[Button]
 
+    # ------->
+    #  Loops
+    # ------->
+
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or self.keys[pg.K_ESCAPE]:
@@ -35,13 +39,6 @@ class LevelEditor:
                 for btn in self.buttons:
                     if btn.is_mouse_in_bounds():
                         self.button_clicked(btn.mouse_down())
-
-    def main_loop(self):
-        while self.running:
-            pg.display.set_caption("Level Editor - FPS: {:.2f}".format(self.clock.get_fps()))
-            self.events()
-            self.render()
-            self.clock.tick(self.fps)
 
     def render(self):
         self.screen.fill([0, 0, 0])
@@ -61,43 +58,68 @@ class LevelEditor:
 
         pg.display.flip()
 
-    def button_clicked(self, operation: tuple):
-        btn_operation = operation[0]
-        btn_value = operation[1]
+    def main_loop(self):
+        while self.running:
+            pg.display.set_caption("Level Editor - FPS: {:.2f}".format(self.clock.get_fps()))
+            self.events()
+            self.render()
+            self.clock.tick(self.fps)
 
-        if btn_operation == BTN_AREA_SEL:
-            self.selected_area = btn_value
-            self.selecting_area = False
-        if btn_operation == BTN_LEVEL_SEL:
-            self.selected_level = btn_value
-            self.selecting_level = False
-
-        self.buttons.clear()
+    # --------->
+    #  "PAGES"
+    # --------->
 
     def open_area_select(self):
+        print("area")
         self.heading_text = "Area Select"
         areas = listdir(str(levels_dir))
         for i in range(len(areas)):
             self.add_button(areas[i], (0, 35 + (25 * i)), areas[i], (BTN_AREA_SEL, areas[i]), size=20)
 
     def open_level_select(self):
-        self.heading_text = "Level Select"
+        print("level")
+        self.heading_text = f"Level Select ({self.selected_area})"
         levels = sorted(listdir(str(levels_dir + self.selected_area)))
         for i in range(len(levels)):
             if levels[i].split(".")[0] != self.selected_area:
                 self.add_button(levels[i], (0, 10 + (25 * i)), levels[i], (BTN_LEVEL_SEL, levels[i]), size=20)
+        self.add_button("back", (0, self.screen.get_height() - 40), "Back", (BTN_BACK, self.open_area_select))
+
+    # ------------>
+    #  Functions
+    # ------------>
+
+    def display_text(self, text, size=30, position=(0, 0)):
+        """ Needs to be called every frame so text remains rendered """
+        fnt = pg.font.SysFont('Times New Roman', size)
+        text_surf = fnt.render(text, True, (255, 255, 0))
+        self.screen.blit(text_surf, position)
 
     def display_buttons(self):
         for btn in self.buttons:
             btn.render()
 
-    def add_button(self, name, pos: tuple, display_text, operation, size=30, image=None):
+    def add_button(self, name, pos: tuple, display_text: str, operation: tuple, size=30, image=None):
         self.buttons.append(Button(screen=self.screen, name=name, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
 
-    def display_text(self, text, size=30, position=(0, 0)):
-        fnt = pg.font.SysFont('Times New Roman', size)
-        text_surf = fnt.render(text, True, (255, 255, 0))
-        self.screen.blit(text_surf, position)
+    def button_clicked(self, operation: tuple):
+        """ Called in 'events' """
+        btn_op_type = operation[0]
+        btn_op_value = operation[1]
+
+        if btn_op_type == BTN_AREA_SEL:
+            self.selected_area = btn_op_value
+            self.selecting_area = False
+        if btn_op_type == BTN_LEVEL_SEL:
+            self.selected_level = btn_op_value
+            self.selecting_level = False
+
+        if btn_op_type == BTN_BACK:
+            if btn_op_value == self.open_area_select:
+                self.selected_area = None
+                self.selecting_level = False
+
+        self.buttons.clear()
 
 
 def main():

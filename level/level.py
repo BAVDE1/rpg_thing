@@ -2,7 +2,7 @@ from constants import *
 import os
 
 
-def parse_level(level_source):
+def parse_level_file(level_source):
     """ Returns list of lines in level file """
     if not os.path.exists(level_source):
         raise FileNotFoundError(
@@ -41,7 +41,7 @@ class Level:
     def __init__(self, level_source, surface):
         self.is_initialised = False
         self.surface = surface
-        self.ground_layer_lines = parse_level(level_source)
+        self.ground_layer_lines = parse_level_file(level_source)
         self.ground_layer = []
         self.outline_layer = []
 
@@ -49,38 +49,36 @@ class Level:
 
     def initialise_level(self):
         if not self.is_initialised:
-            self.is_initialised = False
-
             store_layer(self.ground_layer, self.ground_layer_lines)
             self.initialise_outline()
 
             self.is_initialised = True
 
     def initialise_outline(self):
-        row_num = 0
+        r = 0
         for column in self.ground_layer:
-            col_num = 0
+            c = 0
             row = []
             for sprite in column:
-                n = max(0, row_num - 1)
-                s = min(len(self.ground_layer) - 1, row_num + 1)
-                e = min(len(column) - 1, col_num + 1)
-                w = max(0, col_num - 1)
+                n = max(0, r - 1)
+                s = min(len(self.ground_layer) - 1, r + 1)
+                e = min(len(column) - 1, c + 1)
+                w = max(0, c - 1)
 
                 row.append(outline_decider({
                     TILE: sprite,
-                    NORTH: self.ground_layer[n][col_num],
-                    SOUTH: self.ground_layer[s][col_num],
-                    EAST: self.ground_layer[row_num][e],
-                    WEST: self.ground_layer[row_num][w],
+                    NORTH: self.ground_layer[n][c],
+                    SOUTH: self.ground_layer[s][c],
+                    EAST: self.ground_layer[r][e],
+                    WEST: self.ground_layer[r][w],
                     NORTH_EAST: self.ground_layer[n][e],
                     NORTH_WEST: self.ground_layer[n][w],
                     SOUTH_EAST: self.ground_layer[s][e],
                     SOUTH_WEST: self.ground_layer[s][w]
                 }))
-                col_num += 1
+                c += 1
             self.outline_layer.append(row)
-            row_num += 1
+            r += 1
 
     def render_level(self):
         """ Called every frame """

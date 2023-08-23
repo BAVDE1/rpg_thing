@@ -53,9 +53,9 @@ SHADOW_WIDTH = 0.8  # %
 SHADOW_HEIGHT = 0.4  # %
 
 # Levels
-OVERWORLD = "assets/levels/overworld.txt"
-OVERWORLD_00 = "assets/levels/overworld_00.txt"
-OVERWORLD_01 = "assets/levels/overworld_01.txt"
+OVERWORLD = "assets/levels/overworld/overworld.txt"
+OVERWORLD_00 = "assets/levels/overworld/overworld_00.txt"
+OVERWORLD_01 = "assets/levels/overworld/overworld_01.txt"
 
 
 # -------------------->

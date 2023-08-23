@@ -24,11 +24,17 @@ class Button:
         if self.image:
             self.screen.blit(self.image, (self.pos[0], self.pos[1] + self.display_text.get_height()))
 
-    def mouse_hover(self):
-        m_x = pg.mouse.get_pos()[0]
-        m_y = pg.mouse.get_pos()[1]
+    def mouse_down(self):
+        if self.is_mouse_in_bounds():
+            print(self.name)
 
-        if self.bounds[0][0] < m_x < self.bounds[0][1] and self.bounds[1][0] < m_y < self.bounds[1][1]:
+    def mouse_hover(self):
+        if self.is_mouse_in_bounds():
             pg.draw.rect(self.screen, (50, 50, 50), pg.rect.Rect(self.bounds[0][0], self.bounds[1][0],
                                                                  self.bounds[0][1] - self.bounds[0][0],
                                                                  self.bounds[1][1] - self.bounds[1][0]))
+
+    def is_mouse_in_bounds(self):
+        m_x = pg.mouse.get_pos()[0]
+        m_y = pg.mouse.get_pos()[1]
+        return self.bounds[0][0] < m_x < self.bounds[0][1] and self.bounds[1][0] < m_y < self.bounds[1][1]

@@ -15,9 +15,10 @@ class LevelEditor:
         self.keys = pg.key.get_pressed()
         self.heading_text = ""
 
+        self.selecting_area = False
+        self.selected_area = ""
         self.selecting_level = False
-        self.selected_area = "overworld"  # changeable
-        self.selected_level = None
+        self.selected_level = ""
 
         self.buttons = []
 
@@ -27,6 +28,12 @@ class LevelEditor:
                 self.running = False  # close game
             if event.type in (pg.KEYDOWN, pg.KEYUP):
                 self.keys = pg.key.get_pressed()  # update keys
+
+            # button click
+            if event.type == pg.MOUSEBUTTONDOWN:
+                for btn in self.buttons:
+                    if isinstance(btn, Button):
+                        btn.mouse_down()
 
     def main_loop(self):
         while self.running:
@@ -40,21 +47,31 @@ class LevelEditor:
         self.display_text(self.heading_text)
         self.display_buttons()
 
-        if not self.selected_level and not self.selecting_level:
+        if not self.selected_area and not self.selecting_area:
+            self.selecting_area = True
+            self.open_area_select()
+
+        if self.selected_area and not self.selected_level and not self.selecting_level:
             self.selecting_level = True
-            self.init_level_select()
+            self.open_level_select()
 
         if self.selected_level:
             pass
 
         pg.display.flip()
 
-    def init_level_select(self):
+    def open_area_select(self):
+        self.heading_text = "Area Select"
+        areas = listdir(str(levels_dir))
+        for i in range(len(areas)):
+            self.add_button(areas[i], (0, 35 + (25 * i)), display_text=areas[i], size=20)
+
+    def open_level_select(self):
         self.heading_text = "Level Select"
-        lvls = sorted(listdir(str(levels_dir + self.selected_area)))
-        for i in range(len(lvls)):
-            if lvls[i].split(".")[0] != self.selected_area:
-                self.add_button(lvls[i], (0, 10 + (25 * i)), display_text=lvls[i], size=20)
+        levels = sorted(listdir(str(levels_dir + self.selected_area)))
+        for i in range(len(levels)):
+            if levels[i].split(".")[0] != self.selected_area:
+                self.add_button(levels[i], (0, 10 + (25 * i)), display_text=levels[i], size=20)
 
     def display_buttons(self):
         for btn in self.buttons:

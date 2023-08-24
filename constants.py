@@ -6,7 +6,7 @@ CAPTION = "rpg thing"
 LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
 BASE_UNIT = 20  # ascii level files need to be 19x19
 BASE_RES = BASE_UNIT * LVL_SIZE
-RES_MUL = 2  # should be whole number
+RES_MUL = 3  # should be whole number
 
 RESOLUTION_X = BASE_RES * RES_MUL
 SIDE_GIVE = RESOLUTION_X * 0.75  # give amount beside the level
@@ -16,6 +16,7 @@ UNIT = BASE_UNIT * RES_MUL
 
 # Player
 PLAYER_IDLE = "assets/textures/player_idle.png"
+PLAYER_JUMP = "assets/textures/player_jump.png"
 PLAYER_IDLE_DEBUG = "assets/textures/player_idle_debug.png"
 MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5

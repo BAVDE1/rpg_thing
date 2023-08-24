@@ -26,11 +26,13 @@ class Animator:
         self.one_time_ss = None
         if one_time_ss:
             self.one_time_ss = {ss[0]: ss[1] for ss in one_time_ss if ss[0] and ss[1]}
-        self.animation_queue = {}
         self.current_anim_ss = None
         self.current_anim_frame = None
         self.anim_frame_speed = None
         self.last_anim_frame_time = None
+
+        self.offset_x = 0
+        self.offset_y = 0
 
         self.update()  # init
 
@@ -56,6 +58,9 @@ class Animator:
         """ Should be called every frame """
         if self.idling:
             if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
+                self.offset_x = 0
+                self.offset_y = 0
+
                 self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
                 self.advance_idle_animation_frame()
         elif self.current_anim_ss:
@@ -84,7 +89,7 @@ class Animator:
         else:
             self.last_anim_frame_time = time.time()
 
-    def do_animation(self, anim, duration):
+    def do_animation(self, anim, duration, offset_x=0, offset_y=0):
         """ Call to execute a registered animation (does not loop) """
         if self.one_time_ss:
             if anim not in self.one_time_ss:
@@ -97,20 +102,15 @@ class Animator:
                 self.anim_frame_speed = duration / len(self.current_anim_ss[1])
                 self.last_anim_frame_time = time.time()
                 self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
-            else:
-                self.animation_queue[anim] = duration  # add item to queue
+
+                self.offset_x = offset_x
+                self.offset_y = offset_y
         else:
             raise IndexError(no_anim_error.format(anim))
 
     def finish_animating(self):
-        if len(self.animation_queue) == 0:
-            self.current_anim_ss = None
-            self.current_anim_frame = None
-            self.anim_frame_speed = None
-            self.last_anim_frame_time = None
-            self.idling = True
-        else:
-            self.current_anim_ss = None
-            first_key = list(self.animation_queue.keys())[0]
-            self.do_animation(first_key, self.animation_queue[first_key])  # play next animation in queue & remove
-            self.animation_queue.pop(first_key)
+        self.current_anim_ss = None
+        self.current_anim_frame = None
+        self.anim_frame_speed = None
+        self.last_anim_frame_time = None
+        self.idling = True

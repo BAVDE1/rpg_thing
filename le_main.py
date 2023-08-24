@@ -91,6 +91,7 @@ class LevelEditor:
         areas = sorted(os.listdir(str(levels_dir)))
         for i in range(len(areas)):
             self.add_button(areas[i], (0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
+        self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
     def open_level_select(self):
         self.heading_text = f"Level Select ({self.selected_area})"
@@ -98,12 +99,13 @@ class LevelEditor:
 
         for i in range(len(levels)):
             if levels[i].split(".")[0] == self.selected_area:
-                self.add_file(str(levels_dir + self.selected_area + "/" + levels[i]), ((self.screen.get_width() / 2) + 20, 0))
+                self.add_file(str(levels_dir + self.selected_area + "/" + levels[i]), ((self.screen.get_width() / 2) + 20, 40))
             else:
                 self.add_button(levels[i], (0, 10 + (25 * i)), (BTN_LEVEL_SEL, levels[i]), size=20)
 
         self.add_button("Back", (0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
-        self.add_seperator((self.screen.get_width() / 2, 0), (self.screen.get_width() / 2, self.screen.get_height()))
+        self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
+        self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
     def open_level_editor(self):
         self.heading_text = f"Editing level - {self.selected_area}, {self.selected_level}"
@@ -113,12 +115,12 @@ class LevelEditor:
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
         # buttons
-        self.add_button("Save", (self.screen.get_width() - 280, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
-        self.add_button("Save+Close", (self.screen.get_width() - 200, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
-        self.add_button("Close", (self.screen.get_width() - 40, 8), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)), size=15)
+        self.add_button("Save", (self.screen.get_width() - 300, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Save&Close", (self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Close", (self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
-        self.add_file(self.editing_level, (0, 50))
+        self.add_file(self.editing_level, (10, 40), size=10)
 
     # ------------>
     #  Functions
@@ -171,10 +173,24 @@ class LevelEditor:
                 self.selecting_level = False
                 self.reset_data()
 
-    def reset_data(self):
+        if btn_op_type == BTN_SAVE:
+            print("SAVE")
+
+        if btn_op_type == BTN_SAVE_CLOSE:
+            print("SAVE")
+            self.reset_data(complete=True)
+
+        if btn_op_type == BTN_CLOSE:
+            self.reset_data(complete=True)
+
+    def reset_data(self, complete=False):
         self.seperators.clear()
         self.file_displays.clear()
         self.buttons.clear()
+        if complete:
+            self.selected_area = ""
+            self.selected_level = ""
+            self.editing_level = ""
 
 
 def main():

@@ -18,8 +18,7 @@ class Player:
 
         self.current_texture = None
         self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], False,
-                                 [PLAYER_JUMP, split_sheet(pg.image.load(PLAYER_JUMP).convert_alpha(), (BASE_UNIT * 2, BASE_UNIT * 2), 8)],
-                                 [PLAYER_IDLE_DEBUG, split_sheet(pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha(), (BASE_UNIT, BASE_UNIT), 4)])
+                                 [PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PLAYER_JUMP_HORIZONTAL).convert_alpha(), (BASE_UNIT * 2, BASE_UNIT * 2), 8)])
 
         self.moving = False
         self.sprinting = False
@@ -37,7 +36,7 @@ class Player:
         self.flipped = True if self.direction == LEFT else False if self.direction == RIGHT else self.flipped
         self.sprite_pos = self.position  # will need to be changed based on animation
 
-        self.animator.do_animation(PLAYER_JUMP, 0.13, offset_x=-UNIT / 2 if x > 0 else UNIT / 2, offset_y=-UNIT / 2)  # jump anim
+        self.animator.do_animation(PLAYER_JUMP_HORIZONTAL, 0.125, offset_x=-x / 2, offset_y=-UNIT / 2)  # jump anim
 
         # todo: send beat event (after player movement)
 

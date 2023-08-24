@@ -16,7 +16,8 @@ UNIT = BASE_UNIT * RES_MUL
 
 # Player
 PLAYER_IDLE = "assets/textures/player_idle.png"
-PLAYER_JUMP = "assets/textures/player_jump.png"
+PLAYER_JUMP_HORIZONTAL = "assets/textures/player_jump_horizontal.png"
+PLAYER_JUMP_VERTICAL = "assets/textures/player_jump_vertical.png"
 PLAYER_IDLE_DEBUG = "assets/textures/player_idle_debug.png"
 MOVEMENT_PAUSE = 0.15  # 0.15
 HOLD_TIME_TO_SPRINT = 0.5

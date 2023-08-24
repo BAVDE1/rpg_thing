@@ -42,8 +42,6 @@ class Game:
                         self.player.animator.change_idle_anim(False, new_idle_ss=[PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
                     if self.keys[pg.K_n]:  # reset idle anim
                         self.player.animator.change_idle_anim(set_to_default=True)
-                    if self.keys[pg.K_b]:  # play one time anim
-                        self.player.animator.do_animation(PLAYER_IDLE_DEBUG, 2)
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 

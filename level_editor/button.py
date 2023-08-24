@@ -2,11 +2,10 @@ from constants import *
 
 
 class Button:
-    def __init__(self, screen: pg.surface.Surface, name, display_text: str, image, pos: tuple, operation: tuple, size=30):
+    def __init__(self, screen: pg.surface.Surface, display_text: str, image, pos: tuple, operation: tuple, size=30):
         self.screen = screen
         self.font = pg.font.SysFont('Times New Roman', size)
 
-        self.name = name
         self.pos = pos
         self.operation = operation
 

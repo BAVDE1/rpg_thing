@@ -9,9 +9,9 @@ BASE_RES = BASE_UNIT * LVL_SIZE
 RES_MUL = 2  # should be whole number
 
 RESOLUTION_X = BASE_RES * RES_MUL
-SIDE_SPACE = RESOLUTION_X * 0.75  # amount of give for beside the level
-RESOLUTION_Y = RESOLUTION_X + SIDE_SPACE
-LEVEL_OFFSET = SIDE_SPACE * 0.5
+SIDE_GIVE = RESOLUTION_X * 0.75  # give amount beside the level
+RESOLUTION_Y = RESOLUTION_X + SIDE_GIVE
+LEVEL_OFFSET = SIDE_GIVE * 0.5
 UNIT = BASE_UNIT * RES_MUL
 
 # Player

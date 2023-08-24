@@ -1,7 +1,8 @@
 from level_editor.le_constants import *
 from constants import *
-from os import listdir
+import os
 from level_editor.button import Button
+from level_editor.file_displayer import FileDisplayer
 
 levels_dir = "assets/levels/"
 
@@ -11,7 +12,7 @@ class LevelEditor:
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
-        self.fps = 60
+        self.fps = 30
         self.running = True
         self.keys = pg.key.get_pressed()
         self.heading_text = ""
@@ -21,6 +22,7 @@ class LevelEditor:
         self.selecting_level = False
         self.selected_level = ""
 
+        self.file_displays = []  # type: list[FileDisplayer]
         self.buttons = []  # type: list[Button]
 
     # ------->
@@ -42,7 +44,9 @@ class LevelEditor:
 
     def render(self):
         self.screen.fill([0, 0, 0])
+
         self.display_text(self.heading_text)
+        self.display_files()
         self.display_buttons()
 
         if not self.selected_area and not self.selecting_area:
@@ -70,20 +74,21 @@ class LevelEditor:
     # --------->
 
     def open_area_select(self):
-        print("area")
         self.heading_text = "Area Select"
-        areas = listdir(str(levels_dir))
+        areas = sorted(os.listdir(str(levels_dir)))
         for i in range(len(areas)):
-            self.add_button(areas[i], (0, 35 + (25 * i)), areas[i], (BTN_AREA_SEL, areas[i]), size=20)
+            self.add_button((0, 35 + (25 * i)), areas[i], (BTN_AREA_SEL, areas[i]), size=20)
 
     def open_level_select(self):
-        print("level")
         self.heading_text = f"Level Select ({self.selected_area})"
-        levels = sorted(listdir(str(levels_dir + self.selected_area)))
+        levels = sorted(os.listdir(str(levels_dir + self.selected_area)))
+
         for i in range(len(levels)):
-            if levels[i].split(".")[0] != self.selected_area:
-                self.add_button(levels[i], (0, 10 + (25 * i)), levels[i], (BTN_LEVEL_SEL, levels[i]), size=20)
-        self.add_button("back", (0, self.screen.get_height() - 40), "Back", (BTN_BACK, self.open_area_select))
+            if levels[i].split(".")[0] == self.selected_area:
+                self.file_displays.append(FileDisplayer(self.screen, str(levels_dir + self.selected_area + "/" + levels[i]), (self.screen.get_width() / 2, 0)))
+            else:
+                self.add_button((0, 10 + (25 * i)), levels[i], (BTN_LEVEL_SEL, levels[i]), size=20)
+        self.add_button((0, self.screen.get_height() - 40), "Back", (BTN_BACK, self.open_area_select))
 
     # ------------>
     #  Functions
@@ -99,8 +104,12 @@ class LevelEditor:
         for btn in self.buttons:
             btn.render()
 
-    def add_button(self, name, pos: tuple, display_text: str, operation: tuple, size=30, image=None):
-        self.buttons.append(Button(screen=self.screen, name=name, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
+    def display_files(self):
+        for file in self.file_displays:
+            file.render()
+
+    def add_button(self, pos: tuple, display_text: str, operation: tuple, size=30, image=None):
+        self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
 
     def button_clicked(self, operation: tuple):
         """ Called in 'events' """
@@ -119,6 +128,7 @@ class LevelEditor:
                 self.selected_area = None
                 self.selecting_level = False
 
+        self.file_displays.clear()
         self.buttons.clear()
 
 

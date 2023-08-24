@@ -21,9 +21,13 @@ class LevelEditor:
         self.selected_area = ""
         self.selecting_level = False
         self.selected_level = ""
+        self.editing_level = ""
 
+        self.seperators = []
         self.file_displays = []  # type: list[FileDisplayer]
         self.buttons = []  # type: list[Button]
+
+        self.switch_page()
 
     # ------->
     #  Loops
@@ -41,24 +45,33 @@ class LevelEditor:
                 for btn in self.buttons:
                     if btn.is_mouse_in_bounds():
                         self.button_clicked(btn.mouse_down())
+                self.switch_page()
 
-    def render(self):
-        self.screen.fill([0, 0, 0])
+    def switch_page(self):
+        """ Switch page if needed. If already on page, do nothing """
 
-        self.display_text(self.heading_text)
-        self.display_files()
-        self.display_buttons()
-
+        # select area
         if not self.selected_area and not self.selecting_area:
             self.selecting_area = True
             self.open_area_select()
 
+        # select level
         if self.selected_area and not self.selected_level and not self.selecting_level:
             self.selecting_level = True
             self.open_level_select()
 
-        if self.selected_level:
-            pass
+        # level editor
+        if not self.editing_level and self.selected_area and self.selected_level:
+            self.editing_level = str(levels_dir + self.selected_area + "/" + self.selected_level)
+            self.open_level_editor()
+
+    def render(self):
+        self.screen.fill([0, 0, 0])
+
+        self.draw_seperators()
+        self.display_files()
+        self.display_buttons()
+        self.display_text(self.heading_text)
 
         pg.display.flip()
 
@@ -70,14 +83,14 @@ class LevelEditor:
             self.clock.tick(self.fps)
 
     # --------->
-    #  "PAGES"
+    #  PAGES
     # --------->
 
     def open_area_select(self):
         self.heading_text = "Area Select"
         areas = sorted(os.listdir(str(levels_dir)))
         for i in range(len(areas)):
-            self.add_button((0, 35 + (25 * i)), areas[i], (BTN_AREA_SEL, areas[i]), size=20)
+            self.add_button(areas[i], (0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
 
     def open_level_select(self):
         self.heading_text = f"Level Select ({self.selected_area})"
@@ -85,20 +98,41 @@ class LevelEditor:
 
         for i in range(len(levels)):
             if levels[i].split(".")[0] == self.selected_area:
-                self.file_displays.append(FileDisplayer(self.screen, str(levels_dir + self.selected_area + "/" + levels[i]), (self.screen.get_width() / 2, 0)))
+                self.add_file(str(levels_dir + self.selected_area + "/" + levels[i]), ((self.screen.get_width() / 2) + 20, 0))
             else:
-                self.add_button((0, 10 + (25 * i)), levels[i], (BTN_LEVEL_SEL, levels[i]), size=20)
-        self.add_button((0, self.screen.get_height() - 40), "Back", (BTN_BACK, self.open_area_select))
+                self.add_button(levels[i], (0, 10 + (25 * i)), (BTN_LEVEL_SEL, levels[i]), size=20)
+
+        self.add_button("Back", (0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
+        self.add_seperator((self.screen.get_width() / 2, 0), (self.screen.get_width() / 2, self.screen.get_height()))
+
+    def open_level_editor(self):
+        self.heading_text = f"Editing level - {self.selected_area}, {self.selected_level}"
+
+        # seperators
+        self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
+        self.add_seperator((0, 30), (self.screen.get_width(), 30))
+
+        # buttons
+        self.add_button("Save", (self.screen.get_width() - 280, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Save+Close", (self.screen.get_width() - 200, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Close", (self.screen.get_width() - 40, 8), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)), size=15)
+
+        # files
+        self.add_file(self.editing_level, (0, 50))
 
     # ------------>
     #  Functions
     # ------------>
 
-    def display_text(self, text, size=30, position=(0, 0)):
+    def display_text(self, text, size=25, position=(0, 0)):
         """ Needs to be called every frame so text remains rendered """
         fnt = pg.font.SysFont('Times New Roman', size)
         text_surf = fnt.render(text, True, (255, 255, 0))
         self.screen.blit(text_surf, position)
+
+    def draw_seperators(self):
+        for sep in self.seperators:
+            pg.draw.line(*sep)
 
     def display_buttons(self):
         for btn in self.buttons:
@@ -108,8 +142,14 @@ class LevelEditor:
         for file in self.file_displays:
             file.render()
 
-    def add_button(self, pos: tuple, display_text: str, operation: tuple, size=30, image=None):
+    def add_seperator(self, start: tuple, end: tuple):
+        self.seperators.append([self.screen, (255, 255, 255), start, end])
+
+    def add_button(self, display_text: str, pos: tuple, operation: tuple, size=30, image=None):
         self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
+
+    def add_file(self, file_dir:str, pos: tuple, size=20):
+        self.file_displays.append(FileDisplayer(self.screen, file_dir, pos, size=size))
 
     def button_clicked(self, operation: tuple):
         """ Called in 'events' """
@@ -119,15 +159,20 @@ class LevelEditor:
         if btn_op_type == BTN_AREA_SEL:
             self.selected_area = btn_op_value
             self.selecting_area = False
+            self.reset_data()
         if btn_op_type == BTN_LEVEL_SEL:
             self.selected_level = btn_op_value
             self.selecting_level = False
+            self.reset_data()
 
         if btn_op_type == BTN_BACK:
             if btn_op_value == self.open_area_select:
                 self.selected_area = None
                 self.selecting_level = False
+                self.reset_data()
 
+    def reset_data(self):
+        self.seperators.clear()
         self.file_displays.clear()
         self.buttons.clear()
 

@@ -38,4 +38,4 @@ class FileDisplayer:
     def render(self):
         self.screen.blit(self.display_text, self.pos)
         for i in range(len(self.display_file_lines)):
-            self.screen.blit(self.display_file_lines[i], (self.pos[0], self.pos[1] + (25 * (i + 1))))
+            self.screen.blit(self.display_file_lines[i], (self.pos[0], self.pos[1] + (20 * (i + 1))))

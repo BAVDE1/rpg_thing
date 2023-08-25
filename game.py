@@ -50,7 +50,7 @@ class Game:
 
     def render(self):
         self.screen.fill([0, 5, 5])
-        renderer.render(self.player, OVERWORLD_00, self.screen)
+        renderer.render(self.screen, self.player, OVERWORLD_00)
 
         pg.display.flip()
 

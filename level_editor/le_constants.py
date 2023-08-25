@@ -2,7 +2,7 @@
 
 SELECTED_AREA = "selected_area"
 SELECTED_LEVEL = "selected_level"
-EDITING_LEVEL = "editing_level"
+EDITOR_LEVEL = "editing_level"
 
 BTN_BACK = "btn_back"
 BTN_SAVE = "btn_save"

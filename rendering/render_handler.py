@@ -3,11 +3,11 @@ from level.level import Level
 level = None
 
 
-def render(player, level_to_render, surface):
+def render(surface, player, level_to_render):
     global level
 
     if not level:
-        level = Level(level_to_render, surface)
+        level = Level(surface, level_to_render)
 
     while not player.is_player_loaded():
         player.render_player()

@@ -1,4 +1,5 @@
 from level_editor.file_displayer import FileDisplayer
+from level_editor.level_editor import LevelEditor
 from level_editor.editor_state_handler import *
 from level_editor.le_constants import *
 from level_editor.button import Button
@@ -8,7 +9,13 @@ import os
 LEVELS_DIR = "assets/levels/"
 
 
-class LevelEditor:
+def render_class_items(items: list):
+    """ Used to render a list of classes. Classes must contain 'render()' function """
+    for item in items:
+        item.render()
+
+
+class LevelEditorMain:
     def __init__(self):
         self.screen = pg.display.get_surface()
         self.screen_rect = self.screen.get_rect()
@@ -22,11 +29,13 @@ class LevelEditor:
         self.selected_area = get_json_data()[SELECTED_AREA]
         self.selecting_level = False
         self.selected_level = get_json_data()[SELECTED_LEVEL]
-        self.editing_level = get_json_data()[EDITING_LEVEL]
+        self.editing_level = False
+        self.editor_level = get_json_data()[EDITOR_LEVEL]
 
         self.seperators = []
         self.file_displays = []  # type: list[FileDisplayer]
         self.buttons = []  # type: list[Button]
+        self.level_editors = []  # type: list[LevelEditor]
 
         self.switch_page()
 
@@ -36,11 +45,14 @@ class LevelEditor:
 
     def events(self):
         for event in pg.event.get():
+            # close game
             if event.type == pg.QUIT or self.keys[pg.K_ESCAPE]:
                 self.save_editor_state()
-                self.running = False  # close game
+                self.running = False
+
+            # update keys
             if event.type in (pg.KEYDOWN, pg.KEYUP):
-                self.keys = pg.key.get_pressed()  # update keys
+                self.keys = pg.key.get_pressed()
 
             # button click  (if buttons overlap, both will click)
             if event.type == pg.MOUSEBUTTONDOWN:
@@ -64,16 +76,19 @@ class LevelEditor:
 
         # level editor
         if self.selected_area and self.selected_level:
-            self.editing_level = f"{LEVELS_DIR}{self.selected_area}/{self.selected_level}"
-        if self.editing_level:
+            self.editor_level = f"{LEVELS_DIR}{self.selected_area}/{self.selected_level}"
+        if not self.editing_level and self.editor_level:
+            self.editing_level = True
             self.open_level_editor()
 
     def render(self):
         self.screen.fill([0, 0, 0])
 
         self.draw_seperators()
-        self.display_files()
-        self.display_buttons()
+        render_class_items(self.file_displays)
+        render_class_items(self.buttons)
+        render_class_items(self.level_editors)
+
         self.display_text(self.heading_text)
 
         pg.display.flip()
@@ -94,6 +109,7 @@ class LevelEditor:
         areas = sorted(os.listdir(str(LEVELS_DIR)))
         for i in range(len(areas)):
             self.add_button(areas[i], pg.Vector2(0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
+
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
     def open_level_select(self):
@@ -123,7 +139,9 @@ class LevelEditor:
         self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
-        self.add_file(self.editing_level, pg.Vector2(10, 40), size=12)
+        self.add_file(self.editor_level, pg.Vector2(10, 40), size=12)
+
+        self.level_editors.append(LevelEditor(self.screen, self.editor_level))
 
     # ------------>
     #  Functions
@@ -138,14 +156,6 @@ class LevelEditor:
     def draw_seperators(self):
         for sep in self.seperators:
             pg.draw.line(*sep)
-
-    def display_buttons(self):
-        for btn in self.buttons:
-            btn.render()
-
-    def display_files(self):
-        for file in self.file_displays:
-            file.render()
 
     def add_seperator(self, start: tuple, end: tuple):
         self.seperators.append([self.screen, (255, 255, 255), start, end])
@@ -163,11 +173,10 @@ class LevelEditor:
 
         if btn_op_type == BTN_AREA_SEL:
             self.selected_area = btn_op_value
-            self.selecting_area = False
             self.reset_data()
+
         if btn_op_type == BTN_LEVEL_SEL:
             self.selected_level = btn_op_value
-            self.selecting_level = False
             self.reset_data()
 
         if btn_op_type == BTN_BACK:
@@ -187,19 +196,24 @@ class LevelEditor:
             self.reset_data(complete=True)
 
     def reset_data(self, complete=False):
+        self.selecting_area = False
+        self.selecting_level = False
+        self.editing_level = False
+
         self.seperators.clear()
         self.file_displays.clear()
         self.buttons.clear()
+        self.level_editors.clear()
         if complete:
             self.selected_area = ""
             self.selected_level = ""
-            self.editing_level = ""
+            self.editor_level = ""
 
     def save_editor_state(self):
         dic = {
             SELECTED_AREA: self.selected_area,
             SELECTED_LEVEL: self.selected_level,
-            EDITING_LEVEL: self.editing_level
+            EDITOR_LEVEL: self.editor_level
         }
         save_json_data(dic)
 
@@ -208,7 +222,7 @@ def main():
     pg.init()
     pg.display.set_mode([RESOLUTION_X * 2, RESOLUTION_X])
     pg.font.init()
-    LevelEditor().main_loop()
+    LevelEditorMain().main_loop()
     pg.quit()
 
 

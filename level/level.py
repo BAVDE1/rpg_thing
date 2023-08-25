@@ -38,9 +38,12 @@ def store_layer(layer: list, layer_lines):
 
 
 class Level:
-    def __init__(self, level_source, surface):
+    def __init__(self, surface, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
         self.is_initialised = False
         self.surface = surface
+        self.pos_offset = pos_offset
+        self.size = size
+
         self.ground_layer_lines = parse_level_file(level_source)
         self.ground_layer = []
         self.outline_layer = []
@@ -95,12 +98,18 @@ class Level:
         for column in layer:
             c = 0
             for sprite in column:
-                if sprite:
-                    self.surface.blit(sprite, [((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - sprite.get_height() // 2])
+                if sprite and isinstance(sprite, pg.surface.Surface):
+                    sprite = pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
+                    self.surface.blit(sprite, self.create_draw_pos(sprite, r, c))
 
                 # add fade
                 if has_fade and c == 0 or c == len(column) - 1:
                     f_s = pg.transform.flip(FADE_SPRITE, 1, 0) if c == 0 else FADE_SPRITE
-                    self.surface.blit(f_s, [((c * UNIT) - f_s.get_width() // 2) + LEVEL_OFFSET, (r * UNIT) - f_s.get_height() // 2])
+                    f_s = pg.transform.scale(f_s, (f_s.get_width() * self.size, f_s.get_height() * self.size))
+                    self.surface.blit(f_s, self.create_draw_pos(f_s, r, c))
                 c += 1
             r += 1
+
+    def create_draw_pos(self, sprite: pg.surface.Surface, r, c):
+        return [((((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+                (((r * UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]

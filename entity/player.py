@@ -1,6 +1,7 @@
 import time
 from constants import *
-from rendering.rendering_other import split_sheet
+from rendering.split_sheet import split_sheet
+from rendering.shadow import render_shadow
 from utility.animator import Animator
 
 
@@ -17,7 +18,7 @@ class Player:
         self.ss_idle = split_sheet(self.texture_idle, (BASE_UNIT, BASE_UNIT), 4)
 
         self.current_texture = None
-        self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], False,
+        self.animator = Animator(self.game, [PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
                                  [PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PLAYER_JUMP_HORIZONTAL).convert_alpha(), (BASE_UNIT * 2, BASE_UNIT * 2), 8)],
                                  [PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PLAYER_JUMP_VERTICAL).convert_alpha(), (BASE_UNIT, BASE_UNIT * 3), 8)])
 
@@ -39,9 +40,9 @@ class Player:
 
         # move animation
         if x:
-            self.animator.do_animation(PLAYER_JUMP_HORIZONTAL, 0.125, offset_x=-x / 2, offset_y=-UNIT / 2)  # jump anim
+            self.animator.do_animation(PLAYER_JUMP_HORIZONTAL, PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -UNIT / 2))  # jump anim
         else:
-            self.animator.do_animation(PLAYER_JUMP_VERTICAL, 0.125, offset_y=0 if y < 0 else -UNIT, reverse=y > 0)
+            self.animator.do_animation(PLAYER_JUMP_VERTICAL, PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -UNIT), reverse=y > 0)
 
         # todo: send beat event (after player movement)
 
@@ -71,9 +72,10 @@ class Player:
             if self.flipped:
                 sprite = pg.transform.flip(sprite, 1, 0)
 
-            blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset_x,
-                    (self.sprite_pos.y - sprite.get_height() // 2) + self.animator.offset_y)
+            blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset.x,
+                    (self.sprite_pos.y - sprite.get_height() // 2) + self.animator.offset.y)
 
+            # render_shadow(self.surface, sprite, blit)
             self.surface.blit(sprite, blit)
 
     def is_player_loaded(self):

@@ -1,17 +1,17 @@
 import pygame as pg
-from rendering.rendering_other import split_sheet
+from rendering.split_sheet import split_sheet
 
 # Screen
 CAPTION = "rpg thing"
 LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
 BASE_UNIT = 20  # ascii level files need to be 19x19
 BASE_RES = BASE_UNIT * LVL_SIZE
-RES_MUL = 2  # should be whole number
+RES_MUL = 3  # should be whole number
 
 RESOLUTION_X = BASE_RES * RES_MUL
-SIDE_GIVE = RESOLUTION_X * 0.75  # give amount beside the level
+SIDE_GIVE = RESOLUTION_X * .75  # give amount beside the level
 RESOLUTION_Y = RESOLUTION_X + SIDE_GIVE
-LEVEL_OFFSET = SIDE_GIVE * 0.5
+LEVEL_OFFSET = SIDE_GIVE * .5
 UNIT = BASE_UNIT * RES_MUL
 
 # Player
@@ -19,8 +19,9 @@ PLAYER_IDLE = "assets/textures/player_idle.png"
 PLAYER_JUMP_HORIZONTAL = "assets/textures/player_jump_horizontal.png"
 PLAYER_JUMP_VERTICAL = "assets/textures/player_jump_vertical.png"
 PLAYER_IDLE_DEBUG = "assets/textures/player_idle_debug.png"
-MOVEMENT_PAUSE = 0.15  # 0.15
-HOLD_TIME_TO_SPRINT = 0.5
+MOVEMENT_PAUSE = .15  # 0.15
+PLAYER_MOVE_ANIM_SPEED = .125  # .125
+HOLD_TIME_TO_SPRINT = .5
 
 UP = "u"
 DOWN = "d"
@@ -51,8 +52,8 @@ DIRECTION_MOV = {
 
 # Rendering
 SHADOW_ALPHA = 50  # 0 - 255
-SHADOW_WIDTH = 0.8  # %
-SHADOW_HEIGHT = 0.4  # %
+SHADOW_WIDTH = .8  # %
+SHADOW_HEIGHT = .4  # %
 
 # Levels
 OVERWORLD = "assets/levels/overworld/overworld.txt"

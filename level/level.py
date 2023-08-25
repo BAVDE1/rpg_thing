@@ -25,7 +25,7 @@ def outline_decider(dic: dict):
             should = False if bool(dic[k]) != outlines[key][k] else should
         if should:
             add = key
-            break  # stop loop
+            break  # stop loop once it finds a suitable tile
     return add
 
 
@@ -110,6 +110,6 @@ class Level:
                 c += 1
             r += 1
 
-    def create_draw_pos(self, sprite: pg.surface.Surface, r, c):
-        return [((((c * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET) * self.size) + self.pos_offset.x,
-                (((r * UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]
+    def create_draw_pos(self, sprite: pg.surface.Surface, row, column):
+        return [((((column * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+                (((row * UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]

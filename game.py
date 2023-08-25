@@ -4,7 +4,7 @@ import input_handler
 import rendering.render_handler as renderer
 from constants import *
 from entity.player import Player
-from rendering.rendering_other import split_sheet
+from rendering.split_sheet import split_sheet
 
 
 class Game:

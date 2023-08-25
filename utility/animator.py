@@ -1,3 +1,4 @@
+from constants import *
 import time
 
 idle_error = "Error in loading '{}' idle sprite sheet.\n Something has gone wrong with creation of sprite sheet, or sheet was not added to list."
@@ -6,7 +7,7 @@ no_anim_error = "Cannot animate '{}' because there are no animations registered.
 
 
 class Animator:
-    def __init__(self, game, idle_ss, boomerang_idle=False, *one_time_ss):
+    def __init__(self, game, idle_ss, og_offset: pg.Vector2, boomerang_idle=False, *one_time_ss):
         """ ss - sprite sheets - must be lists of two objects - [0]: CONSTANT, [1]: sprite sheet """
         self.game = game
         self.texture_obj = None
@@ -31,8 +32,8 @@ class Animator:
         self.anim_frame_speed = None
         self.last_anim_frame_time = None
 
-        self.offset_x = 0
-        self.offset_y = 0
+        self.og_offset = og_offset
+        self.offset = og_offset
 
         self.update()  # init
 
@@ -58,8 +59,8 @@ class Animator:
         """ Should be called every frame """
         if self.idling:
             if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
-                self.offset_x = 0
-                self.offset_y = 0
+                if self.offset != self.og_offset:
+                    self.offset = self.og_offset
 
                 self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
                 self.advance_idle_animation_frame()
@@ -89,7 +90,7 @@ class Animator:
         else:
             self.last_anim_frame_time = time.time()
 
-    def do_animation(self, anim, duration, offset_x=0, offset_y=0, reverse=False):
+    def do_animation(self, anim, duration, offset: pg.Vector2 = pg.Vector2(0, 0), reverse=False):
         """ Call to execute a registered animation (does not loop) """
         if self.one_time_ss:
             if anim not in self.one_time_ss:
@@ -110,8 +111,7 @@ class Animator:
                 self.last_anim_frame_time = time.time()
                 self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
 
-                self.offset_x = offset_x
-                self.offset_y = offset_y
+                self.offset = offset
         else:
             raise IndexError(no_anim_error.format(anim))
 

@@ -89,15 +89,22 @@ class Animator:
         else:
             self.last_anim_frame_time = time.time()
 
-    def do_animation(self, anim, duration, offset_x=0, offset_y=0):
+    def do_animation(self, anim, duration, offset_x=0, offset_y=0, reverse=False):
         """ Call to execute a registered animation (does not loop) """
         if self.one_time_ss:
             if anim not in self.one_time_ss:
                 raise IndexError(missing_anim_error.format(anim, self.one_time_ss))
 
             if not self.current_anim_ss:
+                anim_list = list(self.one_time_ss[anim])
+
+                # flip animation
+                if reverse:
+                    for i in range(len(anim_list)):
+                        anim_list.insert(i, anim_list.pop())
+
                 self.idling = False
-                self.current_anim_ss = [anim, self.one_time_ss[anim]]
+                self.current_anim_ss = [anim, anim_list]
                 self.current_anim_frame = 0
                 self.anim_frame_speed = duration / len(self.current_anim_ss[1])
                 self.last_anim_frame_time = time.time()

@@ -120,7 +120,7 @@ class LevelEditor:
         self.add_button("Close", (self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
-        self.add_file(self.editing_level, (10, 40), size=10)
+        self.add_file(self.editing_level, (10, 40), size=12)
 
     # ------------>
     #  Functions

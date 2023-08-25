@@ -6,7 +6,7 @@ CAPTION = "rpg thing"
 LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
 BASE_UNIT = 20  # ascii level files need to be 19x19
 BASE_RES = BASE_UNIT * LVL_SIZE
-RES_MUL = 3  # should be whole number
+RES_MUL = 2  # should be whole number
 
 RESOLUTION_X = BASE_RES * RES_MUL
 SIDE_GIVE = RESOLUTION_X * 0.75  # give amount beside the level

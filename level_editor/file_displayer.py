@@ -16,7 +16,7 @@ def parse_file(file):
 
 
 class FileDisplayer:
-    def __init__(self, screen: pg.surface.Surface, file_dir: str, pos: tuple, size=20):
+    def __init__(self, screen: pg.surface.Surface, file_dir: str, pos: pg.Vector2, size=20):
         self.screen = screen
         self.file_dir = file_dir
 

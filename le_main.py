@@ -1,10 +1,11 @@
+from level_editor.file_displayer import FileDisplayer
+from level_editor.editor_state_handler import *
 from level_editor.le_constants import *
+from level_editor.button import Button
 from constants import *
 import os
-from level_editor.button import Button
-from level_editor.file_displayer import FileDisplayer
 
-levels_dir = "assets/levels/"
+LEVELS_DIR = "assets/levels/"
 
 
 class LevelEditor:
@@ -18,10 +19,10 @@ class LevelEditor:
         self.heading_text = ""
 
         self.selecting_area = False
-        self.selected_area = ""
+        self.selected_area = get_json_data()[SELECTED_AREA]
         self.selecting_level = False
-        self.selected_level = ""
-        self.editing_level = ""
+        self.selected_level = get_json_data()[SELECTED_LEVEL]
+        self.editing_level = get_json_data()[EDITING_LEVEL]
 
         self.seperators = []
         self.file_displays = []  # type: list[FileDisplayer]
@@ -36,6 +37,7 @@ class LevelEditor:
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or self.keys[pg.K_ESCAPE]:
+                self.save_editor_state()
                 self.running = False  # close game
             if event.type in (pg.KEYDOWN, pg.KEYUP):
                 self.keys = pg.key.get_pressed()  # update keys
@@ -61,8 +63,9 @@ class LevelEditor:
             self.open_level_select()
 
         # level editor
-        if not self.editing_level and self.selected_area and self.selected_level:
-            self.editing_level = str(levels_dir + self.selected_area + "/" + self.selected_level)
+        if self.selected_area and self.selected_level:
+            self.editing_level = f"{LEVELS_DIR}{self.selected_area}/{self.selected_level}"
+        if self.editing_level:
             self.open_level_editor()
 
     def render(self):
@@ -88,22 +91,22 @@ class LevelEditor:
 
     def open_area_select(self):
         self.heading_text = "Area Select"
-        areas = sorted(os.listdir(str(levels_dir)))
+        areas = sorted(os.listdir(str(LEVELS_DIR)))
         for i in range(len(areas)):
-            self.add_button(areas[i], (0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
+            self.add_button(areas[i], pg.Vector2(0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
     def open_level_select(self):
         self.heading_text = f"Level Select ({self.selected_area})"
-        levels = sorted(os.listdir(str(levels_dir + self.selected_area)))
+        levels = sorted(os.listdir(str(LEVELS_DIR + self.selected_area)))
 
         for i in range(len(levels)):
             if levels[i].split(".")[0] == self.selected_area:
-                self.add_file(str(levels_dir + self.selected_area + "/" + levels[i]), ((self.screen.get_width() / 2) + 20, 40))
+                self.add_file(f"{LEVELS_DIR}{self.selected_area}/{levels[i]}", pg.Vector2((self.screen.get_width() / 2) + 20, 40))
             else:
-                self.add_button(levels[i], (0, 10 + (25 * i)), (BTN_LEVEL_SEL, levels[i]), size=20)
+                self.add_button(levels[i], pg.Vector2(0, 10 + (25 * i)), (BTN_LEVEL_SEL, levels[i]), size=20)
 
-        self.add_button("Back", (0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
+        self.add_button("Back", pg.Vector2(0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
         self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
@@ -115,12 +118,12 @@ class LevelEditor:
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
         # buttons
-        self.add_button("Save", (self.screen.get_width() - 300, 0), (BTN_SAVE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
-        self.add_button("Save&Close", (self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, str(levels_dir + self.selected_area + "/" + self.selected_level)))
-        self.add_button("Close", (self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
+        self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), (BTN_SAVE, str(LEVELS_DIR + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, str(LEVELS_DIR + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
-        self.add_file(self.editing_level, (10, 40), size=12)
+        self.add_file(self.editing_level, pg.Vector2(10, 40), size=12)
 
     # ------------>
     #  Functions
@@ -147,14 +150,14 @@ class LevelEditor:
     def add_seperator(self, start: tuple, end: tuple):
         self.seperators.append([self.screen, (255, 255, 255), start, end])
 
-    def add_button(self, display_text: str, pos: tuple, operation: tuple, size=30, image=None):
+    def add_button(self, display_text: str, pos: pg.Vector2, operation: tuple, size=30, image=None):
         self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
 
-    def add_file(self, file_dir:str, pos: tuple, size=20):
+    def add_file(self, file_dir:str, pos: pg.Vector2, size=20):
         self.file_displays.append(FileDisplayer(self.screen, file_dir, pos, size=size))
 
     def button_clicked(self, operation: tuple):
-        """ Called in 'events' """
+        """ Called in 'events' every time a button is clicked """
         btn_op_type = operation[0]
         btn_op_value = operation[1]
 
@@ -169,7 +172,7 @@ class LevelEditor:
 
         if btn_op_type == BTN_BACK:
             if btn_op_value == self.open_area_select:
-                self.selected_area = None
+                self.selected_area = ""
                 self.selecting_level = False
                 self.reset_data()
 
@@ -191,6 +194,14 @@ class LevelEditor:
             self.selected_area = ""
             self.selected_level = ""
             self.editing_level = ""
+
+    def save_editor_state(self):
+        dic = {
+            SELECTED_AREA: self.selected_area,
+            SELECTED_LEVEL: self.selected_level,
+            EDITING_LEVEL: self.editing_level
+        }
+        save_json_data(dic)
 
 
 def main():

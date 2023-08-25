@@ -2,7 +2,7 @@ from constants import *
 
 
 class Button:
-    def __init__(self, screen: pg.surface.Surface, display_text: str, image, pos: tuple, operation: tuple, size=30):
+    def __init__(self, screen: pg.surface.Surface, display_text: str, image, pos: pg.Vector2, operation: tuple, size=30):
         self.screen = screen
         self.font = pg.font.SysFont('Times New Roman', size)
 
@@ -13,8 +13,8 @@ class Button:
         self.image = image
 
         # positional bounds [0][0]=x_left, [0][1]=x_right, [1][0]=y_top, [1][1]=y_bottom
-        self.bounds = [(self.pos[0], self.pos[0] + self.display_text.get_width()),
-                       (self.pos[1], self.pos[1] + self.display_text.get_height() + (0 if not self.image else self.image.get_height()))]
+        self.bounds = [(self.pos.x, self.pos.x + self.display_text.get_width()),
+                       (self.pos.y, self.pos.y + self.display_text.get_height() + (0 if not self.image else self.image.get_height()))]
 
     def render(self):
         self.mouse_hover()
@@ -22,7 +22,7 @@ class Button:
         # render text and image
         self.screen.blit(self.display_text, self.pos)
         if self.image:
-            self.screen.blit(self.image, (self.pos[0], self.pos[1] + self.display_text.get_height()))
+            self.screen.blit(self.image, (self.pos.x, self.pos.y + self.display_text.get_height()))
 
     def mouse_down(self):
         if self.is_mouse_in_bounds():

@@ -9,7 +9,7 @@ import os
 LEVELS_DIR = "assets/levels/"
 
 
-def render_class_items(items: list):
+def render_class_items(items: list[FileDisplayer | Button | LevelEditor]):
     """ Used to render a list of classes. Classes must contain 'render()' function """
     for item in items:
         item.render()
@@ -134,8 +134,8 @@ class LevelEditorMain:
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
         # buttons
-        self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), (BTN_SAVE, str(LEVELS_DIR + self.selected_area + "/" + self.selected_level)))
-        self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, str(LEVELS_DIR + self.selected_area + "/" + self.selected_level)))
+        self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), (BTN_SAVE, self.editor_level))
+        self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, self.editor_level))
         self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
@@ -186,10 +186,10 @@ class LevelEditorMain:
                 self.reset_data()
 
         if btn_op_type == BTN_SAVE:
-            print("SAVE")
+            print("SAVE", btn_op_value)
 
         if btn_op_type == BTN_SAVE_CLOSE:
-            print("SAVE")
+            print("SAVE", btn_op_value)
             self.reset_data(complete=True)
 
         if btn_op_type == BTN_CLOSE:

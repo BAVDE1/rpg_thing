@@ -33,7 +33,7 @@ class Game:
                 if event.type == pg.KEYDOWN:
                     input_handler.player_key_down(self.player, event.key)
 
-                    # dev mode
+                    # dev thingos
                     if self.keys[pg.K_p]:
                         self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
                     if self.keys[pg.K_m]:  # set idle anim

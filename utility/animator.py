@@ -7,7 +7,7 @@ no_anim_error = "Cannot animate '{}' because there are no animations registered.
 
 
 class Animator:
-    def __init__(self, game, idle_ss, og_offset: pg.Vector2, boomerang_idle=False, *one_time_ss):
+    def __init__(self, game, idle_ss, idle_offset: pg.Vector2, boomerang_idle=False, *one_time_ss):
         """ ss - sprite sheets - must be lists of two objects - [0]: CONSTANT, [1]: sprite sheet """
         self.game = game
         self.texture_obj = None
@@ -32,8 +32,8 @@ class Animator:
         self.anim_frame_speed = None
         self.last_anim_frame_time = None
 
-        self.og_offset = og_offset
-        self.offset = og_offset
+        self.idle_offset = idle_offset
+        self.offset = idle_offset
 
         self.update()  # init
 
@@ -59,8 +59,8 @@ class Animator:
         """ Should be called every frame """
         if self.idling:
             if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
-                if self.offset != self.og_offset:
-                    self.offset = self.og_offset
+                if self.offset != self.idle_offset:
+                    self.offset = self.idle_offset
 
                 self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
                 self.advance_idle_animation_frame()

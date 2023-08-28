@@ -60,7 +60,7 @@ class Player:
 
     def can_move(self):
         """ Returns true if the player is allowed to move """
-        # TODO: replace out animator.current_anim_ss with some other solution to the animation jumping
+        # TODO: replace animator.current_anim_ss with some other solution to the animation moving bug
         return not self.moving and not self.animator.current_anim_ss and time.time() - MOVEMENT_PAUSE > self.last_moved
 
     def render_player(self):
@@ -69,8 +69,7 @@ class Player:
 
         if self.is_player_loaded():
             sprite = pg.transform.scale(self.current_texture, (self.current_texture.get_width() * RES_MUL, self.current_texture.get_height() * RES_MUL))
-            if self.flipped:
-                sprite = pg.transform.flip(sprite, 1, 0)
+            sprite = pg.transform.flip(sprite, True if self.flipped else False, False)
 
             blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset.x,
                     (self.sprite_pos.y - sprite.get_height() // 2) + self.animator.offset.y)

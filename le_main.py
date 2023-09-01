@@ -3,8 +3,9 @@ from level_editor.level_editor import LevelEditor
 from level_editor.editor_state_handler import *
 from level_editor.le_constants import *
 from level_editor.button import Button
-from constants import *
+from constants import GameUnits
 import os
+import pygame as pg
 
 LEVELS_DIR = "assets/levels/"
 
@@ -220,7 +221,7 @@ class LevelEditorMain:
 
 def main():
     pg.init()
-    pg.display.set_mode([RESOLUTION_X * 2, RESOLUTION_X])
+    pg.display.set_mode([GameUnits.RESOLUTION_X * 2, GameUnits.RESOLUTION_X])
     pg.font.init()
     LevelEditorMain().main_loop()
     pg.quit()

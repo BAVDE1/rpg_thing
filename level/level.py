@@ -1,5 +1,7 @@
-from constants import *
+from constants import GameUnits, DirectionalValues
+from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
 import os
+import pygame as pg
 
 
 def parse_level_file(level_source):
@@ -16,7 +18,7 @@ def parse_level_file(level_source):
 
 
 def outline_decider(dic: dict):
-    outlines = get_outline_tileset_dict(LEAVES_TILESET_SPRITES)
+    outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_SPRITES)
 
     add = None
     for key in outlines.keys():
@@ -69,15 +71,15 @@ class Level:
                 w = max(0, c - 1)
 
                 row.append(outline_decider({
-                    TILE: sprite,
-                    NORTH: self.ground_layer[n][c],
-                    SOUTH: self.ground_layer[s][c],
-                    EAST: self.ground_layer[r][e],
-                    WEST: self.ground_layer[r][w],
-                    NORTH_EAST: self.ground_layer[n][e],
-                    NORTH_WEST: self.ground_layer[n][w],
-                    SOUTH_EAST: self.ground_layer[s][e],
-                    SOUTH_WEST: self.ground_layer[s][w]
+                    DirectionalValues.TILE: sprite,
+                    DirectionalValues.NORTH: self.ground_layer[n][c],
+                    DirectionalValues.SOUTH: self.ground_layer[s][c],
+                    DirectionalValues.EAST: self.ground_layer[r][e],
+                    DirectionalValues.WEST: self.ground_layer[r][w],
+                    DirectionalValues.NORTH_EAST: self.ground_layer[n][e],
+                    DirectionalValues.NORTH_WEST: self.ground_layer[n][w],
+                    DirectionalValues.SOUTH_EAST: self.ground_layer[s][e],
+                    DirectionalValues.SOUTH_WEST: self.ground_layer[s][w]
                 }))
                 c += 1
             self.outline_layer.append(row)
@@ -104,12 +106,12 @@ class Level:
 
                 # add fade
                 if has_fade and c == 0 or c == len(column) - 1:
-                    f_s = pg.transform.flip(FADE_SPRITE, 1, 0) if c == 0 else FADE_SPRITE
+                    f_s = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if c == 0 else TileTextures.FADE_SPRITE
                     f_s = pg.transform.scale(f_s, (f_s.get_width() * self.size, f_s.get_height() * self.size))
                     self.surface.blit(f_s, self.create_draw_pos(f_s, r, c))
                 c += 1
             r += 1
 
     def create_draw_pos(self, sprite: pg.surface.Surface, row, column):
-        return [((((column * UNIT) - sprite.get_width() // 2) + LEVEL_OFFSET) * self.size) + self.pos_offset.x,
-                (((row * UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]
+        return [((((column * GameUnits.UNIT) - sprite.get_width() // 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+                (((row * GameUnits.UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]

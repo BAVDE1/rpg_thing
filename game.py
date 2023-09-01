@@ -1,8 +1,10 @@
 import time
+import pygame as pg
 
 import input_handler
 import rendering.render_handler as renderer
-from constants import *
+from constants import GameUnits, LevelLocations
+from texture_constants import PlayerTextures
 from entity.player import Player
 from rendering.split_sheet import split_sheet
 
@@ -37,9 +39,9 @@ class Game:
                     if self.keys[pg.K_p]:
                         self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
                     if self.keys[pg.K_m]:  # set idle anim
-                        texture_idle = pg.image.load(PLAYER_IDLE_DEBUG).convert_alpha()
-                        ss_idle = split_sheet(texture_idle, (BASE_UNIT, BASE_UNIT), 4)
-                        self.player.animator.change_idle_anim(False, new_idle_ss=[PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
+                        texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE_DEBUG).convert_alpha()
+                        ss_idle = split_sheet(texture_idle, (GameUnits.BASE_UNIT, GameUnits.BASE_UNIT), 4)
+                        self.player.animator.change_idle_anim(False, new_idle_ss=[PlayerTextures.PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
                     if self.keys[pg.K_n]:  # reset idle anim
                         self.player.animator.change_idle_anim(set_to_default=True)
                 elif event.type == pg.KEYUP:
@@ -50,7 +52,7 @@ class Game:
 
     def render(self):
         self.screen.fill([0, 5, 5])
-        renderer.render(self.screen, self.player, OVERWORLD_00)
+        renderer.render(self.screen, self.player, LevelLocations.OVERWORLD_00)
 
         pg.display.flip()
 
@@ -62,4 +64,4 @@ class Game:
 
             self.clock.tick(self.fps)
 
-            pg.display.set_caption("{} - FPS: {:.2f}".format(CAPTION, self.clock.get_fps()))
+            pg.display.set_caption("{} - FPS: {:.2f}".format(GameUnits.CAPTION, self.clock.get_fps()))

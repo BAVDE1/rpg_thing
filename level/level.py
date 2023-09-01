@@ -1,7 +1,5 @@
 from constants import GameUnits, DirectionalValues
 from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
-from utility.util import time_it
-from dataclasses import dataclass
 import os
 import pygame as pg
 
@@ -20,6 +18,7 @@ def parse_level_file(level_source):
 
 
 def outline_decider(dic: dict):
+    """ Returns None if no outline is suitable """
     outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_SPRITES)
 
     add = None
@@ -57,74 +56,82 @@ class Level:
         self.size = size
 
         self.ground_layer_lines = parse_level_file(level_source)
-        self.ground_layer = []
-        self.outline_layer = []
+        self.ground_layer_group = pg.sprite.Group()
+        self.outline_layer_group = pg.sprite.Group()
 
         self.initialise_level()
 
-    @time_it  # about 0.03 seconds
     def initialise_level(self):
         if not self.is_initialised:
-            store_layer(self.ground_layer, self.ground_layer_lines)
-            self.initialise_outline()
+            self.store_group(self.ground_layer_group, self.ground_layer_lines)
+            self.store_outline(True)
 
             self.is_initialised = True
-
-    def initialise_outline(self):
-        r = 0
-        for column in self.ground_layer:
-            c = 0
-            row = []
-            for sprite in column:
-                n = max(0, r - 1)
-                s = min(len(self.ground_layer) - 1, r + 1)
-                e = min(len(column) - 1, c + 1)
-                w = max(0, c - 1)
-
-                row.append(outline_decider({
-                    DirectionalValues.TILE: sprite,
-                    DirectionalValues.NORTH: self.ground_layer[n][c],
-                    DirectionalValues.SOUTH: self.ground_layer[s][c],
-                    DirectionalValues.EAST: self.ground_layer[r][e],
-                    DirectionalValues.WEST: self.ground_layer[r][w],
-                    DirectionalValues.NORTH_EAST: self.ground_layer[n][e],
-                    DirectionalValues.NORTH_WEST: self.ground_layer[n][w],
-                    DirectionalValues.SOUTH_EAST: self.ground_layer[s][e],
-                    DirectionalValues.SOUTH_WEST: self.ground_layer[s][w]
-                }))
-                c += 1
-            self.outline_layer.append(row)
-            r += 1
 
     def render_level(self):
         """ Called every frame """
         if self.is_initialised:
-            self.draw_layer(self.ground_layer)
+            self.ground_layer_group.draw(self.surface)
 
     def render_level_foreground(self):
         """ Called every frame (after other things have been rendered) """
         if self.is_initialised:
-            self.draw_layer(self.outline_layer, True)
+            self.outline_layer_group.draw(self.surface)
 
-    # @time_it  # about 0.007 seconds on average
-    def draw_layer(self, layer, has_fade=False):
-        for r, column in enumerate(layer):
-            for c, sprite in enumerate(column):
-                if sprite and isinstance(sprite, pg.surface.Surface):
-                    sprite = pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
-                    g = pg.sprite.Group()
-                    dp = self.create_draw_pos(sprite, r, c)
-                    s = TileSprite(sprite, pg.Vector2(dp[0], dp[1]))
-                    s.add(g)
-                    g.draw(self.surface)
-                    # self.surface.blit(sprite, self.create_draw_pos(sprite, r, c))
+    def store_group(self, group: pg.sprite.Group, layer_lines):
+        for r, line in enumerate(layer_lines):
+            for c, chars in enumerate(line.split(",")):
+                if sp := ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None:
+                    sp = self.scaled_sprite(sp)
+                    t_pos = self.create_tile_pos(sp, r, c)
 
-                # add fade
-                if has_fade and c == 0 or c == len(column) - 1:
-                    f_s = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if c == 0 else TileTextures.FADE_SPRITE
-                    f_s = pg.transform.scale(f_s, (f_s.get_width() * self.size, f_s.get_height() * self.size))
-                    self.surface.blit(f_s, self.create_draw_pos(f_s, r, c))
+                    sprite = TileSprite(sp, t_pos)
+                    sprite.add(group)
 
-    def create_draw_pos(self, sprite: pg.surface.Surface, row, column):
-        return [((((column * GameUnits.UNIT) - sprite.get_width() // 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
-                (((row * GameUnits.UNIT) - sprite.get_height() // 2) * self.size) + self.pos_offset.y]
+    def store_outline(self, store_fade=False):
+        ground_layer_bools = []
+        for line in self.ground_layer_lines:
+            row = [1 if chars in ASCII_TO_SPRITE else 0 for chars in line.split(',')]
+            ground_layer_bools.append(row)
+
+        for r, line in enumerate(ground_layer_bools):
+            for c, chars in enumerate(line):
+                n = max(0, r - 1)
+                s = min(len(ground_layer_bools) - 1, r + 1)
+                e = min(len(line) - 1, c + 1)
+                w = max(0, c - 1)
+
+                sp = outline_decider({
+                    DirectionalValues.TILE: chars,
+                    DirectionalValues.NORTH: ground_layer_bools[n][c],
+                    DirectionalValues.SOUTH: ground_layer_bools[s][c],
+                    DirectionalValues.EAST: ground_layer_bools[r][e],
+                    DirectionalValues.WEST: ground_layer_bools[r][w],
+                    DirectionalValues.NORTH_EAST: ground_layer_bools[n][e],
+                    DirectionalValues.NORTH_WEST: ground_layer_bools[n][w],
+                    DirectionalValues.SOUTH_EAST: ground_layer_bools[s][e],
+                    DirectionalValues.SOUTH_WEST: ground_layer_bools[s][w]
+                })
+
+                if sp:
+                    sp = self.scaled_sprite(sp)
+                    t_pos = self.create_tile_pos(sp, r, c)
+
+                    sprite = TileSprite(sp, t_pos)
+                    sprite.add(self.outline_layer_group)
+
+                if store_fade and (c == 0 or c == len(line) - 1):
+                    f_sp = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if c == 0 else TileTextures.FADE_SPRITE
+                    f_sp = self.scaled_sprite(f_sp)
+                    f_pos = self.create_tile_pos(f_sp, r, c)
+
+                    f_sprite = TileSprite(f_sp, f_pos)
+                    f_sprite.add(self.outline_layer_group)
+
+    def scaled_sprite(self, sprite) -> pg.surface.Surface:
+        return pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
+
+    def create_tile_pos(self, sprite: pg.surface.Surface, row, column) -> pg.Vector2:
+        return pg.Vector2(
+            ((((column * GameUnits.UNIT) - sprite.get_width() / 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+            (((row * GameUnits.UNIT) - sprite.get_height() / 2) * self.size) + self.pos_offset.y)

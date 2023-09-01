@@ -142,7 +142,7 @@ class LevelEditorMain:
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=12)
 
-        self.level_editors.append(LevelEditor(self.screen, self.editor_level))
+        self.level_editors.append(LevelEditor(self.screen, self.editor_level, size=0.8))
 
     # ------------>
     #  Functions

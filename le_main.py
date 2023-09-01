@@ -1,13 +1,13 @@
 from level_editor.file_displayer import FileDisplayer
-from level_editor.level_editor import LevelEditor
-from level_editor.editor_state_handler import *
+from level_editor.le_editor import LevelEditor
+from level_editor.le_state_handler import *
 from level_editor.le_constants import *
 from level_editor.button import Button
 from constants import GameUnits
 import os
 import pygame as pg
 
-LEVELS_DIR = "assets/levels/"
+LEVELS_DIR = "./assets/levels/"
 
 
 def render_class_items(items: list[FileDisplayer | Button | LevelEditor]):

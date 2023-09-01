@@ -1,6 +1,6 @@
 import json
 
-EDITOR_STATE_FILE = "level_editor/editor_state.json"
+EDITOR_STATE_FILE = "level_editor/le_state.json"
 
 
 def get_json_data():

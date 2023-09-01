@@ -1,5 +1,7 @@
 from constants import GameUnits, DirectionalValues
 from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
+from utility.util import time_it
+from dataclasses import dataclass
 import os
 import pygame as pg
 
@@ -39,6 +41,14 @@ def store_layer(layer: list, layer_lines):
         layer.append(row)
 
 
+class TileSprite(pg.sprite.Sprite):
+    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
+        pg.sprite.Sprite.__init__(self)
+
+        self.image = sprite_img
+        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
+
+
 class Level:
     def __init__(self, surface, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
         self.is_initialised = False
@@ -52,6 +62,7 @@ class Level:
 
         self.initialise_level()
 
+    @time_it  # about 0.03 seconds
     def initialise_level(self):
         if not self.is_initialised:
             store_layer(self.ground_layer, self.ground_layer_lines)
@@ -95,22 +106,24 @@ class Level:
         if self.is_initialised:
             self.draw_layer(self.outline_layer, True)
 
+    # @time_it  # about 0.007 seconds on average
     def draw_layer(self, layer, has_fade=False):
-        r = 0
-        for column in layer:
-            c = 0
-            for sprite in column:
+        for r, column in enumerate(layer):
+            for c, sprite in enumerate(column):
                 if sprite and isinstance(sprite, pg.surface.Surface):
                     sprite = pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
-                    self.surface.blit(sprite, self.create_draw_pos(sprite, r, c))
+                    g = pg.sprite.Group()
+                    dp = self.create_draw_pos(sprite, r, c)
+                    s = TileSprite(sprite, pg.Vector2(dp[0], dp[1]))
+                    s.add(g)
+                    g.draw(self.surface)
+                    # self.surface.blit(sprite, self.create_draw_pos(sprite, r, c))
 
                 # add fade
                 if has_fade and c == 0 or c == len(column) - 1:
                     f_s = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if c == 0 else TileTextures.FADE_SPRITE
                     f_s = pg.transform.scale(f_s, (f_s.get_width() * self.size, f_s.get_height() * self.size))
                     self.surface.blit(f_s, self.create_draw_pos(f_s, r, c))
-                c += 1
-            r += 1
 
     def create_draw_pos(self, sprite: pg.surface.Surface, row, column):
         return [((((column * GameUnits.UNIT) - sprite.get_width() // 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,

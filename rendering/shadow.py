@@ -1,20 +1,38 @@
+from dataclasses import dataclass
 import pygame as pg
 
 
+@dataclass
+class ToGoal:
+    pass
+
+
+class ShadowStripSprite(pg.sprite.Sprite):
+    """ Sprite object to hold shadow sprites """
+    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
+        pg.sprite.Sprite.__init__(self)
+
+        self.image = sprite_img
+        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
+
+
 class Shadow:
-    def __init__(self, sprite: pg.surface.Surface, alpha: int = 150, slope=0.8, sign=-.5):
+    def __init__(self, sprite: pg.surface.Surface, position: pg.Vector2, alpha: int = 100, slope=0.8, sign=-.5):
         self.sprite = sprite
 
         self.shadow_offset = pg.Vector2(0, 0)
         self.shadow_alpha = alpha
 
-        self.shadow_strips = self.make_shadow_elements()
+        self.shadow_strips = self.make_shadow_elements(position)
+        self.shadow_strips_group = pg.sprite.Group()
 
         self.slope = slope
         self.sign = sign
 
-    def make_shadow_elements(self):
-        """ Split the image into horizontal strips. """
+    def make_shadow_elements(self, position: pg.Vector2):
+        """ Split the image into horizontal strips.
+        WARNING: updating this too often is heavy on performance
+        """
         blank_col = (0, 0, 0, 0)
 
         color_key = self.sprite.get_colorkey()
@@ -40,27 +58,14 @@ class Shadow:
             angled = pg.Vector2((self.sprite.get_rect().x + i * self.slope * self.sign),
                                 (self.sprite.get_rect().bottom - 1 + i * self.sign))
 
-            pos = (((position.x - self.sprite.get_width() / 2 + angled.x) + self.shadow_offset.x),
-                   (position.y - self.sprite.get_height() / 2 + angled.y) + self.shadow_offset.y)
-            print(pos)
-            surface.blit(strip, pos)
-        print("----")
+            pos = pg.Vector2((position.x - self.sprite.get_width() / 2 + angled.x) + self.shadow_offset.x,
+                             (position.y - self.sprite.get_height() / 2 + angled.y) + self.shadow_offset.y)
 
-    def update_sprite(self, new_sprite: pg.surface.Surface, offset: pg.Vector2):
+            altered_pos = pg.Vector2(pos.x, pos.y)
+
+            surface.blit(strip, altered_pos)
+
+    def update_sprite(self, position: pg.Vector2, new_sprite: pg.surface.Surface, offset: pg.Vector2 = pg.Vector2(0, 0)):
         self.sprite = new_sprite
         self.shadow_offset = offset
-        self.shadow_strips = self.make_shadow_elements()
-
-
-# def render_shadow(surface: pg.Surface, sprite, player_blit_xy):
-#     width = sprite.get_width() * SHADOW_WIDTH
-#     height = sprite.get_height() * SHADOW_HEIGHT
-#     pos_x = player_blit_xy[0] + sprite.get_width() * ((1 - SHADOW_WIDTH) / 2)
-#     pos_y = player_blit_xy[1] + (sprite.get_height() - (height / 2))
-#
-#     rect = pg.Rect(pos_x, pos_y, width, height)
-#
-#     shadow_surf = pg.Surface(rect.size, pg.SRCALPHA)
-#     pg.draw.rect(shadow_surf, [0, 0, 0, SHADOW_ALPHA], shadow_surf.get_rect())
-#
-#     surface.blit(shadow_surf, rect)
+        self.shadow_strips = self.make_shadow_elements(position)

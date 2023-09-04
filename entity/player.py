@@ -75,18 +75,17 @@ class Player:
             return
 
         if not self.shadow and self.current_texture is not None:
-            self.shadow = Shadow(self.get_sprite())
+            self.shadow = Shadow(self.get_sprite(), self.sprite_pos)
 
     def render_player(self):
-        if not self.is_player_loaded():
-            while not self.is_player_loaded():
-                self.load_player()
-            return
+        while not self.is_player_loaded():
+            self.load_player()
 
         # updates
         self.animator.update()
-        self.current_texture = self.animator.texture_obj
-        self.shadow.update_sprite(self.get_sprite(), self.animator.offset)
+        if self.animator.has_changed_texture:
+            self.sprite_updated()
+            self.animator.has_changed_texture = False
 
         sprite = self.get_sprite()
         blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset.x,
@@ -98,11 +97,18 @@ class Player:
         # player
         self.surface.blit(sprite, blit)
 
+    def sprite_updated(self):
+        """ Called when sprite updates its texture """
+        self.current_texture = self.animator.texture_obj
+
+        self.shadow.update_sprite(self.sprite_pos, self.get_sprite(), self.animator.offset)
+
     def get_sprite(self) -> pg.surface.Surface:
+        """ Always use this to get the player sprite """
         sprite = pg.transform.scale(self.current_texture, (self.current_texture.get_width() * GameUnits.RES_MUL, self.current_texture.get_height() * GameUnits.RES_MUL))
         sprite = pg.transform.flip(sprite, True if self.flipped else False, False)
         return sprite
 
-    def is_player_loaded(self):
+    def is_player_loaded(self) -> bool:
         """ Returns whether player has fully loaded in (add more checks later) """
         return self.current_texture and self.shadow

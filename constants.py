@@ -61,7 +61,7 @@ class PlayerValues:
     MOVEMENT_PAUSE = .15  # 0.15
     HOLD_TIME_TO_SPRINT = .5
 
-    PLAYER_MOVE_ANIM_SPEED = 3  # .125
+    PLAYER_MOVE_ANIM_SPEED = .125  # .125
 
 
 # TEMPORARY

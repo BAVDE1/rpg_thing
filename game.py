@@ -7,6 +7,7 @@ from constants import GameUnits, LevelLocations
 from texture_constants import PlayerTextures
 from entity.player import Player
 from rendering.split_sheet import split_sheet
+from utility.logging import Logger
 
 
 class Game:
@@ -16,6 +17,8 @@ class Game:
         self.clock = pg.time.Clock()
         self.fps = 60
         self.running = True
+        self.logger = Logger(self.screen)
+
         self.keys = pg.key.get_pressed()
 
         self.bpm = 180

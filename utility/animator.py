@@ -11,6 +11,7 @@ class Animator:
         """ ss - sprite sheets - must be lists of two objects - [0]: CONSTANT, [1]: sprite sheet """
         self.game = game
         self.texture_obj = None
+        self.has_changed_texture = False  # updates to true on texture change (and should be back to false within the frame)
 
         self.idling = True
         self.idle_ss = idle_ss
@@ -27,6 +28,8 @@ class Animator:
         self.one_time_ss = None
         if one_time_ss:
             self.one_time_ss = {ss[0]: ss[1] for ss in one_time_ss if ss[0] and ss[1]}
+
+        self.current_one_time_anim = ""
         self.current_anim_ss = None
         self.current_anim_frame = None
         self.anim_frame_speed = None
@@ -57,18 +60,23 @@ class Animator:
 
     def update(self):
         """ Should be called every frame """
-        if self.idling:
+        if self.idling:  # idle
             if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
                 if self.offset != self.idle_offset:
                     self.offset = self.idle_offset
 
-                self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
                 self.advance_idle_animation_frame()
-        elif self.current_anim_ss:
+                self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
+
+                self.has_changed_texture = True
+
+        elif self.current_anim_ss:  # one time anim
             if time.time() > self.last_anim_frame_time + self.anim_frame_speed:
                 self.advance_one_time_anim_frame()
                 if self.current_anim_ss:  # check incase animation finished in the advance
-                    self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set image
+                    self.texture_obj = self.current_anim_ss[self.current_anim_frame]  # set image
+
+                    self.has_changed_texture = True
 
     def advance_idle_animation_frame(self):
         im_frame = self.idle_frame
@@ -85,7 +93,7 @@ class Animator:
 
     def advance_one_time_anim_frame(self):
         self.current_anim_frame += 1
-        if self.current_anim_frame == len(self.current_anim_ss[1]):
+        if self.current_anim_frame == len(self.current_anim_ss):
             self.finish_animating()
         else:
             self.last_anim_frame_time = time.time()
@@ -96,7 +104,7 @@ class Animator:
             if anim not in self.one_time_ss:
                 raise IndexError(missing_anim_error.format(anim, self.one_time_ss))
 
-            if not self.current_anim_ss:
+            if not self.current_one_time_anim:
                 anim_list = list(self.one_time_ss[anim])
 
                 # flip animation
@@ -104,18 +112,22 @@ class Animator:
                     for i in range(len(anim_list)):
                         anim_list.insert(i, anim_list.pop())
 
+                self.current_one_time_anim = anim
                 self.idling = False
-                self.current_anim_ss = [anim, anim_list]
+                self.current_anim_ss = anim_list
                 self.current_anim_frame = 0
-                self.anim_frame_speed = duration / len(self.current_anim_ss[1])
+                self.anim_frame_speed = duration / len(self.current_anim_ss)
                 self.last_anim_frame_time = time.time()
-                self.texture_obj = self.current_anim_ss[1][self.current_anim_frame]  # set one time anim image
+                self.texture_obj = self.current_anim_ss[self.current_anim_frame]  # set one time anim image
 
                 self.offset = offset
+
+                self.has_changed_texture = True
         else:
             raise IndexError(no_anim_error.format(anim))
 
     def finish_animating(self):
+        self.current_one_time_anim = ""
         self.current_anim_ss = None
         self.current_anim_frame = None
         self.anim_frame_speed = None

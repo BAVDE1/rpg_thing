@@ -18,29 +18,34 @@ def parse_level_file(level_source):
 
 
 def outline_decider(dic: dict):
-    """ Returns None if no outline is suitable """
+    """ Returns suitable outline for tiles' position depending upon its surrounding tiles.
+    Returns None if no suitable outline is found """
     outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_SPRITES)
 
-    add = None
-    for key in outlines.keys():
-        should = True
-        for k in outlines[key]:
-            should = False if bool(dic[k]) != outlines[key][k] else should
-        if should:
-            add = key
+    sprite_to_add = None
+    for sprite in outlines.keys():
+        found_suitable_sprite = True
+        for requirement in outlines[sprite]:  # if even one requirement is not met, 'found_suitable_sprite' will be false
+            found_suitable_sprite = False if bool(dic[requirement]) != outlines[sprite][requirement] else found_suitable_sprite
+
+        if found_suitable_sprite:
+            sprite_to_add = sprite
             break  # stop loop once it finds a suitable tile
-    return add
+
+    return sprite_to_add
 
 
 def store_layer(layer: list, layer_lines):
+    """ Generates a list of split lines of the level file given
+     eg: [[  ,Gr,Gr,  ], [Gr,Gr,Gr,  ]]
+     """
     for line in layer_lines:
-        row = []
-        for chars in line.split(","):
-            row.append(ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None)
+        row = [ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None for chars in line.split(',')]
         layer.append(row)
 
 
 class TileSprite(pg.sprite.Sprite):
+    """ Sprite object to hold tile sprites information """
     def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
         pg.sprite.Sprite.__init__(self)
 
@@ -63,9 +68,11 @@ class Level:
 
     def initialise_level(self):
         if not self.is_initialised:
+            # create tiles & fill groups
             self.store_group(self.ground_layer_group, self.ground_layer_lines)
             self.store_outline(True)
 
+            # finish
             self.is_initialised = True
 
     def render_level(self):
@@ -79,59 +86,64 @@ class Level:
             self.outline_layer_group.draw(self.surface)
 
     def store_group(self, group: pg.sprite.Group, layer_lines):
-        for r, line in enumerate(layer_lines):
-            for c, chars in enumerate(line.split(",")):
-                if sp := ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None:
-                    sp = self.scaled_sprite(sp)
-                    t_pos = self.create_tile_pos(sp, r, c)
+        """ Converts ascii chars from layer_lines into valid TileSprites and stores them into the given group """
+        for row_n, line in enumerate(layer_lines):
+            for column_n, chars in enumerate(line.split(",")):
+                if raw_sprite := ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None:
+                    raw_sprite = self.create_scaled_sprite(raw_sprite)
+                    t_pos = self.create_tile_pos(raw_sprite, row_n, column_n)
 
-                    sprite = TileSprite(sp, t_pos)
-                    sprite.add(group)
+                    tile_sprite = TileSprite(raw_sprite, t_pos)
+                    tile_sprite.add(group)
 
     def store_outline(self, store_fade=False):
+        """ Used to determine and put sprites into the outline group """
         ground_layer_bools = []
         for line in self.ground_layer_lines:
             row = [1 if chars in ASCII_TO_SPRITE else 0 for chars in line.split(',')]
             ground_layer_bools.append(row)
 
-        for r, line in enumerate(ground_layer_bools):
-            for c, chars in enumerate(line):
-                n = max(0, r - 1)
-                s = min(len(ground_layer_bools) - 1, r + 1)
-                e = min(len(line) - 1, c + 1)
-                w = max(0, c - 1)
+        for row_n, line in enumerate(ground_layer_bools):
+            for column_n, chars in enumerate(line):
+                north_t = max(0, row_n - 1)
+                south_t = min(len(ground_layer_bools) - 1, row_n + 1)
+                east_t = min(len(line) - 1, column_n + 1)
+                west_t = max(0, column_n - 1)
 
-                sp = outline_decider({
+                cardinal_dic = {
                     DirectionalValues.TILE: chars,
-                    DirectionalValues.NORTH: ground_layer_bools[n][c],
-                    DirectionalValues.SOUTH: ground_layer_bools[s][c],
-                    DirectionalValues.EAST: ground_layer_bools[r][e],
-                    DirectionalValues.WEST: ground_layer_bools[r][w],
-                    DirectionalValues.NORTH_EAST: ground_layer_bools[n][e],
-                    DirectionalValues.NORTH_WEST: ground_layer_bools[n][w],
-                    DirectionalValues.SOUTH_EAST: ground_layer_bools[s][e],
-                    DirectionalValues.SOUTH_WEST: ground_layer_bools[s][w]
-                })
+                    DirectionalValues.NORTH: ground_layer_bools[north_t][column_n],
+                    DirectionalValues.SOUTH: ground_layer_bools[south_t][column_n],
+                    DirectionalValues.EAST: ground_layer_bools[row_n][east_t],
+                    DirectionalValues.WEST: ground_layer_bools[row_n][west_t],
+                    DirectionalValues.NORTH_EAST: ground_layer_bools[north_t][east_t],
+                    DirectionalValues.NORTH_WEST: ground_layer_bools[north_t][west_t],
+                    DirectionalValues.SOUTH_EAST: ground_layer_bools[south_t][east_t],
+                    DirectionalValues.SOUTH_WEST: ground_layer_bools[south_t][west_t]
+                }
 
-                if sp:
-                    sp = self.scaled_sprite(sp)
-                    t_pos = self.create_tile_pos(sp, r, c)
+                if raw_sprite := outline_decider(cardinal_dic):
+                    raw_sprite = self.create_scaled_sprite(raw_sprite)
+                    t_pos = self.create_tile_pos(raw_sprite, row_n, column_n)
 
-                    sprite = TileSprite(sp, t_pos)
-                    sprite.add(self.outline_layer_group)
+                    tile_sprite = TileSprite(raw_sprite, t_pos)
+                    tile_sprite.add(self.outline_layer_group)
 
-                if store_fade and (c == 0 or c == len(line) - 1):
-                    f_sp = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if c == 0 else TileTextures.FADE_SPRITE
-                    f_sp = self.scaled_sprite(f_sp)
-                    f_pos = self.create_tile_pos(f_sp, r, c)
+                # store fade tiles after other tiles, so it renders on top
+                if store_fade and (column_n == 0 or column_n == len(line) - 1):  # only on the level sides atm
+                    f_raw_sprite = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if column_n == 0 else TileTextures.FADE_SPRITE
+                    f_raw_sprite = self.create_scaled_sprite(f_raw_sprite)
+                    f_pos = self.create_tile_pos(f_raw_sprite, row_n, column_n)
 
-                    f_sprite = TileSprite(f_sp, f_pos)
-                    f_sprite.add(self.outline_layer_group)
+                    f_tile_sprite = TileSprite(f_raw_sprite, f_pos)
+                    f_tile_sprite.add(self.outline_layer_group)
 
-    def scaled_sprite(self, sprite) -> pg.surface.Surface:
+    def create_scaled_sprite(self, sprite) -> pg.surface.Surface:
+        """ Returns given sprite scaled to levels' size """
         return pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
 
     def create_tile_pos(self, sprite: pg.surface.Surface, row, column) -> pg.Vector2:
+        """ Returns Vector2 of a given sprites position depending upon row, column and level size """
         return pg.Vector2(
             ((((column * GameUnits.UNIT) - sprite.get_width() / 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
             (((row * GameUnits.UNIT) - sprite.get_height() / 2) * self.size) + self.pos_offset.y)

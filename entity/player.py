@@ -3,7 +3,7 @@ import pygame as pg
 from constants import GameUnits, DirectionalValues, PlayerValues
 from texture_constants import PlayerTextures
 from rendering.split_sheet import split_sheet
-from rendering.shadow import render_shadow
+from rendering.shadow import Shadow
 from utility.animator import Animator
 
 
@@ -18,6 +18,8 @@ class Player:
 
         self.texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE).convert_alpha()
         self.ss_idle = split_sheet(self.texture_idle, (GameUnits.BASE_UNIT, GameUnits.BASE_UNIT), 4)
+
+        self.shadow = None
 
         self.current_texture = None
         self.animator = Animator(self.game, [PlayerTextures.PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
@@ -42,9 +44,9 @@ class Player:
 
         # move animation
         if x:
-            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim
+            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim horizontal
         else:
-            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)
+            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
 
         # todo: send beat event (after player movement)
 
@@ -65,20 +67,42 @@ class Player:
         # TODO: replace animator.current_anim_ss with some other solution to the animation moving bug
         return not self.moving and not self.animator.current_anim_ss and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved
 
+    def load_player(self):
+        """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded """
+        if not self.current_texture:
+            self.animator.update()
+            self.current_texture = self.animator.texture_obj
+            return
+
+        if not self.shadow and self.current_texture is not None:
+            self.shadow = Shadow(self.get_sprite())
+
     def render_player(self):
+        if not self.is_player_loaded():
+            while not self.is_player_loaded():
+                self.load_player()
+            return
+
+        # updates
         self.animator.update()
         self.current_texture = self.animator.texture_obj
+        self.shadow.update_sprite(self.get_sprite(), self.animator.offset)
 
-        if self.is_player_loaded():
-            sprite = pg.transform.scale(self.current_texture, (self.current_texture.get_width() * GameUnits.RES_MUL, self.current_texture.get_height() * GameUnits.RES_MUL))
-            sprite = pg.transform.flip(sprite, True if self.flipped else False, False)
+        sprite = self.get_sprite()
+        blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset.x,
+                (self.sprite_pos.y - sprite.get_height() // 2) + self.animator.offset.y)
 
-            blit = ((self.sprite_pos.x - sprite.get_width() // 2) + self.animator.offset.x,
-                    (self.sprite_pos.y - sprite.get_height() // 2) + self.animator.offset.y)
+        # shadow
+        self.shadow.draw(self.surface, self.sprite_pos)
 
-            # render_shadow(self.surface, sprite, blit)
-            self.surface.blit(sprite, blit)
+        # player
+        self.surface.blit(sprite, blit)
+
+    def get_sprite(self) -> pg.surface.Surface:
+        sprite = pg.transform.scale(self.current_texture, (self.current_texture.get_width() * GameUnits.RES_MUL, self.current_texture.get_height() * GameUnits.RES_MUL))
+        sprite = pg.transform.flip(sprite, True if self.flipped else False, False)
+        return sprite
 
     def is_player_loaded(self):
         """ Returns whether player has fully loaded in (add more checks later) """
-        return self.current_texture
+        return self.current_texture and self.shadow

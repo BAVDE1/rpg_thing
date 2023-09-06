@@ -2,14 +2,15 @@ from dataclasses import dataclass
 from texture_constants import RenderValues
 import pygame as pg
 
-SHADOW_CLARITY = 10 - RenderValues.SHADOW_QUALITY * 2
+SHADOW_CLARITY = 10 - RenderValues.SHADOW_QUALITY * 2  # makes even & translates to correct value
 SHADOW_CLARITY = min(10 - RenderValues.SHADOW_QUALITY_MIN * 2,
-                     max(10 - RenderValues.SHADOW_QUALITY_MAX * 2, SHADOW_CLARITY))  # clamps between 2 and 10
+                     max(10 - RenderValues.SHADOW_QUALITY_MAX * 2, SHADOW_CLARITY))  # clamps value
 
 SUN_SLOPE = .8
 SUN_SIGN = -.5
 
 
+# todo: these vvv
 @dataclass
 class ToGoal:
     pass
@@ -33,19 +34,18 @@ class ShadowStripSprite(pg.sprite.Sprite):
 
 
 class Shadow:
-    def __init__(self, surface: pg.surface.Surface, sprite: pg.surface.Surface, position: pg.Vector2, alpha: int = 100):
+    def __init__(self, surface: pg.surface.Surface, sprite: pg.surface.Surface, position: pg.Vector2):
         self.surface = surface
         self.sprite = sprite
 
         self.shadow_offset = pg.Vector2(0, 0)
-        self.shadow_alpha = alpha
 
         self.shadow_strips_group = pg.sprite.Group()
-        self.make_shadow_elements(position)
+        self.update_shadow_elements(position)
 
-    def make_shadow_elements(self, position: pg.Vector2):
+    def update_shadow_elements(self, position: pg.Vector2):
         """ Split the image into horizontal strips.
-        WARNING: updating this too often is heavy on performance
+        WARNING: updating this too often is heavy on performance, SHADOW_QUALITY can be turned down as well
         """
         color_key = self.sprite.get_colorkey()
         blank_col = (0, 0, 0, 0)
@@ -53,7 +53,7 @@ class Shadow:
 
         shadow_strips: list[ShadowStripSprite] = []
         for y_row in range(self.sprite.get_height()):
-            if y_row % SHADOW_CLARITY == 0:
+            if SHADOW_CLARITY == 0 or y_row % SHADOW_CLARITY == 0:
                 horizontal_strip = pg.Surface((self.sprite.get_width(), 1)).convert_alpha()
                 horizontal_strip.fill(blank_col)
 
@@ -61,11 +61,13 @@ class Shadow:
                 for x_column in range(self.sprite.get_width()):
                     pixel_colour = self.sprite.get_at((x_column, y_row))
                     if pixel_colour != transparent:
-                        horizontal_strip.set_at((x_column, 0), (10, 0, 10, self.shadow_alpha))  # sets colour value
+                        horizontal_strip.set_at((x_column, 0), (10, 0, 10, RenderValues.SHADOW_ALPHA if SHADOW_CLARITY else RenderValues.SHADOW_ALPHA / 2))  # sets colour value (if on highest quality, halve alpha)
 
-                horizontal_strip = pg.transform.scale(horizontal_strip, (
-                    horizontal_strip.get_width(),
-                    horizontal_strip.get_height() * (SHADOW_CLARITY / 2)))  # scale horizontal strips' height
+                # scale horizontal strips' height
+                if SHADOW_CLARITY:
+                    horizontal_strip = pg.transform.scale(horizontal_strip, (
+                        horizontal_strip.get_width(),
+                        horizontal_strip.get_height() * (SHADOW_CLARITY / 2)))
 
                 # create position
                 angled = pg.Vector2(
@@ -89,4 +91,4 @@ class Shadow:
             new_sprite = self.sprite
         self.sprite = new_sprite
         self.shadow_offset = offset
-        self.make_shadow_elements(position)
+        self.update_shadow_elements(position)

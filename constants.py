@@ -6,7 +6,7 @@ class GameUnits:
     CAPTION = "rpg thing"
     LVL_SIZE = 14  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
     UNIT = 20  # ascii level files need to be 19x19
-    RES_MUL: int = 2  # must be whole number
+    RES_MUL: int = 3  # must be whole number  (3 has average of 200fps)
 
     RES_H = UNIT * LVL_SIZE
     SIDE_GIVE = RES_H * .75  # give amount beside the level

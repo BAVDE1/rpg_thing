@@ -34,9 +34,9 @@ class LevelEditorMain:
         self.editor_level = get_json_data()[EDITOR_LEVEL]
 
         self.seperators = []
-        self.file_displays = []  # type: list[FileDisplayer]
-        self.buttons = []  # type: list[Button]
-        self.level_editors = []  # type: list[LevelEditor]
+        self.file_displays: list[FileDisplayer] = []
+        self.buttons: list[Button] = []
+        self.level_editors: list[LevelEditor] = []
 
         self.switch_page()
 

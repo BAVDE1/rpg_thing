@@ -4,9 +4,10 @@ import pygame as pg
 
 
 class RenderValues:
+    SHADOW_ALPHA = 100
     SHADOW_QUALITY_MIN = 1
-    SHADOW_QUALITY_MAX = 4
-    SHADOW_QUALITY: int = 4  # the higher the number, the better quality but is harder on performance (is later automatically converted to an even number and clamped between min & max)
+    SHADOW_QUALITY_MAX = 5
+    SHADOW_QUALITY: int = 5  # the higher the number, the better quality but is harder on performance
 
 
 class PlayerTextures:

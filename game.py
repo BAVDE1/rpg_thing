@@ -16,7 +16,7 @@ class Game:
         self.screen_canvas = pg.surface.Surface((GameUnits.RES_W, GameUnits.RES_H))
 
         self.clock = pg.time.Clock()
-        self.fps = 60
+        self.fps = 60  # 500 cap
         self.running = True
         self.logger = Logger(self.screen_canvas)
 

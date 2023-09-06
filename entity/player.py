@@ -85,22 +85,6 @@ class Player:
         flipped_sprite = pg.transform.flip(self.current_texture, True if self.flipped else False, False)
         return flipped_sprite
 
-    def is_player_loaded(self) -> bool:
-        """ Returns whether player has fully loaded in (add more checks later) """
-        return self.current_texture and self.shadow
-
-    def can_move(self):
-        """ Returns true if the player is allowed to move """
-        return not self.moving and not self.animator.current_anim_ss and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved
-
-    def set_pos(self, x, y):
-        """ Sets player position & sprite pos instantly """
-        self.moving = True
-        self.position.x = x
-        self.position.y = y
-        self.last_moved = time.time()
-        self.moving = False
-
     def load_player(self):
         """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded """
         if not self.current_texture:
@@ -110,3 +94,19 @@ class Player:
 
         if not self.shadow and self.current_texture is not None:
             self.shadow = Shadow(self.surface, self.get_sprite(), self.position)
+
+    def set_pos(self, x, y):
+        """ Sets player position & sprite pos instantly """
+        self.moving = True
+        self.position.x = x
+        self.position.y = y
+        self.last_moved = time.time()
+        self.moving = False
+
+    def is_player_loaded(self) -> bool:
+        """ Returns whether player has fully loaded in (add more checks later) """
+        return self.current_texture and self.shadow
+
+    def can_move(self) -> bool:
+        """ Returns true if the player is allowed to move """
+        return not self.moving and not self.animator.current_anim_ss and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved

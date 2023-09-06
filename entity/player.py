@@ -22,15 +22,15 @@ class Player:
 
         # texture stuff
         self.texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(self.texture_idle, (GameUnits.BASE_UNIT, GameUnits.BASE_UNIT), 4)
+        self.ss_idle = split_sheet(self.texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
 
         self.flipped = False
         self.shadow = None
         self.current_texture = None
 
         self.animator = Animator(self.game, [PlayerTextures.PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
-                                 [PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.BASE_UNIT * 2, GameUnits.BASE_UNIT * 2), 8)],
-                                 [PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.BASE_UNIT, GameUnits.BASE_UNIT * 3), 8)])
+                                 [PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)],
+                                 [PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8)])
 
     def move(self):
         """ Moves player 1 tile in its current direction """
@@ -82,8 +82,7 @@ class Player:
 
     def get_sprite(self) -> pg.surface.Surface:
         """ Always use this to get the player sprite """
-        scaled_sprite = pg.transform.scale(self.current_texture, (self.current_texture.get_width() * GameUnits.RES_MUL, self.current_texture.get_height() * GameUnits.RES_MUL))
-        flipped_sprite = pg.transform.flip(scaled_sprite, True if self.flipped else False, False)
+        flipped_sprite = pg.transform.flip(self.current_texture, True if self.flipped else False, False)
         return flipped_sprite
 
     def is_player_loaded(self) -> bool:

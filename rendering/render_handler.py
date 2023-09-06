@@ -4,7 +4,6 @@ from utility.util import time_it
 level = None
 
 
-# @time_it  # about 0.015 to be expected though?
 def render(surface, player, level_to_render):
     global level
 

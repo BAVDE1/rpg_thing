@@ -20,7 +20,7 @@ class Animator:
             self.idle_len = len(idle_ss[1]) - 1
         except IndexError:
             raise IndexError(idle_error.format(idle_ss[0]))
-        self.prev_idle_beat = game.song_start_time
+        self.prev_idle_beat = time.time()
         self.idle_prev_frame = 0
         self.idle_frame = 0
         self.bmrng_idle = boomerang_idle

@@ -1,5 +1,4 @@
 from constants import DirectionalValues
-import humanize
 import time
 
 

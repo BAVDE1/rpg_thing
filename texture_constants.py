@@ -1,11 +1,12 @@
 from rendering.split_sheet import split_sheet
 from constants import GameUnits, DirectionalValues
-
 import pygame as pg
 
 
 class RenderValues:
-    SHADOW_QUALITY: int = 8  # the higher the number, the better quality but is harder on performance (is later automatically converted to an even number and clamped between 2 and 10)
+    SHADOW_QUALITY_MIN = 1
+    SHADOW_QUALITY_MAX = 4
+    SHADOW_QUALITY: int = 4  # the higher the number, the better quality but is harder on performance (is later automatically converted to an even number and clamped between min & max)
 
 
 class PlayerTextures:

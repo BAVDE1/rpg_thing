@@ -4,16 +4,15 @@ import pygame as pg
 # Screen
 class GameUnits:
     CAPTION = "rpg thing"
-    LVL_SIZE = 13 + 1  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
-    BASE_UNIT = 20  # ascii level files need to be 19x19
-    BASE_RES = BASE_UNIT * LVL_SIZE
-    RES_MUL = 3  # should be whole number
+    LVL_SIZE = 14  # 13 for whole lvl; +1 to include level edge (+0.5 for each edge)
+    UNIT = 20  # ascii level files need to be 19x19
+    RES_MUL: int = 2  # must be whole number
 
-    RESOLUTION_X = BASE_RES * RES_MUL
-    SIDE_GIVE = RESOLUTION_X * .75  # give amount beside the level
-    RESOLUTION_Y = RESOLUTION_X + SIDE_GIVE
+    RES_H = UNIT * LVL_SIZE
+    SIDE_GIVE = RES_H * .75  # give amount beside the level
+    RES_W = RES_H + SIDE_GIVE
+    
     LEVEL_OFFSET = SIDE_GIVE * .5
-    UNIT = BASE_UNIT * RES_MUL
 
 
 class DirectionalValues:

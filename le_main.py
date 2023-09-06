@@ -221,7 +221,7 @@ class LevelEditorMain:
 
 def main():
     pg.init()
-    pg.display.set_mode([GameUnits.RESOLUTION_X * 2, GameUnits.RESOLUTION_X])
+    pg.display.set_mode([GameUnits.SCALED_RES_H * 2, GameUnits.SCALED_RES_H])
     pg.font.init()
     LevelEditorMain().main_loop()
     pg.quit()

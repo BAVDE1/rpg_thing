@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from texture_constants import RenderValues
 import pygame as pg
 
-SHADOW_CLARITY = 10 - RenderValues.SHADOW_QUALITY
-SHADOW_CLARITY = SHADOW_CLARITY if SHADOW_CLARITY % 2 == 0 else SHADOW_CLARITY + 1  # must always be even. If odd, add 1
-SHADOW_CLARITY = max(2, min(10, SHADOW_CLARITY))  # clamps between 2 and 10
+SHADOW_CLARITY = 10 - RenderValues.SHADOW_QUALITY * 2
+SHADOW_CLARITY = min(10 - RenderValues.SHADOW_QUALITY_MIN * 2,
+                     max(10 - RenderValues.SHADOW_QUALITY_MAX * 2, SHADOW_CLARITY))  # clamps between 2 and 10
 
 SUN_SLOPE = .8
 SUN_SIGN = -.5
@@ -22,11 +22,14 @@ class FromGoal:
 
 class ShadowStripSprite(pg.sprite.Sprite):
     """ Sprite object to hold shadow sprites """
-    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
+
+    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2,
+                 sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
         pg.sprite.Sprite.__init__(self)
 
         self.image = sprite_img
-        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
+        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(),
+                                 self.image.get_height())
 
 
 class Shadow:
@@ -65,8 +68,9 @@ class Shadow:
                     horizontal_strip.get_height() * (SHADOW_CLARITY / 2)))  # scale horizontal strips' height
 
                 # create position
-                angled = pg.Vector2((self.sprite.get_rect().x + (self.sprite.get_height() - y_row) * SUN_SLOPE * SUN_SIGN),
-                                    (self.sprite.get_rect().bottom - 1 + (self.sprite.get_height() - y_row) * SUN_SIGN))
+                angled = pg.Vector2(
+                    (self.sprite.get_rect().x + (self.sprite.get_height() - y_row) * SUN_SLOPE * SUN_SIGN),
+                    (self.sprite.get_rect().bottom - 1 + (self.sprite.get_height() - y_row) * SUN_SIGN))
 
                 pos = pg.Vector2((position.x - self.sprite.get_width() / 2 + angled.x) + self.shadow_offset.x,
                                  (position.y - self.sprite.get_height() / 2 + angled.y) + self.shadow_offset.y)

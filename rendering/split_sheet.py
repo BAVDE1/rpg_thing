@@ -1,4 +1,4 @@
-from constants import *
+import pygame as pg
 
 
 def split_sheet(image, size: tuple, columns, rows=1):

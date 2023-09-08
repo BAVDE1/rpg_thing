@@ -1,10 +1,9 @@
 from level.level import Level
-from utility.util import time_it
 
 level = None
 
 
-def render(surface, player, level_to_render):
+def render(surface, player, level_to_render, logger):
     global level
 
     if not level:
@@ -16,3 +15,6 @@ def render(surface, player, level_to_render):
     level.render_level()
     player.render_player()
     level.render_level_foreground()
+
+    # for debugging:
+    logger.render_logs()

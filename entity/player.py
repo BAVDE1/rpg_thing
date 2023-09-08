@@ -4,7 +4,7 @@ from constants import GameUnits, DirectionalValues, PlayerValues
 from texture_constants import PlayerTextures
 from rendering.split_sheet import split_sheet
 from rendering.shadow import Shadow
-from utility.animator import Animator
+from rendering.animator import Animator
 
 
 class Player:

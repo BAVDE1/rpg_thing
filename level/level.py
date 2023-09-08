@@ -1,5 +1,6 @@
 from constants import GameUnits, DirectionalValues
 from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
+from rendering.sprites_holder import TileSprite
 import os
 import pygame as pg
 
@@ -42,15 +43,6 @@ def store_layer(layer: list, layer_lines):
     for line in layer_lines:
         row = [ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None for chars in line.split(',')]
         layer.append(row)
-
-
-class TileSprite(pg.sprite.Sprite):
-    """ Sprite object to hold tile sprites information """
-    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
-        pg.sprite.Sprite.__init__(self)
-
-        self.image = sprite_img
-        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
 
 
 class Level:

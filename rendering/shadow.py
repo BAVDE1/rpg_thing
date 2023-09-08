@@ -1,5 +1,9 @@
+import time
 from dataclasses import dataclass
+
+import utility.logging
 from texture_constants import RenderValues
+from rendering.sprites_holder import BasicSprite
 import pygame as pg
 
 SHADOW_CLARITY = 10 - RenderValues.SHADOW_QUALITY * 2  # makes even & translates to correct value
@@ -21,18 +25,6 @@ class FromGoal:
     pass
 
 
-class ShadowStripSprite(pg.sprite.Sprite):
-    """ Sprite object to hold shadow sprites """
-
-    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2,
-                 sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
-        pg.sprite.Sprite.__init__(self)
-
-        self.image = sprite_img
-        self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(),
-                                 self.image.get_height())
-
-
 class Shadow:
     def __init__(self, surface: pg.surface.Surface, sprite: pg.surface.Surface, position: pg.Vector2):
         self.surface = surface
@@ -51,7 +43,7 @@ class Shadow:
         blank_col = (0, 0, 0, 0)
         transparent = color_key if color_key else blank_col
 
-        shadow_strips: list[ShadowStripSprite] = []
+        shadow_strips: list[BasicSprite] = []
         for y_row in range(self.sprite.get_height()):
             if SHADOW_CLARITY == 0 or y_row % SHADOW_CLARITY == 0:
                 horizontal_strip = pg.Surface((self.sprite.get_width(), 1)).convert_alpha()
@@ -77,7 +69,7 @@ class Shadow:
                 pos = pg.Vector2((position.x - self.sprite.get_width() / 2 + angled.x) + self.shadow_offset.x,
                                  (position.y - self.sprite.get_height() / 2 + angled.y) + self.shadow_offset.y)
 
-                shadow_strips.append(ShadowStripSprite(horizontal_strip, pos))
+                shadow_strips.append(BasicSprite(horizontal_strip, pos))
         self.shadow_strips_group.empty()
         self.shadow_strips_group.add(*shadow_strips)
 

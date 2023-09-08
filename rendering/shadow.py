@@ -14,23 +14,45 @@ SUN_SLOPE = .8
 SUN_SIGN = -.5
 
 
-# todo: these vvv
-@dataclass
-class ToGoal:
-    pass
+class OffsetGoal:
+    def __init__(self, iteration_len: int, goal_offset: pg.Vector2, reverse=False):
+        self.iteration_len = iteration_len
+        self.current_iteration = 0
+        self.reverse = reverse
+        self.finished = False
 
+        self.goal_offset = goal_offset
+        self.offset_iterations: list[pg.Vector2] = self.create_iteration_list()
 
-@dataclass
-class FromGoal:
-    pass
+    def create_iteration_list(self) -> list[pg.Vector2]:
+        li = []
+
+        for i in range(self.iteration_len):
+            offset = pg.Vector2(self.goal_offset * (i / self.iteration_len))
+            li.append(offset)
+
+        if self.reverse:
+            return li[::-1]
+        return li
+
+    def advance_iteration(self):
+        if self.current_iteration < self.iteration_len:
+            self.current_iteration += 1
+        else:
+            self.finished = True
+
+    def get_current_offset(self) -> pg.Vector2:
+        return self.offset_iterations[self.current_iteration - 1]
 
 
 class Shadow:
-    def __init__(self, surface: pg.surface.Surface, sprite: pg.surface.Surface, position: pg.Vector2):
+    def __init__(self, surface: pg.surface.Surface, sprite: pg.surface.Surface, position: pg.Vector2, logger: utility.logging.Logger):
+        self.logger = logger
         self.surface = surface
         self.sprite = sprite
 
-        self.shadow_offset = pg.Vector2(0, 0)
+        self.shadow_offset: pg.Vector2 = pg.Vector2(0, 0)
+        self.shadow_offset_goal: OffsetGoal | None = None
 
         self.shadow_strips_group = pg.sprite.Group()
         self.update_shadow_elements(position)
@@ -42,6 +64,11 @@ class Shadow:
         color_key = self.sprite.get_colorkey()
         blank_col = (0, 0, 0, 0)
         transparent = color_key if color_key else blank_col
+
+        if self.shadow_offset_goal:
+            self.shadow_offset_goal.advance_iteration()
+            if self.shadow_offset_goal.finished:
+                self.shadow_offset_goal = None
 
         shadow_strips: list[BasicSprite] = []
         for y_row in range(self.sprite.get_height()):
@@ -69,6 +96,11 @@ class Shadow:
                 pos = pg.Vector2((position.x - self.sprite.get_width() / 2 + angled.x) + self.shadow_offset.x,
                                  (position.y - self.sprite.get_height() / 2 + angled.y) + self.shadow_offset.y)
 
+                # offset goal
+                if self.shadow_offset_goal:
+                    pos = pg.Vector2(pos.x + self.shadow_offset_goal.get_current_offset().x,
+                                     pos.y + self.shadow_offset_goal.get_current_offset().y)
+
                 shadow_strips.append(BasicSprite(horizontal_strip, pos))
         self.shadow_strips_group.empty()
         self.shadow_strips_group.add(*shadow_strips)
@@ -76,6 +108,9 @@ class Shadow:
     def draw(self):
         """ Draw each strip of the shadow offsetting the x-axis accordingly. """
         self.shadow_strips_group.draw(self.surface)
+
+    def add_offset_goal(self, iteration_len, goal_offset, reverse=False):
+        self.shadow_offset_goal = OffsetGoal(iteration_len, goal_offset, reverse)
 
     def update_shadow(self, position: pg.Vector2, new_sprite: pg.surface.Surface = None, offset: pg.Vector2 = pg.Vector2(0, 0)):
         """ Updates the shadow with a new position and a new sprite """

@@ -104,6 +104,7 @@ class Animator:
             if anim not in self.one_time_ss:
                 raise IndexError(missing_anim_error.format(anim, self.one_time_ss))
 
+            # do animation
             if not self.current_one_time_anim:
                 anim_list = list(self.one_time_ss[anim])
 

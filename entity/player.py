@@ -48,6 +48,7 @@ class Player:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim horizontal
         else:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
+            self.shadow.add_offset_goal(len(self.animator.current_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
 
         # todo: send beat event (after player movement)
 
@@ -93,7 +94,7 @@ class Player:
             return
 
         if not self.shadow and self.current_texture is not None:
-            self.shadow = Shadow(self.surface, self.get_sprite(), self.position)
+            self.shadow = Shadow(self.surface, self.get_sprite(), self.position, self.game.logger)
 
     def set_pos(self, x, y):
         """ Sets player position & sprite pos instantly """

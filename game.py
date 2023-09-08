@@ -18,7 +18,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.fps = 60  # 500 cap
         self.running = True
-        self.logger = Logger(self.screen_canvas)
+        self.logger = Logger(self.screen)
 
         self.keys = pg.key.get_pressed()
 
@@ -42,18 +42,17 @@ class Game:
                     # dev thingos
                     if self.keys[pg.K_p]:
                         self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
-
                         self.logger.add_log(f"bpm = {self.bpm}")
+
                     if self.keys[pg.K_m]:  # set idle anim
                         texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE_DEBUG).convert_alpha()
                         ss_idle = split_sheet(texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
-                        self.player.animator.change_idle_anim(False, new_idle_ss=[PlayerTextures.PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
+                        self.player.animator.change_idle_anim(set_to_default=False, new_idle_ss=[PlayerTextures.PLAYER_IDLE_DEBUG, ss_idle], boomerang_idle=False)
+                        self.logger.add_log("Debug idle: enabled")
 
-                        self.logger.add_log("Debug idle active")
                     if self.keys[pg.K_n]:  # reset idle anim
                         self.player.animator.change_idle_anim(set_to_default=True)
-
-                        self.logger.add_log("Reset idle anim")
+                        self.logger.add_log("Debug idle: disabled")
                 elif event.type == pg.KEYUP:
                     input_handler.player_key_up(event.key)
 
@@ -65,10 +64,13 @@ class Game:
         self.screen.fill(fill_col)
         self.screen_canvas.fill(fill_col)
 
-        renderer.render(self.screen_canvas, self.player, LevelLocations.OVERWORLD_00, self.logger)
+        renderer.render(self.screen_canvas, self.player, LevelLocations.OVERWORLD_00)
 
+        # scale to proper resolution
         self.screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0))
-        # self.screen.blit(self.screen_canvas, (0, 0))
+
+        # only for debugging
+        self.logger.render_logs()
 
         pg.display.flip()
 

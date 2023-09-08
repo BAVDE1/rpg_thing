@@ -3,7 +3,7 @@ from level.level import Level
 level = None
 
 
-def render(surface, player, level_to_render, logger):
+def render(surface, player, level_to_render):
     global level
 
     if not level:
@@ -15,6 +15,3 @@ def render(surface, player, level_to_render, logger):
     level.render_level()
     player.render_player()
     level.render_level_foreground()
-
-    # for debugging:
-    logger.render_logs()

@@ -1,6 +1,3 @@
-import time
-from dataclasses import dataclass
-
 import utility.logging
 from texture_constants import RenderValues
 from rendering.sprites_holder import BasicSprite
@@ -15,6 +12,12 @@ SUN_SIGN = -.5
 
 
 class OffsetGoal:
+    """ OffsetGoal returns a vector2 depending upon the classes current iteration. The current iteration can be advanced to increase the offset closer to the offset_goal. \n
+        Example: \n
+        A current_iter of 0 and an iter_length of 5, will have a vector2 offset of: goal_offset * 0   (0%, or 0/5, of the goal_offset: 0, 0) \n
+        A current_iter of 1 and an iter_length of 5, will have a vector2 offset of: goal_offset * .2  (20%, or 1/5, of the goal_offset)
+    """
+
     def __init__(self, iteration_len: int, goal_offset: pg.Vector2, reverse=False):
         self.iteration_len = iteration_len
         self.current_iteration = 0

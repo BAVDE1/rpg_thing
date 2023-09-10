@@ -142,7 +142,7 @@ class LevelEditorMain:
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=12)
 
-        self.level_editors.append(LevelEditor(self.screen, self.editor_level, size=0.8))
+        self.level_editors.append(LevelEditor(self.screen, self.editor_level, size=2))
 
     # ------------>
     #  Functions
@@ -221,7 +221,7 @@ class LevelEditorMain:
 
 def main():
     pg.init()
-    pg.display.set_mode([GameUnits.SCALED_RES_H * 2, GameUnits.SCALED_RES_H])
+    pg.display.set_mode([GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL])
     pg.font.init()
     LevelEditorMain().main_loop()
     pg.quit()

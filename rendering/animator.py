@@ -110,8 +110,7 @@ class Animator:
 
                 # flip animation
                 if reverse:
-                    for i in range(len(anim_list)):
-                        anim_list.insert(i, anim_list.pop())
+                    anim_list = anim_list[::-1]
 
                 self.current_one_time_anim = anim
                 self.idling = False

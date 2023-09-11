@@ -8,6 +8,7 @@ class BasicSprite(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
 
         self.image = sprite_img
+        self.pos = pos
         self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
 
 

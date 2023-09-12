@@ -57,6 +57,11 @@ class LevelEditorMain:
 
             # button click  (if buttons overlap, both will click)
             if event.type == pg.MOUSEBUTTONDOWN:
+                # for level editors
+                if self.editor_level:
+                    for level_editor in self.level_editors:
+                        level_editor.mouse_clicked()
+
                 for btn in self.buttons:
                     if btn.is_mouse_in_bounds():
                         self.button_clicked(btn.mouse_down())
@@ -115,13 +120,20 @@ class LevelEditorMain:
 
     def open_level_select(self):
         self.heading_text = f"Level Select ({self.selected_area})"
-        levels = sorted(os.listdir(str(LEVELS_DIR + self.selected_area)))
+        levels = sorted(os.listdir(str(LEVELS_DIR + self.selected_area)))  # list of files
 
-        for i in range(len(levels)):
-            if levels[i].split(".")[0] == self.selected_area:
-                self.add_file(f"{LEVELS_DIR}{self.selected_area}/{levels[i]}", pg.Vector2((self.screen.get_width() / 2) + 20, 40))
+        skipped = 0  # takes away from 'i'
+        for i, level_file in enumerate(levels):
+            # if it is an editor level, skip
+            if level_file[-1] == '*':
+                skipped += 1
+                continue
+
+            # list level
+            if level_file.split(".")[0] == self.selected_area:
+                self.add_file(f"{LEVELS_DIR}{self.selected_area}/{level_file}", pg.Vector2((self.screen.get_width() / 2) + 20, 40))
             else:
-                self.add_button(levels[i], pg.Vector2(0, 10 + (25 * i)), (BTN_LEVEL_SEL, levels[i]), size=20)
+                self.add_button(level_file, pg.Vector2(0, 10 + (25 * (i - skipped))), (BTN_LEVEL_SEL, level_file), size=20)
 
         self.add_button("Back", pg.Vector2(0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
         self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
@@ -140,9 +152,9 @@ class LevelEditorMain:
         self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
 
         # files
-        self.add_file(self.editor_level, pg.Vector2(10, 40), size=12)
+        self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
 
-        self.level_editors.append(LevelEditor(self.screen, self.editor_level, pos_offset=pg.Vector2(200 * GameUnits.RES_MUL, 30 * GameUnits.RES_MUL), size=1.3))
+        self.level_editors.append(LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 15, 40), size=1.4))
 
     # ------------>
     #  Functions

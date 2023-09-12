@@ -52,7 +52,21 @@ class Level:
         self.pos_offset = pos_offset
         self.size = size
 
+        self.level_source = level_source
+
         self.ground_layer_lines = parse_level_file(level_source)
+        self.ground_layer_group = pg.sprite.Group()
+        self.outline_layer_group = pg.sprite.Group()
+
+        self.initialise_level()
+
+    def reload_or_load_level(self, new_level_source=None):
+        """ Reloads level with the option of using a different level file """
+        if not new_level_source:
+            new_level_source = self.level_source
+
+        self.is_initialised = False
+        self.ground_layer_lines = parse_level_file(new_level_source)
         self.ground_layer_group = pg.sprite.Group()
         self.outline_layer_group = pg.sprite.Group()
 
@@ -137,5 +151,14 @@ class Level:
     def create_tile_pos(self, sprite: pg.surface.Surface, row, column) -> pg.Vector2:
         """ Returns Vector2 of a given sprites position depending upon row, column and level size """
         return pg.Vector2(
-            ((((column * GameUnits.UNIT) - sprite.get_width() / 2) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+            (((column * GameUnits.UNIT) - sprite.get_width() / 2) * self.size) + self.pos_offset.x,
             (((row * GameUnits.UNIT) - sprite.get_height() / 2) * self.size) + self.pos_offset.y)
+
+    def generate_tile_rects(self) -> list[tuple]:
+        """ Generates and returns a list of tile rects: 0=x, 1=y, 2=width, 3=height, 4=row, 5=column (used in level editor) """
+        li: list[tuple] = []
+        for row_n in range(GameUnits.LVL_HEIGHT + 1):
+            for column_n in range(GameUnits.LVL_WIDTH + 1):
+                tile_pos = self.create_tile_pos(self.create_scaled_sprite(TileTextures.GRASS_SPRITE), row_n, column_n)
+                li.append((tile_pos.x, tile_pos.y, GameUnits.UNIT * self.size, GameUnits.UNIT * self.size, column_n, row_n))
+        return li

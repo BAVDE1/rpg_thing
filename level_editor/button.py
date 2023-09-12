@@ -2,7 +2,7 @@ from constants import *
 
 
 class Button:
-    def __init__(self, screen: pg.surface.Surface, display_text: str, image, pos: pg.Vector2, operation: tuple, size: int = 30):
+    def __init__(self, screen: pg.surface.Surface, display_text, image, pos: pg.Vector2, operation: tuple, size: int = 30, override_size: tuple | None = None):
         self.screen = screen
         self.font = pg.font.SysFont('Times New Roman', size)
 
@@ -13,8 +13,13 @@ class Button:
         self.image = image
 
         # positional bounds [0][0]=x_left, [0][1]=x_right, [1][0]=y_top, [1][1]=y_bottom
-        self.bounds = [(self.pos.x, self.pos.x + self.display_text.get_width()),
-                       (self.pos.y, self.pos.y + self.display_text.get_height() + (0 if not self.image else self.image.get_height()))]
+        self.bounds = []
+        if not override_size:
+            self.bounds = [(self.pos.x, self.pos.x + self.display_text.get_width()),
+                           (self.pos.y, self.pos.y + self.display_text.get_height() + (0 if not self.image else self.image.get_height()))]
+        else:
+            self.bounds = [(self.pos.x, self.pos.x + override_size[0]),
+                           (self.pos.y, self.pos.y + override_size[1])]
 
     def render(self):
         self.mouse_hover()
@@ -32,7 +37,7 @@ class Button:
         if self.is_mouse_in_bounds():
             pg.draw.rect(self.screen, (50, 50, 50), pg.rect.Rect(self.bounds[0][0], self.bounds[1][0],
                                                                  self.bounds[0][1] - self.bounds[0][0],
-                                                                 self.bounds[1][1] - self.bounds[1][0]))
+                                                                 self.bounds[1][1] - self.bounds[1][0]), 2)
 
     def is_mouse_in_bounds(self):
         m_x = pg.mouse.get_pos()[0]

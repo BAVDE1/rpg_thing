@@ -1,5 +1,6 @@
 from level.level import Level
-from level_editor.button import Button
+from level_editor.buttons import ButtonOutlined
+from constants import EDITING_TAG
 import pygame as pg
 import os
 
@@ -9,21 +10,21 @@ class LevelEditor:
     def __init__(self, screen: pg.surface.Surface, level_file: str, position: pg.Vector2, size):
         self.screen = screen
         self.SOURCE_LEVEL_FILE = level_file
-        self.EDITING_LEVEL_FILE = f"{level_file}*"
+        self.EDITING_LEVEL_FILE = f"{level_file}{EDITING_TAG}"
         self.SOURCE_LEVEL_DIR = '/'.join(self.SOURCE_LEVEL_FILE.split('/')[:-1])  # removes ending file from path
         self.opened_level_file = self.SOURCE_LEVEL_FILE  # only change this
         self.update_opened_level_file()
 
         self.size = size
         self.position = position
-        self.lvl_pos = pg.Vector2(position.x + 20, position.y + 50)
+        self.lvl_pos = pg.Vector2(position.x + 20, position.y + 80)
 
         self.font = pg.font.SysFont('Times New Roman', max(20, 3))
         self.display_text = None
         self.update_display_text()
 
         self.level = Level(screen, self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE, pos_offset=self.lvl_pos, size=size)
-        self.buttons: list[Button] = []
+        self.buttons: list[ButtonOutlined] = []
         self.create_editing_buttons()
 
         self.selected_tile = '  '
@@ -48,7 +49,7 @@ class LevelEditor:
             self.add_button('', pos, operation, override_size=size)
 
     def add_button(self, display_text: str, pos: pg.Vector2, operation: tuple, size=30, image=None, override_size=None):
-        self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size, override_size=override_size))
+        self.buttons.append(ButtonOutlined(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size, override_size=override_size))
 
     def mouse_clicked(self):
         for btn in self.buttons:

@@ -37,9 +37,17 @@ class Button:
         if self.is_mouse_in_bounds():
             pg.draw.rect(self.screen, (50, 50, 50), pg.rect.Rect(self.bounds[0][0], self.bounds[1][0],
                                                                  self.bounds[0][1] - self.bounds[0][0],
-                                                                 self.bounds[1][1] - self.bounds[1][0]), 2)
+                                                                 self.bounds[1][1] - self.bounds[1][0]))
 
     def is_mouse_in_bounds(self):
         m_x = pg.mouse.get_pos()[0]
         m_y = pg.mouse.get_pos()[1]
         return self.bounds[0][0] < m_x < self.bounds[0][1] and self.bounds[1][0] < m_y < self.bounds[1][1]
+
+
+class ButtonOutlined(Button):
+    def mouse_hover(self):
+        if self.is_mouse_in_bounds():
+            pg.draw.rect(self.screen, (50, 50, 50), pg.rect.Rect(self.bounds[0][0], self.bounds[1][0],
+                                                                 self.bounds[0][1] - self.bounds[0][0],
+                                                                 self.bounds[1][1] - self.bounds[1][0]), 2)

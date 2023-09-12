@@ -2,8 +2,8 @@ from level_editor.file_displayer import FileDisplayer
 from level_editor.le_editor import LevelEditor
 from level_editor.le_state_handler import *
 from level_editor.le_constants import *
-from level_editor.button import Button
-from constants import GameUnits
+from level_editor.buttons import Button
+from constants import GameUnits, EDITING_TAG
 import os
 import pygame as pg
 
@@ -125,7 +125,7 @@ class LevelEditorMain:
         skipped = 0  # takes away from 'i'
         for i, level_file in enumerate(levels):
             # if it is an editor level, skip
-            if level_file[-1] == '*':
+            if level_file.split(" ")[-1] == EDITING_TAG.split(" ")[-1]:
                 skipped += 1
                 continue
 
@@ -154,7 +154,7 @@ class LevelEditorMain:
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
 
-        self.level_editors.append(LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 15, 40), size=1.4))
+        self.level_editors.append(LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=2))
 
     # ------------>
     #  Functions

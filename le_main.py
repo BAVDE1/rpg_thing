@@ -10,7 +10,7 @@ import pygame as pg
 LEVELS_DIR = "./assets/levels/"
 
 
-def render_class_items(items: list[FileDisplayer | Button | LevelEditor]):
+def render_class_items(items: list[FileDisplayer | Button]):
     """ Used to render a list of classes. Classes must contain 'render()' function """
     for item in items:
         item.render()
@@ -36,7 +36,7 @@ class LevelEditorMain:
         self.seperators = []
         self.file_displays: list[FileDisplayer] = []
         self.buttons: list[Button] = []
-        self.level_editors: list[LevelEditor] = []
+        self.level_editor: LevelEditor | None = None
 
         self.switch_page()
 
@@ -58,9 +58,8 @@ class LevelEditorMain:
             # button click  (if buttons overlap, both will click)
             if event.type == pg.MOUSEBUTTONDOWN:
                 # for level editors
-                if self.editor_level:
-                    for level_editor in self.level_editors:
-                        level_editor.mouse_clicked()
+                if self.editor_level and self.level_editor:
+                    self.level_editor.mouse_clicked()
 
                 for btn in self.buttons:
                     if btn.is_mouse_in_bounds():
@@ -93,7 +92,8 @@ class LevelEditorMain:
         self.draw_seperators()
         render_class_items(self.file_displays)
         render_class_items(self.buttons)
-        render_class_items(self.level_editors)
+        if self.level_editor:
+            self.level_editor.render()
 
         self.display_text(self.heading_text)
 
@@ -154,7 +154,7 @@ class LevelEditorMain:
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
 
-        self.level_editors.append(LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=2))
+        self.level_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=1.4)
 
     # ------------>
     #  Functions
@@ -176,8 +176,12 @@ class LevelEditorMain:
     def add_button(self, display_text: str, pos: pg.Vector2, operation: tuple, size=30, image=None):
         self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
 
-    def add_file(self, file_dir:str, pos: pg.Vector2, size=20):
+    def add_file(self, file_dir: str, pos: pg.Vector2, size=20):
         self.file_displays.append(FileDisplayer(self.screen, file_dir, pos, size=size))
+
+    def reload_files(self):
+        for i, file in enumerate(self.file_displays):
+            self.file_displays[i] = FileDisplayer(file.screen, file.file_dir, file.pos, file.size)
 
     def button_clicked(self, operation: tuple):
         """ Called in 'events' every time a button is clicked """
@@ -199,10 +203,13 @@ class LevelEditorMain:
                 self.reset_data()
 
         if btn_op_type == BTN_SAVE:
-            print("SAVE", btn_op_value)
+            if self.level_editor:
+                self.level_editor.save_editing_level()
+                self.reload_files()
 
         if btn_op_type == BTN_SAVE_CLOSE:
-            print("SAVE", btn_op_value)
+            if self.level_editor:
+                self.level_editor.save_editing_level()
             self.reset_data(complete=True)
 
         if btn_op_type == BTN_CLOSE:
@@ -216,7 +223,7 @@ class LevelEditorMain:
         self.seperators.clear()
         self.file_displays.clear()
         self.buttons.clear()
-        self.level_editors.clear()
+        self.level_editor = None
         if complete:
             self.selected_area = ""
             self.selected_level = ""

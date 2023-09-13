@@ -60,7 +60,7 @@ class Level:
 
         self.initialise_level()
 
-    def reload_or_load_level(self, new_level_source=None):
+    def load_or_reload_level(self, new_level_source=None):
         """ Reloads level with the option of using a different level file """
         if not new_level_source:
             new_level_source = self.level_source

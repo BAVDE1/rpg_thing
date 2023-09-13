@@ -1,7 +1,7 @@
 [  ,  ,  ,  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ,  ,  ,  ]
 [  ,  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ,  ]
 [  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ]
-[  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ]
+[  ,Gr,Gr,Gr,Gr,  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ]
 [Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ]
 [Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Dt*0,Dt*1,Dt*2,Dt*3,Gr,Gr,Gr]
 [Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr]

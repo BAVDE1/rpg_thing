@@ -1,8 +1,8 @@
 import pygame as pg
 
 
-def split_sheet(image, size: tuple, columns, rows=1):
-    """ Returns list of rectangles for each frame """
+def split_sheet(image: pg.surface.Surface, size: tuple, columns, rows=1):
+    """ Returns list of sub-surfaces (really just surfaces) of image, for each rect """
     sub_surfaces = []
     for y in range(rows):
         for x in range(columns):

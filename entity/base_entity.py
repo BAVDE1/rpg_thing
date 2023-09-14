@@ -1,6 +1,6 @@
 
 
-# Base entity class to be inherited by entities
+# abstract base class?
 class BaseEntity:
     def __init__(self):
         self.health = None

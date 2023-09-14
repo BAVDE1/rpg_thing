@@ -1,10 +1,16 @@
 from constants import *
 
 
+class BTNOperation:
+    def __init__(self, btn_type: str, value):
+        self.type = btn_type
+        self.value = value
+
+
 class Button:
-    def __init__(self, screen: pg.surface.Surface, display_text, image, pos: pg.Vector2, operation: tuple, size: int = 30, override_size: tuple | None = None):
+    def __init__(self, screen: pg.surface.Surface, display_text, image, pos: pg.Vector2, operation: BTNOperation, text_size: int = 30, override_size: tuple | None = None):
         self.screen = screen
-        self.font = pg.font.SysFont('Times New Roman', size)
+        self.font = pg.font.SysFont('Times New Roman', text_size)
 
         self.pos = pos
         self.operation = operation
@@ -29,7 +35,7 @@ class Button:
         if self.image:
             self.screen.blit(self.image, (self.pos.x, self.pos.y + self.display_text.get_height()))
 
-    def mouse_down(self):
+    def get_operation(self):
         if self.is_mouse_in_bounds():
             return self.operation
 

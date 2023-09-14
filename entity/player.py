@@ -50,7 +50,7 @@ class Player:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
             self.shadow.add_offset_goal(len(self.animator.current_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
 
-        # todo: send beat event (after player movement)
+        # todo: send beat event, after player movement, to conductor (or could be something / somewhere else, plans change)
 
         self.moving = False
 

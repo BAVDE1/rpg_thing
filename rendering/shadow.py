@@ -12,7 +12,7 @@ SUN_SIGN = -.5
 
 
 class OffsetGoal:
-    """ OffsetGoal returns a vector2 depending upon the classes current iteration. The current iteration can be advanced to increase the offset closer to the offset_goal. \n
+    """ OffsetGoal returns a vector2 depending upon the classes current iteration. The current iteration can be advanced to increase the offset closer to its offset_goal. \n
         Example: \n
         A current_iter of 0 and an iter_length of 5, will have a vector2 offset of: goal_offset * 0   (0%, or 0/5, of the goal_offset: 0, 0) \n
         A current_iter of 1 and an iter_length of 5, will have a vector2 offset of: goal_offset * .2  (20%, or 1/5, of the goal_offset)
@@ -61,11 +61,11 @@ class Shadow:
         self.update_shadow_elements(position)
 
     def update_shadow_elements(self, position: pg.Vector2):
-        """ Split the image into horizontal strips.
-        WARNING: updating this too often is heavy on performance, SHADOW_QUALITY can be turned down as well
+        """ Splits the image into horizontal strips, and stores into group.
+        WARNING: updating this too often is heavy on performance, SHADOW_QUALITY can be turned down to help as well
         """
-        color_key = self.sprite.get_colorkey()
         blank_col = (0, 0, 0, 0)
+        color_key = self.sprite.get_colorkey()
         transparent = color_key if color_key else blank_col
 
         if self.shadow_offset_goal:
@@ -109,14 +109,14 @@ class Shadow:
         self.shadow_strips_group.add(*shadow_strips)
 
     def draw(self):
-        """ Draw each strip of the shadow offsetting the x-axis accordingly. """
+        """ Draws the shadow cuh """
         self.shadow_strips_group.draw(self.surface)
 
     def add_offset_goal(self, iteration_len, goal_offset, reverse=False):
         self.shadow_offset_goal = OffsetGoal(iteration_len, goal_offset, reverse)
 
     def update_shadow(self, position: pg.Vector2, new_sprite: pg.surface.Surface = None, offset: pg.Vector2 = pg.Vector2(0, 0)):
-        """ Updates the shadow with a new position and a new sprite """
+        """ Updates the shadow with a new position and an optional new sprite """
         if not new_sprite:
             new_sprite = self.sprite
         self.sprite = new_sprite

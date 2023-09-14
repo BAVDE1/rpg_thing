@@ -2,7 +2,7 @@ from level_editor.file_displayer import FileDisplayer
 from level_editor.le_editor import LevelEditor
 from level_editor.le_state_handler import *
 from level_editor.le_constants import *
-from level_editor.buttons import Button
+from level_editor.buttons import Button, BTNOperation
 from constants import GameUnits, EDITING_TAG
 import os
 import pygame as pg
@@ -63,7 +63,7 @@ class LevelEditorMain:
 
                 for btn in self.buttons:
                     if btn.is_mouse_in_bounds():
-                        self.button_clicked(btn.mouse_down())
+                        self.button_clicked(btn.get_operation())
                 self.switch_page()
 
     def switch_page(self):
@@ -114,7 +114,7 @@ class LevelEditorMain:
         self.heading_text = "Area Select"
         areas = sorted(os.listdir(str(LEVELS_DIR)))
         for i in range(len(areas)):
-            self.add_button(areas[i], pg.Vector2(0, 35 + (25 * i)), (BTN_AREA_SEL, areas[i]), size=20)
+            self.add_button(areas[i], pg.Vector2(0, 35 + (25 * i)), BTNOperation(BTN_AREA_SEL, areas[i]), size=20)
 
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
@@ -133,9 +133,9 @@ class LevelEditorMain:
             if level_file.split(".")[0] == self.selected_area:
                 self.add_file(f"{LEVELS_DIR}{self.selected_area}/{level_file}", pg.Vector2((self.screen.get_width() / 2) + 20, 40))
             else:
-                self.add_button(level_file, pg.Vector2(0, 10 + (25 * (i - skipped))), (BTN_LEVEL_SEL, level_file), size=20)
+                self.add_button(level_file, pg.Vector2(0, 10 + (25 * (i - skipped))), BTNOperation(BTN_LEVEL_SEL, level_file), size=20)
 
-        self.add_button("Back", pg.Vector2(0, self.screen.get_height() - 40), (BTN_BACK, self.open_area_select))
+        self.add_button("Back", pg.Vector2(0, self.screen.get_height() - 40), BTNOperation(BTN_BACK, self.open_area_select))
         self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
@@ -147,9 +147,9 @@ class LevelEditorMain:
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
 
         # buttons
-        self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), (BTN_SAVE, self.editor_level))
-        self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), (BTN_SAVE_CLOSE, self.editor_level))
-        self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), (BTN_CLOSE, None), size=15)
+        self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), BTNOperation(BTN_SAVE, self.editor_level))
+        self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), BTNOperation(BTN_SAVE_CLOSE, self.editor_level))
+        self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), BTNOperation(BTN_CLOSE, None), size=15)
 
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
@@ -173,8 +173,8 @@ class LevelEditorMain:
     def add_seperator(self, start: tuple, end: tuple):
         self.seperators.append([self.screen, (255, 255, 255), start, end])
 
-    def add_button(self, display_text: str, pos: pg.Vector2, operation: tuple, size=30, image=None):
-        self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, size=size))
+    def add_button(self, display_text: str, pos: pg.Vector2, operation: BTNOperation, size=30, image=None):
+        self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, text_size=size))
 
     def add_file(self, file_dir: str, pos: pg.Vector2, size=20):
         self.file_displays.append(FileDisplayer(self.screen, file_dir, pos, size=size))
@@ -183,36 +183,36 @@ class LevelEditorMain:
         for i, file in enumerate(self.file_displays):
             self.file_displays[i] = FileDisplayer(file.screen, file.file_dir, file.pos, file.size)
 
-    def button_clicked(self, operation: tuple):
+    def button_clicked(self, operation: BTNOperation):
         """ Called in 'events' every time a button is clicked """
-        btn_op_type = operation[0]
-        btn_op_value = operation[1]
+        btn_type = operation.type
+        btn_value = operation.value
 
-        if btn_op_type == BTN_AREA_SEL:
-            self.selected_area = btn_op_value
+        if btn_type == BTN_AREA_SEL:
+            self.selected_area = btn_value
             self.reset_data()
 
-        if btn_op_type == BTN_LEVEL_SEL:
-            self.selected_level = btn_op_value
+        if btn_type == BTN_LEVEL_SEL:
+            self.selected_level = btn_value
             self.reset_data()
 
-        if btn_op_type == BTN_BACK:
-            if btn_op_value == self.open_area_select:
+        if btn_type == BTN_BACK:
+            if btn_value == self.open_area_select:
                 self.selected_area = ""
                 self.selecting_level = False
                 self.reset_data()
 
-        if btn_op_type == BTN_SAVE:
+        if btn_type == BTN_SAVE:
             if self.level_editor:
                 self.level_editor.save_editing_level()
                 self.reload_files()
 
-        if btn_op_type == BTN_SAVE_CLOSE:
+        if btn_type == BTN_SAVE_CLOSE:
             if self.level_editor:
                 self.level_editor.save_editing_level()
             self.reset_data(complete=True)
 
-        if btn_op_type == BTN_CLOSE:
+        if btn_type == BTN_CLOSE:
             self.reset_data(complete=True)
 
     def reset_data(self, complete=False):

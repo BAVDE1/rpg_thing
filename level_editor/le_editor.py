@@ -9,35 +9,79 @@ import os
 
 
 class TileOption:
-    def __init__(self, screen: pg.surface.Surface, tile_chars: str, tile_sprite: pg.surface.Surface, position: pg.Vector2, scale=1):
+    def __init__(self, screen: pg.surface.Surface, tile_chars: str, tile_sprite: pg.surface.Surface, position: pg.Vector2, scale=1, text_index: str = ''):
         self.screen = screen
         self.pos = position
 
         self.tile_chars = tile_chars
-        self.txt_size = 20
+        self.txt_size = 10 * scale
         self.tile_sprite = pg.transform.scale(tile_sprite, (tile_sprite.get_width() * scale, tile_sprite.get_height() * scale))
 
-        self.button = Button(screen, tile_chars, self.tile_sprite, position, BTNOperation(BTN_TILE_OPTION, tile_chars), text_size=self.txt_size,
+        if text_index:
+            text_index += '-'
+        self.button = Button(screen, f"{text_index}{tile_chars[:2]}", self.tile_sprite, position, BTNOperation(BTN_TILE_OPTION, tile_chars), text_size=self.txt_size,
                              override_size=(self.tile_sprite.get_width(), self.tile_sprite.get_height() + self.txt_size))
+
+    def get_rect(self) -> pg.Rect:
+        return pg.Rect(self.pos.x, self.pos.y, self.tile_sprite.get_width(), self.tile_sprite.get_height() + self.txt_size)
+
+    def __repr__(self):
+        return f"TileOption({self.tile_chars}, {self.pos})"
 
 
 class Hotbar:
-    def __init__(self):
-        self.max_size = 6
-        self.tile_options: list[TileOption] = []
+    def __init__(self, screen, position: pg.Vector2, scale=1):
+        self.screen = screen
 
-    def add_tile_option(self, slot: int, tile_option: TileOption):
-        slot = max(1, min(6, slot))
-        self.tile_options.insert(slot, tile_option)
+        self.pos = position
+        self.scale = scale
+
+        self.max_size = 9
+        self.tile_options: list[TileOption | None] = [None for _ in range(self.max_size)]
+
+        self.selected_slot = 1
+        self.selected_slot_tile = self.get_selected_tile_chars()
+
+    def add_tile_option(self, slot_num: int, tile_char: str):
+        """ Add a new tile to the hotbar, overrides existing tile in chosen slot """
+        if tile_char in ASCII_TO_SPRITE:
+            slot_num = max(1, min(self.max_size, slot_num))
+
+            tile_sprite = ASCII_TO_SPRITE[tile_char]
+            tile_option = TileOption(self.screen, tile_char, tile_sprite, pg.Vector2(self.pos.x + (50 * (slot_num - 1)), self.pos.y), scale=self.scale, text_index=str(slot_num))
+
+            self.tile_options[slot_num - 1] = tile_option
+
+    def get_selected_tile_chars(self) -> str:
+        """ Returns the tile_chars (for ASCII_TO_SPRITE) or nothing if no tile in slot """
+        slot = self.get_selected_slot()
+        if slot:
+            return slot.tile_chars
+        return ""
 
     def render(self):
         for tile_option in self.tile_options:
-            tile_option.button.render()
+            if tile_option:
+                # selected outline
+                if slot := self.get_selected_slot():
+                    pg.draw.rect(self.screen, (255, 255, 255), slot.get_rect(), 2)
+
+                tile_option.button.render()
+
+    def switch_selected_slot(self, slot_num):
+        """ Used to switch the selected hotbar slot (clamped) """
+        slot_num = max(1, min(self.max_size, slot_num))
+        self.selected_slot = slot_num
+        self.selected_slot_tile = self.get_selected_tile_chars()
+
+    def get_selected_slot(self) -> TileOption | None:
+        """ Returns TileOption (or None) of the slot selected """
+        return self.tile_options[self.selected_slot - 1]
 
 
-class TileSelector:
-    def __init__(self):
-
+class TileSelectorInventory:
+    def __init__(self, hotbar: Hotbar):
+        self.hotbar = hotbar
         self.is_open = False
 
     def render(self):
@@ -70,10 +114,18 @@ class LevelEditor:
         self.create_editing_buttons()
         self.update_opened_level_file()
 
-        self.selected_tile = '  '
-        self.hotbar: Hotbar = Hotbar()
-        self.hotbar.add_tile_option(1, TileOption(self.screen, 'Gr', ASCII_TO_SPRITE['Gr'], pg.Vector2(6, self.screen.get_height() - 70), scale=2))
-        self.tile_selector: TileSelector = TileSelector()
+        self.hotbar: Hotbar = Hotbar(self.screen, pg.Vector2(6, self.screen.get_height() - 70), scale=2)
+        self.hotbar.add_tile_option(1, 'Gr')
+        self.hotbar.add_tile_option(2, 'Dt*0')
+        self.hotbar.add_tile_option(3, 'Dt*1')
+        self.hotbar.add_tile_option(4, 'Dt*2')
+        self.hotbar.add_tile_option(5, 'Dt*3')
+        self.hotbar.add_tile_option(6, 'Gr')
+        self.hotbar.add_tile_option(7, 'Gr')
+        self.hotbar.add_tile_option(8, 'Gr')
+        self.hotbar.add_tile_option(9, 'Gr')
+
+        self.tile_selector: TileSelectorInventory = TileSelectorInventory(self.hotbar)
 
     def render(self):
         # level text
@@ -105,16 +157,28 @@ class LevelEditor:
     def add_button(self, display_text: str, pos: pg.Vector2, operation: BTNOperation, size=30, image=None, override_size=None):
         self.buttons.append(Button(screen=self.screen, display_text=display_text, image=image, pos=pos, operation=operation, text_size=size, override_size=override_size))
 
-    def mouse_clicked(self):
+    def keyboard_num_pressed(self, number):
+        self.hotbar.switch_selected_slot(number)
+
+    def mouse_left_clicked(self):
+        self.mouse_clicked_on_editor_level()
+
+    def mouse_right_clicked(self):
+        self.mouse_clicked_on_editor_level(override_value='  ')
+
+    def mouse_middle_clicked(self):
+        print("middle")
+
+    def mouse_clicked_on_editor_level(self, override_value=None):
         for btn in self.buttons:
             if btn.is_mouse_in_bounds():
                 btn_type = btn.operation.type
                 btn_value = btn.operation.value
 
                 if btn_type == BTN_TILE_CHANGE:
-                    self.change_tile(btn_value[1], btn_value[0])
+                    self.change_tile(btn_value[1], btn_value[0], override_value)
 
-    def change_tile(self, row, column):
+    def change_tile(self, row, column, override_value=None):
         """ Changes the tile to selected tile in the editing file """
         if not self.editing_file_exists():
             self.create_editing_file()
@@ -126,7 +190,7 @@ class LevelEditor:
                 lines.append(line.strip().replace("[", "").replace("]", "").split(","))
 
         # set tile
-        lines[row][column] = self.selected_tile
+        lines[row][column] = self.hotbar.get_selected_tile_chars() if override_value is None else override_value
 
         # update file
         with open(self.EDITING_LEVEL_FILE, 'w') as editing_file:

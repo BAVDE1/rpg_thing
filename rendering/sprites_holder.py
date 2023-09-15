@@ -11,6 +11,9 @@ class BasicSprite(pg.sprite.Sprite):
         self.pos = pos
         self.rect = pg.rect.Rect(pos.x + sprite_offset_pos.x, pos.y + sprite_offset_pos.y, self.image.get_width(), self.image.get_height())
 
+    def __repr__(self):
+        return f"BasicSprite({self.pos}, {self.rect})"
+
 
 class TileSprite(BasicSprite):
     """ Sprite object to hold tile sprites information """

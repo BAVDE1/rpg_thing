@@ -8,6 +8,7 @@ import os
 import pygame as pg
 
 LEVELS_DIR = "./assets/levels/"
+KEYBOARD_NUMS = {pg.K_1: 1, pg.K_2: 2, pg.K_3: 3, pg.K_4: 4, pg.K_5: 5, pg.K_6: 6, pg.K_7: 7, pg.K_8: 8, pg.K_9: 9}
 
 
 def render_class_items(items: list[FileDisplayer | Button]):
@@ -52,19 +53,40 @@ class LevelEditorMain:
                 self.running = False
 
             # update keys
-            if event.type in (pg.KEYDOWN, pg.KEYUP):
+            if event.type == pg.KEYDOWN:
+                self.keys = pg.key.get_pressed()
+
+                # keyboard numbers
+                if event.key in KEYBOARD_NUMS:
+                    if self.editor_level and self.level_editor:
+                        self.level_editor.keyboard_num_pressed(KEYBOARD_NUMS[event.key])
+            if event.type == pg.KEYUP:
                 self.keys = pg.key.get_pressed()
 
             # button click  (if buttons overlap, both will click)
             if event.type == pg.MOUSEBUTTONDOWN:
-                # for level editors
-                if self.editor_level and self.level_editor:
-                    self.level_editor.mouse_clicked()
+                mouse_button = event.button
 
-                for btn in self.buttons:
-                    if btn.is_mouse_in_bounds():
-                        self.button_clicked(btn.get_operation())
-                self.switch_page()
+                # left click
+                if mouse_button == 1:
+                    # for level editors
+                    if self.editor_level and self.level_editor:
+                        self.level_editor.mouse_left_clicked()
+
+                    for btn in self.buttons:
+                        if btn.is_mouse_in_bounds():
+                            self.button_left_clicked(btn.get_operation())
+                    self.switch_page()
+
+                # middle click
+                if mouse_button == 2:
+                    if self.editor_level and self.level_editor:
+                        self.level_editor.mouse_middle_clicked()
+
+                # right click
+                if mouse_button == 3:
+                    if self.editor_level and self.level_editor:
+                        self.level_editor.mouse_right_clicked()
 
     def switch_page(self):
         """ Switch page if needed. If already on page, do nothing """
@@ -183,7 +205,7 @@ class LevelEditorMain:
         for i, file in enumerate(self.file_displays):
             self.file_displays[i] = FileDisplayer(file.screen, file.file_dir, file.pos, file.size)
 
-    def button_clicked(self, operation: BTNOperation):
+    def button_left_clicked(self, operation: BTNOperation):
         """ Called in 'events' every time a button is clicked """
         btn_type = operation.type
         btn_value = operation.value

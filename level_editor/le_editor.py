@@ -1,7 +1,7 @@
 from level.level import Level
 from level_editor.buttons import ButtonOutlined, Button, BTNOperation
 from level_editor.file_displayer import FileDisplayer
-from constants import EDITING_TAG
+from constants import EDITING_TAG, GameUnits
 from texture_constants import ASCII_TO_SPRITE
 from level_editor.le_constants import *
 import pygame as pg
@@ -106,15 +106,15 @@ class LevelEditor:
 
         self.size = size
         self.position = position
-        self.lvl_pos = pg.Vector2(position.x + 20, position.y + self.display_text.get_height() * 2)
+        self.lvl_pos = self.load_lvl_pos()
 
-        self.level = Level(screen, self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE, pos_offset=self.lvl_pos, size=size)
+        self.level = self.load_lvl()
         self.editing_file: FileDisplayer | None = None
         self.buttons: list[ButtonOutlined | Button] = []
         self.create_editing_buttons()
         self.update_opened_level_file()
 
-        self.hotbar: Hotbar = Hotbar(self.screen, pg.Vector2(6, self.screen.get_height() - 70), scale=2)
+        self.hotbar: Hotbar = Hotbar(self.screen, pg.Vector2((self.screen.get_width() / 2) + 10, self.screen.get_height() - 70), scale=2)
         self.hotbar.add_tile_option(1, 'Gr')
         self.hotbar.add_tile_option(2, 'Dt*0')
         self.hotbar.add_tile_option(3, 'Dt*1')
@@ -126,6 +126,12 @@ class LevelEditor:
         self.hotbar.add_tile_option(9, 'Gr')
 
         self.tile_selector: TileSelectorInventory = TileSelectorInventory(self.hotbar)
+
+    def load_lvl_pos(self) -> pg.Vector2:
+        return pg.Vector2(self.position.x + 22 * self.size, self.position.y + self.display_text.get_height() * (self.size * 2))
+
+    def load_lvl(self) -> Level:
+        return Level(self.screen, self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE, pos_offset=self.lvl_pos, size=self.size)
 
     def render(self):
         # level text
@@ -148,6 +154,8 @@ class LevelEditor:
             button.render()
 
     def create_editing_buttons(self):
+        """ Creates (or updates) the buttons for editing the level """
+        self.buttons = []
         for tile_rect in self.level.generate_tile_rects():
             pos = pg.Vector2(tile_rect[0], tile_rect[1])
             size = (tile_rect[2], tile_rect[3])
@@ -170,6 +178,7 @@ class LevelEditor:
         print("middle")
 
     def mouse_clicked_on_editor_level(self, override_value=None):
+        """ Used for button click detection & functionality when the mouse is clicked """
         for btn in self.buttons:
             if btn.is_mouse_in_bounds():
                 btn_type = btn.operation.type
@@ -218,9 +227,18 @@ class LevelEditor:
         self.update_display_text()
         self.level.load_or_reload_level(self.opened_level_file)
 
+        self.lvl_pos = self.load_lvl_pos()
+        self.level = self.load_lvl()
+        self.create_editing_buttons()
+
         # reload file
         if self.editing_file:
             self.editing_file.create_display_file_lines()
+
+    def zoom_size(self, amount):
+        """ Rounds to 1 decimal place """
+        self.size = max(0.5, min(1.3 if GameUnits.RES_MUL == 2 else 2.2, round(self.size + amount, 1)))
+        self.update_all_items()
 
     def create_editing_file(self):
         """ If it doesn't exist, creates new file in level directory for editing, on creation it is an exact copy of it level """

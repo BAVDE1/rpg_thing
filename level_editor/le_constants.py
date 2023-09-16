@@ -8,6 +8,7 @@ BTN_BACK = "btn_back"
 BTN_SAVE = "btn_save"
 BTN_SAVE_CLOSE = "btn_save_close"
 BTN_CLOSE = "btn_close"
+BTN_ZOOM = "btn_zoom"
 
 BTN_TILE_CHANGE = "btn_tile_change"
 BTN_TILE_OPTION = "btn_tile_option"

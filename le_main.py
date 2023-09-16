@@ -167,16 +167,19 @@ class LevelEditorMain:
         # seperators
         self.add_seperator((self.screen.get_width() / 2, 30), (self.screen.get_width() / 2, self.screen.get_height()))
         self.add_seperator((0, 30), (self.screen.get_width(), 30))
+        self.add_seperator((self.screen.get_width() / 2, self.screen.get_height() - 80), (self.screen.get_width(), self.screen.get_height() - 80))
 
         # buttons
         self.add_button("Save", pg.Vector2(self.screen.get_width() - 300, 0), BTNOperation(BTN_SAVE, self.editor_level))
         self.add_button("Save&Close", pg.Vector2(self.screen.get_width() - 210, 0), BTNOperation(BTN_SAVE_CLOSE, self.editor_level))
         self.add_button("Close", pg.Vector2(self.screen.get_width() - 40, 8), BTNOperation(BTN_CLOSE, None), size=15)
+        self.add_button(" + ", pg.Vector2(self.screen.get_width() - 30, self.screen.get_height() - 70), BTNOperation(BTN_ZOOM, 0.1), size=25)
+        self.add_button(" - ", pg.Vector2(self.screen.get_width() - 30, self.screen.get_height() - 40), BTNOperation(BTN_ZOOM, -0.1), size=30)
 
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
 
-        self.level_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=1.4)
+        self.level_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=0.5 * GameUnits.RES_MUL)
 
     # ------------>
     #  Functions
@@ -236,6 +239,9 @@ class LevelEditorMain:
 
         if btn_type == BTN_CLOSE:
             self.reset_data(complete=True)
+
+        if btn_type == BTN_ZOOM:
+            self.level_editor.zoom_size(btn_value)
 
     def reset_data(self, complete=False):
         self.selecting_area = False

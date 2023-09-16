@@ -31,6 +31,7 @@ class FileDisplayer:
         self.display_file_lines = self.create_display_file_lines()
 
     def create_display_file_lines(self):
+        """ Creates (or updates) the opened file's display """
         return [self.file_font.render(str("[{}]".format(line)), True, (255, 255, 255)) for line in self.file_lines]
 
     def render(self):

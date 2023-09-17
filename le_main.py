@@ -60,6 +60,10 @@ class LevelEditorMain:
                 if event.key in KEYBOARD_NUMS:
                     if self.editor_level and self.level_editor:
                         self.level_editor.keyboard_num_pressed(KEYBOARD_NUMS[event.key])
+
+                if self.keys[pg.K_LCTRL] and self.keys[pg.K_z]:
+                    if self.editor_level and self.level_editor:
+                        self.level_editor.keyboard_ctrl_z_pressed()
             if event.type == pg.KEYUP:
                 self.keys = pg.key.get_pressed()
 

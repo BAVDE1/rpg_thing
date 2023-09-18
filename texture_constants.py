@@ -39,6 +39,11 @@ def register_tiles():
 
     four_way_rotated_tile('Dt', TileTextures.DEV_TILE)
 
+    four_way_rotated_tile('Ga', TileTextures.DEV_TILE)
+    four_way_rotated_tile('Gb', TileTextures.DEV_TILE)
+    four_way_rotated_tile('Gc', TileTextures.DEV_TILE)
+    four_way_rotated_tile('Gd', TileTextures.DEV_TILE)
+
 
 ASCII_TO_SPRITE = {}
 register_tiles()

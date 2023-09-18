@@ -37,7 +37,7 @@ class LevelEditorMain:
         self.seperators = []
         self.file_displays: list[FileDisplayer] = []
         self.buttons: list[Button] = []
-        self.level_editor: LevelEditor | None = None
+        self.lvl_editor: LevelEditor | None = None
 
         self.switch_page()
 
@@ -56,14 +56,32 @@ class LevelEditorMain:
             if event.type == pg.KEYDOWN:
                 self.keys = pg.key.get_pressed()
 
-                # keyboard numbers
-                if event.key in KEYBOARD_NUMS:
-                    if self.editor_level and self.level_editor:
-                        self.level_editor.keyboard_num_pressed(KEYBOARD_NUMS[event.key])
+                # level editor
+                if self.editor_level and self.lvl_editor:
+                    # keyboard numbers
+                    if event.key in KEYBOARD_NUMS:
+                        self.lvl_editor.keyboard_num_pressed(KEYBOARD_NUMS[event.key])
 
-                if self.keys[pg.K_LCTRL] and self.keys[pg.K_z]:
-                    if self.editor_level and self.level_editor:
-                        self.level_editor.keyboard_ctrl_z_pressed()
+                    # inventory
+                    is_open = self.lvl_editor.tile_inv.is_open
+                    if self.keys[pg.K_e]:  # open / close inv
+                        self.lvl_editor.tile_inv.is_open = not is_open
+                    if is_open:  # change page
+                        on_page = self.lvl_editor.tile_inv.on_page
+                        if self.keys[pg.K_d] or self.keys[pg.K_RIGHT]:  # right (next page)
+                            pages_len = len(self.lvl_editor.tile_inv.inv_pages) - 1
+                            self.lvl_editor.tile_inv.on_page = min(pages_len, on_page + 1)
+                        if self.keys[pg.K_a] or self.keys[pg.K_LEFT]:  # left (prev page)
+                            self.lvl_editor.tile_inv.on_page = max(0, on_page - 1)
+
+                    # ctrl+
+                    if self.keys[pg.K_LCTRL]:
+                        if self.keys[pg.K_z]:
+                            self.lvl_editor.keyboard_ctrl_z_pressed()
+
+                        if self.keys[pg.K_s]:
+                            self.lvl_editor.save_editing_level()
+                            self.reload_files()
             if event.type == pg.KEYUP:
                 self.keys = pg.key.get_pressed()
 
@@ -74,8 +92,8 @@ class LevelEditorMain:
                 # left click
                 if mouse_button == 1:
                     # for level editors
-                    if self.editor_level and self.level_editor:
-                        self.level_editor.mouse_left_clicked()
+                    if self.editor_level and self.lvl_editor:
+                        self.lvl_editor.mouse_left_clicked()
 
                     for btn in self.buttons:
                         if btn.is_mouse_in_bounds():
@@ -84,13 +102,13 @@ class LevelEditorMain:
 
                 # middle click
                 if mouse_button == 2:
-                    if self.editor_level and self.level_editor:
-                        self.level_editor.mouse_middle_clicked()
+                    if self.editor_level and self.lvl_editor:
+                        self.lvl_editor.mouse_middle_clicked()
 
                 # right click
                 if mouse_button == 3:
-                    if self.editor_level and self.level_editor:
-                        self.level_editor.mouse_right_clicked()
+                    if self.editor_level and self.lvl_editor:
+                        self.lvl_editor.mouse_right_clicked()
 
     def switch_page(self):
         """ Switch page if needed. If already on page, do nothing """
@@ -118,8 +136,8 @@ class LevelEditorMain:
         self.draw_seperators()
         render_class_items(self.file_displays)
         render_class_items(self.buttons)
-        if self.level_editor:
-            self.level_editor.render()
+        if self.lvl_editor:
+            self.lvl_editor.render()
 
         self.display_text(self.heading_text)
 
@@ -183,7 +201,7 @@ class LevelEditorMain:
         # files
         self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
 
-        self.level_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=0.5 * GameUnits.RES_MUL)
+        self.lvl_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=0.5 * GameUnits.RES_MUL)
 
     # ------------>
     #  Functions
@@ -232,20 +250,20 @@ class LevelEditorMain:
                 self.reset_data()
 
         if btn_type == BTN_SAVE:
-            if self.level_editor:
-                self.level_editor.save_editing_level()
+            if self.lvl_editor:
+                self.lvl_editor.save_editing_level()
                 self.reload_files()
 
         if btn_type == BTN_SAVE_CLOSE:
-            if self.level_editor:
-                self.level_editor.save_editing_level()
+            if self.lvl_editor:
+                self.lvl_editor.save_editing_level()
             self.reset_data(complete=True)
 
         if btn_type == BTN_CLOSE:
             self.reset_data(complete=True)
 
         if btn_type == BTN_ZOOM:
-            self.level_editor.zoom_size(btn_value)
+            self.lvl_editor.zoom_size(btn_value)
 
     def reset_data(self, complete=False):
         self.selecting_area = False
@@ -255,7 +273,7 @@ class LevelEditorMain:
         self.seperators.clear()
         self.file_displays.clear()
         self.buttons.clear()
-        self.level_editor = None
+        self.lvl_editor = None
         if complete:
             self.selected_area = ""
             self.selected_level = ""

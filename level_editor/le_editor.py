@@ -45,7 +45,7 @@ class Hotbar:
 
         self.selected_slot = 1
 
-    def add_tile_option(self, slot_num: int, tile_char: str):
+    def set_tile_option(self, slot_num: int, tile_char: str):
         """ Add a new tile to the hotbar, overrides existing tile in chosen slot """
         if tile_char in ASCII_TO_SPRITE:
             slot_num = max(1, min(self.max_size, slot_num))
@@ -83,14 +83,73 @@ class Hotbar:
         return self.tile_options[self.selected_slot - 1]
 
 
-class TileSelectorInventory:
-    def __init__(self, hotbar: Hotbar):
+class TileInventory:
+    def __init__(self, screen, hotbar: Hotbar, position):
+        self.screen = screen
         self.hotbar = hotbar
+        self.position = position
+
+        self.spacing = (GameUnits.UNIT * 2) + 20
+
+        self.rows = 8  # 8
+        self.columns = 6  # 6
+
+        self.inv_pages: dict = {}
+        self.on_page = 0
+
         self.is_open = False
+        self.create_inv()
+
+    def create_inv(self):
+        """ Creates the inventory """
+        on_page = 0
+        on_row = 0
+        on_column = 0
+
+        page = []
+        for chars in ASCII_TO_SPRITE.keys():
+            page.append(TileOption(self.screen, chars, ASCII_TO_SPRITE[chars],
+                                  pg.Vector2(self.position.x + (self.spacing * on_column), self.position.y + (self.spacing * on_row)), scale=2))
+            on_column += 1
+
+            # restart column & add row
+            if on_column == self.columns:
+                on_column = 0
+                on_row += 1
+
+                # complete page & start a new page
+                if on_row == self.rows:
+                    self.inv_pages[on_page] = page
+                    page = []
+                    on_row = 0
+                    on_page += 1
+
+        # add if there was an incomplete page
+        if len(page) > 0:
+            self.inv_pages[on_page] = page
 
     def render(self):
+        if self.is_open and len(self.inv_pages) > 0:
+            # background
+            pg.draw.rect(self.screen, (0, 0, 0), pg.Rect(self.position.x - 10, self.position.y, (self.spacing * self.columns) + 20, self.spacing * self.rows))
+
+            # tiles
+            for tile_option in self.inv_pages[self.on_page]:
+                tile_option.button.render()
+
+            # page number
+            self.screen.blit(pg.font.SysFont('Times New Roman', 20)
+                             .render(f"{self.on_page + 1}/{len(self.inv_pages)}", False, (255, 255, 0)),
+                             pg.Vector2(10, self.screen.get_height() - 20))
+
+    def user_input(self, number=None):
+        """ Called when the user left-clicks or presses a number on their keyboard """
         if self.is_open:
-            pass
+            for tile_option in self.inv_pages[self.on_page]:
+                if tile_option.button.is_mouse_in_bounds():
+                    if number:
+                        self.hotbar.selected_slot = number
+                    self.hotbar.set_tile_option(self.hotbar.selected_slot, tile_option.tile_chars)
 
 
 class LevelEditor:
@@ -123,19 +182,18 @@ class LevelEditor:
         self.saved_changes: list[tuple[int, int, str]] = []  # row, column, tile chars
 
         self.hotbar: Hotbar = Hotbar(self.screen,
-                                     pg.Vector2((self.screen.get_width() / 2) + 10, self.screen.get_height() - 70),
-                                     scale=2)
-        self.hotbar.add_tile_option(1, 'Gr')
-        self.hotbar.add_tile_option(2, 'Dt*0')
-        self.hotbar.add_tile_option(3, 'Dt*1')
-        self.hotbar.add_tile_option(4, 'Dt*2')
-        self.hotbar.add_tile_option(5, 'Dt*3')
-        self.hotbar.add_tile_option(6, 'Gr')
-        self.hotbar.add_tile_option(7, 'Gr')
-        self.hotbar.add_tile_option(8, 'Gr')
-        self.hotbar.add_tile_option(9, 'Gr')
+                                     pg.Vector2((self.screen.get_width() / 2) + 10, self.screen.get_height() - 70), scale=2)
+        self.hotbar.set_tile_option(1, 'Gr')
+        self.hotbar.set_tile_option(2, 'Dt*0')
+        self.hotbar.set_tile_option(3, 'Dt*1')
+        self.hotbar.set_tile_option(4, 'Dt*2')
+        self.hotbar.set_tile_option(5, 'Dt*3')
+        self.hotbar.set_tile_option(6, 'Gr')
+        self.hotbar.set_tile_option(7, 'Gr')
+        self.hotbar.set_tile_option(8, 'Gr')
+        self.hotbar.set_tile_option(9, 'Gr')
 
-        self.tile_selector_inv: TileSelectorInventory = TileSelectorInventory(self.hotbar)
+        self.tile_inv: TileInventory = TileInventory(self.screen, self.hotbar, pg.Vector2(10, 40))
 
     def load_lvl_pos(self) -> pg.Vector2:
         return pg.Vector2(self.position.x + 22 * self.size,
@@ -159,7 +217,7 @@ class LevelEditor:
 
         # tile selection
         self.hotbar.render()
-        self.tile_selector_inv.render()
+        self.tile_inv.render()
 
         # editor
         for button in self.buttons:
@@ -181,6 +239,7 @@ class LevelEditor:
                    text_size=size, override_size=override_size))
 
     def keyboard_num_pressed(self, number):
+        self.tile_inv.user_input(number)
         self.hotbar.switch_selected_slot(number)
 
     def keyboard_ctrl_z_pressed(self):
@@ -188,6 +247,7 @@ class LevelEditor:
             self.change_tile(*self.saved_changes.pop(0), save_change=False)
 
     def mouse_left_clicked(self):
+        self.tile_inv.user_input()
         self.mouse_clicked_on_editor_level()
 
     def mouse_right_clicked(self):

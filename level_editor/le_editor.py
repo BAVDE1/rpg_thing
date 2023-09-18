@@ -89,7 +89,8 @@ class TileInventory:
         self.hotbar = hotbar
         self.position = position
 
-        self.spacing = (GameUnits.UNIT * 2) + 20
+        self.spacing_x = (GameUnits.UNIT * 2) + 15
+        self.spacing_y = (GameUnits.UNIT * 2) + 25
 
         self.rows = 8  # 8
         self.columns = 6  # 6
@@ -109,7 +110,7 @@ class TileInventory:
         page = []
         for chars in ASCII_TO_SPRITE.keys():
             page.append(TileOption(self.screen, chars, ASCII_TO_SPRITE[chars],
-                                  pg.Vector2(self.position.x + (self.spacing * on_column), self.position.y + (self.spacing * on_row)), scale=2))
+                                  pg.Vector2(self.position.x + (self.spacing_x * on_column), self.position.y + (self.spacing_y * on_row)), scale=2))
             on_column += 1
 
             # restart column & add row
@@ -131,7 +132,7 @@ class TileInventory:
     def render(self):
         if self.is_open and len(self.inv_pages) > 0:
             # background
-            pg.draw.rect(self.screen, (0, 0, 0), pg.Rect(self.position.x - 10, self.position.y, (self.spacing * self.columns) + 20, self.spacing * self.rows))
+            pg.draw.rect(self.screen, (0, 0, 0), pg.Rect(self.position.x - 10, self.position.y, (self.spacing_x * self.columns) + 20, self.spacing_y * self.rows))
 
             # tiles
             for tile_option in self.inv_pages[self.on_page]:

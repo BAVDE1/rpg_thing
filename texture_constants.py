@@ -27,7 +27,8 @@ class TileTextures:
 
     GRASS_SPRITE = pg.image.load("assets/textures/tiles/grass.png")
 
-    DEV_TILE = pg.image.load("assets/textures/tiles/devart/dir_tile.png")
+    PLACEHOLDER_TILE = pg.image.load("assets/textures/tiles/tile_placeholder.png")
+    DIR_TILE = pg.image.load("assets/textures/tiles/devart/dir_tile.png")
 
     LEAVES_TILESET_SPRITE = pg.image.load("assets/textures/tiles/leaves_tileset.png")
     LEAVES_TILESET_SPRITES = split_sheet(LEAVES_TILESET_SPRITE, (20, 20), 5, 5)
@@ -37,12 +38,9 @@ def register_tiles():
     """ Register new tiles here """
     single_tile('Gr', TileTextures.GRASS_SPRITE)
 
-    four_way_rotated_tile('Dt', TileTextures.DEV_TILE)
+    four_way_rotated_tile('Dt', TileTextures.DIR_TILE)
 
-    four_way_rotated_tile('Ga', TileTextures.DEV_TILE)
-    four_way_rotated_tile('Gb', TileTextures.DEV_TILE)
-    four_way_rotated_tile('Gc', TileTextures.DEV_TILE)
-    four_way_rotated_tile('Gd', TileTextures.DEV_TILE)
+    single_tile('Pt', TileTextures.PLACEHOLDER_TILE)
 
 
 ASCII_TO_SPRITE = {}

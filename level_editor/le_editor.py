@@ -82,8 +82,22 @@ class Hotbar:
                     pg.draw.rect(self.screen, (255, 255, 255), slot.get_rect(), 2)
 
     def switch_selected_slot(self, slot_num):
-        """ Used to switch the selected hotbar slot (clamped) """
+        """ Used to switch the selected hotbar slot (clamped). Auto cycles from end to start & vice versa """
         slot_num = max(1, min(self.max_size, slot_num))  # clamps
+
+        # auto cycle to start
+        while self.tile_options[slot_num - 1] is None:
+            if slot_num == 9:
+                slot_num = 0
+            else:
+                slot_num += 1
+
+        # auto cycle to end
+        if slot_num == 1 and self.selected_slot == 1:
+            slot_num = 9
+            while self.tile_options[slot_num - 1] is None:
+                slot_num -= 1
+
         self.selected_slot = slot_num
 
     def get_selected_slot(self) -> TileOption | None:

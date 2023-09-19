@@ -62,11 +62,28 @@ class LevelEditorMain:
                     if event.key in KEYBOARD_NUMS:
                         self.lvl_editor.keyboard_num_pressed(KEYBOARD_NUMS[event.key])
 
-                    # inventory
-                    is_open = self.lvl_editor.tile_inv.is_open
-                    if self.keys[pg.K_e]:  # open / close inv
-                        self.lvl_editor.tile_inv.is_open = not is_open
-                    if is_open:  # change page
+                    # change layer up / down
+                    layer = self.lvl_editor.selected_layer
+                    if self.keys[pg.K_UP] or self.keys[pg.K_w]:
+                        self.lvl_editor.change_selected_layer(layer - 1)
+                    if self.keys[pg.K_DOWN] or self.keys[pg.K_s]:
+                        self.lvl_editor.change_selected_layer(layer + 1)
+
+                    is_inv_open = self.lvl_editor.tile_inv.is_open
+                    # hotbar left / right
+                    if not is_inv_open:
+                        selected_slot = self.lvl_editor.hotbar.selected_slot
+                        if self.keys[pg.K_LEFT] or self.keys[pg.K_a]:
+                            self.lvl_editor.hotbar.switch_selected_slot(selected_slot - 1)
+                        if self.keys[pg.K_RIGHT] or self.keys[pg.K_d]:
+                            self.lvl_editor.hotbar.switch_selected_slot(selected_slot + 1)
+
+                    # inventory open / close
+                    if self.keys[pg.K_e]:
+                        self.lvl_editor.tile_inv.is_open = not is_inv_open
+
+                    # inventory page left / right
+                    if is_inv_open:
                         on_page = self.lvl_editor.tile_inv.on_page
                         if self.keys[pg.K_d] or self.keys[pg.K_RIGHT]:  # right (next page)
                             pages_len = len(self.lvl_editor.tile_inv.inv_pages) - 1

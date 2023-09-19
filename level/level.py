@@ -1,4 +1,4 @@
-from constants import GameUnits, DirectionalValues
+from constants import GameUnits, DirectionalValues, LevelLocations
 from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
 from rendering.sprites_holder import TileSprite
 import os
@@ -11,11 +11,24 @@ def parse_level_file(level_source):
         raise FileNotFoundError(
             f"level file {level_source} could not be found. Was there a typo; was the directory not properly declared?")
 
-    level_lines = []
+    seperator_count = 0
+    layers_dict: dict[int:list] = {}
+
     with open(level_source) as file:
         for line in file:
-            level_lines.append(line.strip().replace("[", "").replace("]", ""))
-    return level_lines
+            line = line.strip().replace("[", "").replace("]", "")
+
+            # seperator
+            if line == LevelLocations.LEVEL_LAYER_SEPERATOR:
+                seperator_count += 1
+                continue
+
+            # add line to dict
+            if seperator_count in layers_dict:
+                layers_dict[seperator_count].append(line)
+            else:
+                layers_dict[seperator_count] = [line]
+    return layers_dict
 
 
 def outline_decider(dic: dict):
@@ -54,21 +67,33 @@ class Level:
 
         self.level_source = level_source
 
-        self.ground_layer_lines = parse_level_file(level_source)
+        self.whole_level = None
+        self.top_layer_lines = None
+        self.entity_layer_lines = None
+        self.ground_layer_lines = None
+
+        self.top_layer_group = pg.sprite.Group()
+        self.entity_layer_group = pg.sprite.Group()
         self.ground_layer_group = pg.sprite.Group()
         self.outline_layer_group = pg.sprite.Group()
 
-        self.initialise_level()
+        # initializes level
+        self.load_or_reload_level(self.level_source)
 
     def load_or_reload_level(self, new_level_source=None):
         """ Reloads level with the option of using a different level file """
-        if not new_level_source:
-            new_level_source = self.level_source
+        if new_level_source:
+            self.level_source = new_level_source
 
         self.is_initialised = False
-        self.ground_layer_lines = parse_level_file(new_level_source)
-        self.ground_layer_group = pg.sprite.Group()
-        self.outline_layer_group = pg.sprite.Group()
+        self.whole_level = parse_level_file(self.level_source)
+        self.top_layer_lines = self.whole_level[0]
+        self.entity_layer_lines = self.whole_level[1]
+        self.ground_layer_lines = self.whole_level[2]
+
+        self.top_layer_group.empty()
+        self.ground_layer_group.empty()
+        self.outline_layer_group.empty()
 
         self.initialise_level()
 
@@ -76,6 +101,7 @@ class Level:
         if not self.is_initialised:
             # create tiles & fill groups
             self.store_group(self.ground_layer_group, self.ground_layer_lines)
+            self.store_group(self.top_layer_group, self.top_layer_lines)
             self.store_outline(True)
 
             # finish
@@ -85,6 +111,7 @@ class Level:
         """ Called every frame """
         if self.is_initialised:
             self.ground_layer_group.draw(self.surface)
+            self.top_layer_group.draw(self.surface)
 
     def render_level_foreground(self):
         """ Called every frame (after other things have been rendered) """

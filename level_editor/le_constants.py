@@ -12,6 +12,7 @@ BTN_ZOOM = "btn_zoom"
 
 BTN_TILE_CHANGE = "btn_tile_change"
 BTN_TILE_OPTION = "btn_tile_option"
+BTN_LAYER_OPTION = "btn_layer_option"
 
 BTN_AREA_SEL = "btn_area_sel"
 BTN_LEVEL_SEL = "btn_level_sel"

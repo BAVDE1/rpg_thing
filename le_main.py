@@ -199,9 +199,9 @@ class LevelEditorMain:
         self.add_button(" - ", pg.Vector2(self.screen.get_width() - 30, self.screen.get_height() - 40), BTNOperation(BTN_ZOOM, -0.1), size=30)
 
         # files
-        self.add_file(self.editor_level, pg.Vector2(10, 40), size=10)
+        self.add_file(self.editor_level, pg.Vector2(6, 40), size=7)
 
-        self.lvl_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=0.5 * GameUnits.RES_MUL)
+        self.lvl_editor = LevelEditor(self.screen, self.editor_level, position=pg.Vector2(self.screen.get_width() / 2 + 30, 40), size=0.65 * GameUnits.RES_MUL)
 
     # ------------>
     #  Functions

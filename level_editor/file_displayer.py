@@ -23,16 +23,16 @@ class FileDisplayer:
         self.pos = pos
 
         self.size = size
-        self.font = pg.font.SysFont('Times New Roman', max(20, size))
-        self.file_font = pg.font.SysFont('Consolas', size)
-        self.display_text = self.font.render(f"file_display: {file_dir.split('/')[-1:][0]}", True, (255, 255, 0))
+        self.file_name_font = pg.font.SysFont('Times New Roman', min(20, size * 2))
+        self.file_content_font = pg.font.SysFont('Consolas', size)
+        self.display_text = self.file_name_font.render(f"file_display: {file_dir.split('/')[-1:][0]}", True, (255, 255, 0))
 
         self.file_lines = parse_file(file_dir)
         self.display_file_lines = self.create_display_file_lines()
 
     def create_display_file_lines(self):
         """ Creates (or updates) the opened file's display """
-        return [self.file_font.render(str("[{}]".format(line)), True, (255, 255, 255)) for line in self.file_lines]
+        return [self.file_content_font.render(str("[{}]".format(line)), True, (255, 255, 255)) for line in self.file_lines]
 
     def render(self):
         self.screen.blit(self.display_text, self.pos)

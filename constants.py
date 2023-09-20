@@ -9,7 +9,7 @@ class GameUnits:
     LVL_WIDTH = 14  # +1 to include level edge (+0.5 for each edge)
     LVL_HEIGHT = 14
     UNIT = 20  # ascii level files need to be 19x19
-    RES_MUL: int = 2  # must be whole number  (3 has average of 200fps)
+    RES_MUL: int = 3  # must be whole number  (3 has average of 200fps)
 
     RES_H = UNIT * LVL_HEIGHT
     SIDE_GIVE = RES_H * .75  # give amount beside the level

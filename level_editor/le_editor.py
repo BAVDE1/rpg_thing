@@ -82,7 +82,7 @@ class Hotbar:
                     pg.draw.rect(self.screen, (255, 255, 255), slot.get_rect(), 2)
 
     def switch_selected_slot(self, slot_num=None, addition=0):
-        """ Used to switch the selected hotbar slot (clamped). Auto cycles items """
+        """ Used to switch the selected hotbar slot (clamped). Auto cycles through items """
         if addition:
             slot_num = max(0, min(self.max_size + 1, self.selected_slot + addition))
 
@@ -158,7 +158,7 @@ class TileInventory:
 
             # tiles
             for tile_option in self.inv_pages[self.on_page]:
-                tile_option.button.render_active_level()
+                tile_option.button.render()
 
             # page number
             self.screen.blit(pg.font.SysFont('Times New Roman', 20)

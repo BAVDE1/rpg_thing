@@ -81,24 +81,22 @@ class Hotbar:
                 if slot := self.get_selected_slot():
                     pg.draw.rect(self.screen, (255, 255, 255), slot.get_rect(), 2)
 
-    def switch_selected_slot(self, slot_num):
-        """ Used to switch the selected hotbar slot (clamped). Auto cycles from end to start & vice versa """
-        slot_num = max(1, min(self.max_size, slot_num))  # clamps
+    def switch_selected_slot(self, slot_num=None, addition=0):
+        """ Used to switch the selected hotbar slot (clamped). Auto cycles items """
+        if addition:
+            slot_num = max(0, min(self.max_size + 1, self.selected_slot + addition))
 
-        # auto cycle to start
-        while self.tile_options[slot_num - 1] is None:
-            if slot_num == 9:
-                slot_num = 0
-            else:
-                slot_num += 1
+            if slot_num > self.max_size:
+                slot_num = 1
+            elif slot_num < 1:
+                slot_num = self.max_size
 
-        # auto cycle to end
-        if slot_num == 1 and self.selected_slot == 1:
-            slot_num = 9
             while self.tile_options[slot_num - 1] is None:
-                slot_num -= 1
+                slot_num += addition
+                if slot_num > self.max_size:
+                    slot_num = 1
 
-        self.selected_slot = slot_num
+        self.selected_slot = max(1, min(self.max_size, slot_num))  # clamps
 
     def get_selected_slot(self) -> TileOption | None:
         """ Returns TileOption (or None) of the slot selected """
@@ -268,7 +266,7 @@ class LevelEditor:
 
     def keyboard_num_pressed(self, number):
         self.tile_inv.user_input(number)
-        self.hotbar.switch_selected_slot(number)
+        self.hotbar.switch_selected_slot(slot_num=number)
 
     def keyboard_ctrl_z_pressed(self):
         if len(self.saved_changes) != 0:

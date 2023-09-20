@@ -6,27 +6,37 @@ import rendering.render_handler as renderer
 from constants import GameUnits, LevelLocations
 from rendering.split_sheet import split_sheet
 from texture_constants import PlayerTextures
+from conductor.conductor import Conductor
 from utility.logging import Logger
 from entity.player import Player
+from level.level import Level
+
+
+class GameStates:
+    IN_LEVEL = "in_level"
 
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.get_surface()
+        self.final_screen = pg.display.get_surface()
         self.screen_canvas = pg.surface.Surface((GameUnits.RES_W, GameUnits.RES_H))
 
         self.clock = pg.time.Clock()
         self.fps = 60  # 500 cap
         self.running = True
-        self.logger = Logger(self.screen)
+        self.logger = Logger(self.final_screen)
 
         self.keys = pg.key.get_pressed()
 
         self.bpm = 180
         self.song_start_time = time.time()
 
+        self.game_state = GameStates.IN_LEVEL
+
         # set after requirements
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
+        self.level = Level(self.screen_canvas, LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
+        self.conductor = Conductor(self.logger)
 
     def events(self):
         """ For events in event queue """
@@ -59,15 +69,21 @@ class Game:
     def functionality(self):
         input_handler.sprint_manager(self.player)
 
+    def on_level_fully_loaded(self):
+        """ Called (on frame) once the level and entities are fully loaded """
+        self.logger.add_log(f"level loaded")
+        self.conductor.start_conducting()
+
     def render(self):
         fill_col = (0, 5, 5)
-        self.screen.fill(fill_col)
+        self.final_screen.fill(fill_col)
         self.screen_canvas.fill(fill_col)
 
-        renderer.render(self.screen_canvas, self.player, LevelLocations.OVERWORLD_00)
+        if self.game_state == GameStates.IN_LEVEL:
+            renderer.render_active_level(self, self.player, self.level)
 
         # scale to proper resolution
-        self.screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0))
+        self.final_screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0))
 
         # only for debugging
         self.logger.render_logs()

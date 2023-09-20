@@ -1,18 +1,17 @@
 from level.level import Level
-from constants import GameUnits
-import pygame as pg
-
-level = None
+from entity.player import Player
 
 
-def render(surface, player, level_to_render):
-    global level
+def render_active_level(game, player: Player, level: Level):
+    """ Renders an active player, level & its entities """
+    if not player.is_player_loaded() or not level.is_initialised:
+        while not player.is_player_loaded():
+            player.render_player()
+        while not level.is_initialised:  # isn't needed here, but just in case
+            level.initialise_level()
 
-    if not level:
-        level = Level(surface, level_to_render, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
-
-    while not player.is_player_loaded():
-        player.render_player()
+        # called once everything is loaded
+        game.on_level_fully_loaded()
 
     level.render_level()
     player.render_player()

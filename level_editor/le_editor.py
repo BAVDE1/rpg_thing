@@ -158,7 +158,7 @@ class TileInventory:
 
             # tiles
             for tile_option in self.inv_pages[self.on_page]:
-                tile_option.button.render()
+                tile_option.button.render_active_level()
 
             # page number
             self.screen.blit(pg.font.SysFont('Times New Roman', 20)

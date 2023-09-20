@@ -62,7 +62,7 @@ class Player:
         # updates
         self.animator.update()
         if self.animator.has_changed_texture:
-            self.sprite_updated()
+            self.on_sprite_updated()
             self.animator.has_changed_texture = False
 
         sprite = self.get_sprite()
@@ -75,7 +75,7 @@ class Player:
         # player
         self.surface.blit(sprite, blit)
 
-    def sprite_updated(self):
+    def on_sprite_updated(self):
         """ Called when sprite updates its texture """
         self.current_texture = self.animator.texture_obj
 
@@ -87,7 +87,8 @@ class Player:
         return flipped_sprite
 
     def load_player(self):
-        """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded """
+        """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded.
+            Probably needs to be called twice before player is fully loaded? Maybe? """
         if not self.current_texture:
             self.animator.update()
             self.current_texture = self.animator.texture_obj
@@ -105,7 +106,7 @@ class Player:
         self.moving = False
 
     def is_player_loaded(self) -> bool:
-        """ Returns whether player has fully loaded in (add more checks later) """
+        """ Returns whether player has fully loaded in (add more checks later). Call player.Render() to load """
         return self.current_texture and self.shadow
 
     def can_move(self) -> bool:

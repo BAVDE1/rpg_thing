@@ -10,7 +10,7 @@ class Logger:
     def __init__(self, screen: pg.surface.Surface):
         self.screen = screen
 
-        self.font = pg.font.SysFont("consolas", 15)
+        self.font = pg.font.SysFont("consolas", 13)
         self.logs_cap = 6
         self.log_num = 0
 
@@ -32,7 +32,7 @@ class Logger:
     def update_log_group(self):
         self.logs_group.empty()
         for i, log_text in enumerate(self.logs):
-            text_sprite = BasicSprite(self.font.render(log_text, True, (255, 255, 0)),
+            text_sprite = BasicSprite(self.font.render(log_text, False, (255, 255, 0)),
                                       pg.Vector2(5, self.screen.get_height() - (15 * (i + 2))))
             text_sprite.add(self.logs_group)
 

@@ -243,7 +243,7 @@ class LevelEditorMain:
 
     def reload_files(self):
         for i, file in enumerate(self.file_displays):
-            self.file_displays[i] = FileDisplayer(file.screen, file.file_dir, file.pos, file.size)
+            self.file_displays[i] = FileDisplayer(file.final_screen, file.file_dir, file.pos, file.size)
 
     def button_left_clicked(self, operation: BTNOperation):
         """ Called in 'events' every time a button is clicked """

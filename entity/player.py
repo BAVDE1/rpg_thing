@@ -28,9 +28,13 @@ class Player:
         self.shadow = None
         self.current_texture = None
 
-        self.animator = Animator(self.game, [PlayerTextures.PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
+        self.animator = Animator(self.game.conductor, [PlayerTextures.PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
                                  [PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)],
                                  [PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8)])
+
+    def on_beat(self):
+        """ Called on the beat """
+        self.animator.on_beat()
 
     def move(self):
         """ Moves player 1 tile in its current direction """

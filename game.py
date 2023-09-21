@@ -28,15 +28,15 @@ class Game:
 
         self.keys = pg.key.get_pressed()
 
-        self.bpm = 180
         self.song_start_time = time.time()
 
         self.game_state = GameStates.IN_LEVEL
 
         # set after requirements
+        self.conductor = Conductor(self, self.logger)  # before entities
+
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
         self.level = Level(self.screen_canvas, LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
-        self.conductor = Conductor(self.logger)
 
     def events(self):
         """ For events in event queue """
@@ -51,8 +51,10 @@ class Game:
 
                     # dev thingos
                     if self.keys[pg.K_p]:
-                        self.bpm = 60 if self.bpm == 120 else 120 if self.bpm > 120 else 180
-                        self.logger.add_log(f"bpm = {self.bpm}")
+                        bpm = self.conductor.bpm
+                        bpm = 60 if bpm == 120 else 120 if bpm > 120 else 180
+                        self.conductor.set_bpm(bpm)
+                        self.logger.add_log(f"bpm = {bpm}")
 
                     if self.keys[pg.K_m]:  # set idle anim
                         texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE_DEBUG).convert_alpha()
@@ -69,10 +71,19 @@ class Game:
     def functionality(self):
         input_handler.sprint_manager(self.player)
 
+        # conductor
+        self.conductor.update()
+
     def on_level_fully_loaded(self):
         """ Called (on frame) once the level and entities are fully loaded """
         self.logger.add_log(f"level loaded")
+
+        self.conductor.set_music("ph", "ph", 60)
         self.conductor.start_conducting()
+
+    def on_conductor_beat(self):
+        """ Called when the conductor sends a beat """
+        self.player.on_beat()
 
     def render(self):
         fill_col = (0, 5, 5)

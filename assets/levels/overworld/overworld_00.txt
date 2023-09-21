@@ -37,7 +37,7 @@
 [Gr,Gr,Gr,Gr,  ,  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,  ]
 [Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr]
 [Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr]
-[  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Pt,Pt,Gr,Gr]
+[  ,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr,Gr]
 [  ,Gr,Gr,Gr,Gr,  ,  ,Gr,Gr,Gr,Gr,Pt,Pt,Gr,Gr]
 [  ,Gr,Gr,Gr,  ,  ,  ,Gr,Gr,Gr,Pt,Pt,Pt,Gr,Gr]
 [  ,Gr,Gr,Gr,  ,  ,  ,Gr,Gr,Gr,Gr,Pt,Gr,Gr,  ]

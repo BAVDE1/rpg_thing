@@ -1,4 +1,5 @@
 from constants import *
+from conductor.conductor import Conductor
 import time
 
 idle_error = "Error in loading '{}' idle sprite sheet.\n Something has gone wrong with creation of sprite sheet, or sheet was not added to list."
@@ -7,9 +8,9 @@ no_anim_error = "Cannot animate '{}' because there are no animations registered.
 
 
 class Animator:
-    def __init__(self, game, idle_ss, idle_offset: pg.Vector2, boomerang_idle=False, *one_time_ss):
+    def __init__(self, conductor: Conductor, idle_ss, idle_offset: pg.Vector2, boomerang_idle=False, *one_time_ss):
         """ ss - sprite sheets - must be lists of two objects - [0]: CONSTANT, [1]: sprite sheet """
-        self.game = game
+        self.conductor = conductor
         self.texture_obj = None
         self.has_changed_texture = False  # updates to true on texture change (and should be back to false within the frame)
 
@@ -20,7 +21,7 @@ class Animator:
             self.idle_len = len(idle_ss[1]) - 1
         except IndexError:
             raise IndexError(idle_error.format(idle_ss[0]))
-        self.prev_idle_beat = time.time()
+        self.prev_idle_start = time.time()
         self.idle_prev_frame = 0
         self.idle_frame = 0
         self.bmrng_idle = boomerang_idle
@@ -38,7 +39,15 @@ class Animator:
         self.idle_offset = idle_offset
         self.offset = idle_offset
 
+        self.c = 0
+
         self.update()  # init
+
+    def on_beat(self):
+        """ Call on the beat """
+        self.idle_frame = 0
+        self.prev_idle_start = self.conductor.prev_beat_time
+        print("ya")
 
     def change_idle_anim(self, set_to_default, new_idle_ss=None, boomerang_idle=False):
         """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored later. """
@@ -61,13 +70,15 @@ class Animator:
     def update(self):
         """ Should be called every frame """
         if self.idling:  # idle
-            if time.time() > self.prev_idle_beat + ((60 / self.game.bpm) / self.idle_len):  # 60 secs
+            if time.time() >= self.prev_idle_start + (self.conductor.sec_per_beat * (self.idle_frame / self.idle_len)):
+                # reset offset (changed because of a one time anim)
                 if self.offset != self.idle_offset:
                     self.offset = self.idle_offset
 
                 self.advance_idle_animation_frame()
                 self.texture_obj = self.idle_ss[1][self.idle_frame]  # set image
 
+                print(f"{self.idle_frame}")
                 self.has_changed_texture = True
 
         elif self.current_anim_ss:  # one time anim
@@ -89,7 +100,6 @@ class Animator:
             self.idle_frame -= 1
 
         self.idle_prev_frame = im_frame
-        self.prev_idle_beat = time.time()
 
     def advance_one_time_anim_frame(self):
         self.current_anim_frame += 1

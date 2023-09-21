@@ -1,15 +1,35 @@
+import time
+
 from utility.logging import Logger
 
 
 class Conductor:
-    def __init__(self, logger: Logger):
+    def __init__(self, game, logger: Logger):
+        self.game = game
         self.logger = logger
+
         self.is_conducting = False
 
-        self.bpm = "placeholder"
+        self.combat_song = ""
+        self.passive_song = ""
 
-        self.combat_song = "placeholder"
-        self.passive_song = "placeholder"
+        self.bpm = 300  # preset so not errors & fast when loading (in update()) animator
+        self.song_started_time = time.time()
+        self.next_beat_time = time.time()
+        self.prev_beat_time = time.time()
+        self.total_song_beats = 0
+        self.sec_per_beat = 0
+
+    def update(self):
+        if self.is_conducting:
+            if time.time() >= self.next_beat_time:
+                self.total_song_beats += 1
+
+                self.prev_beat_time = self.next_beat_time
+                self.next_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_beats)
+                self.game.on_conductor_beat()
+
+                self.logger.add_log(f"beat ({self.total_song_beats}): {self.prev_beat_time}")
 
     def start_conducting(self):
         """ Call to start up the conductor, will fail if no music or bpm has been set """
@@ -17,8 +37,13 @@ class Conductor:
             raise ValueError(f"Conductor not properly initialised:\nCombat song: {self.combat_song}\nPassive song: {self.passive_song}\nBPM: {self.bpm}")
 
         if not self.is_conducting:
+            self.song_started_time = time.time()
+            self.next_beat_time = time.time()
+            self.prev_beat_time = time.time()
+            self.sec_per_beat = 60 / self.bpm
+
             self.is_conducting = True
-            self.logger.add_log(f"conductor started")
+            self.logger.add_log(f"conductor started ({self.sec_per_beat} / sec)")
         else:
             self.logger.add_log("cannot start: already conducting")
 
@@ -35,3 +60,7 @@ class Conductor:
         self.combat_song = combat_song_file
         self.passive_song = passive_song_file
         self.bpm = new_bpm
+
+    def set_bpm(self, new_bpm):
+        self.bpm = new_bpm
+        self.sec_per_beat = 60 / self.bpm

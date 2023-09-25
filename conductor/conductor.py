@@ -14,7 +14,7 @@ class Conductor:
         self.combat_song = ""
         self.passive_song = ""
 
-        self.bpm = 300  # preset so not errors & fast when loading (in update()) animator
+        self.bpm = 300  # preset so not errors & fast when loading (in update()) animator, reset in on_level_fully_loaded() in Game
         self.song_started_time = time.time()
         self.next_beat_time = time.time()
         self.prev_beat_time = time.time()

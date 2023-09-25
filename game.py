@@ -1,11 +1,11 @@
 import time
 import pygame as pg
-import input_handler
 import rendering.render_handler as renderer
 
 from constants import GameUnits, LevelLocations
 from rendering.split_sheet import split_sheet
 from rendering.sprites_holder import SpriteSheet
+from utility.text_object import TextObjectsHolder
 from texture_constants import PlayerTextures
 from conductor.conductor import Conductor
 from utility.logging import Logger
@@ -35,6 +35,7 @@ class Game:
 
         # set after requirements
         self.conductor = Conductor(self, self.logger)  # before entities
+        self.text_objects_holder = TextObjectsHolder(self, self.screen_canvas)
 
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
         self.level = Level(self.screen_canvas, LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
@@ -53,6 +54,9 @@ class Game:
                 self.player.on_key_down(event.key)
 
                 # dev thingos
+                if self.keys[pg.K_t]:
+                    self.text_objects_holder.add_text_object("abcdefghijklmnopqrstuvwxyz", self.player.position)
+
                 if self.keys[pg.K_p]:
                     bpm = self.conductor.bpm
                     bpm = 60 if bpm == 120 else 120 if bpm > 120 else 180
@@ -95,7 +99,7 @@ class Game:
         self.screen_canvas.fill(fill_col)
 
         if self.game_state == GameStates.IN_LEVEL:
-            renderer.render_active_level(self, self.player, self.level)
+            renderer.render_active_level(self, self.player, self.level, self.text_objects_holder)
 
         # scale to proper resolution
         self.final_screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0))

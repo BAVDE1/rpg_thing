@@ -6,12 +6,14 @@ from rendering.split_sheet import split_sheet
 from rendering.sprites_holder import SpriteSheet
 from rendering.shadow import Shadow
 from rendering.animator import Animator
+from utility.text_object import TextObjectsHolder
 
 
 class Player:
     def __init__(self, game, screen: pg.Surface, centre_screen):
         self.logger = game.logger
         self.conductor = game.conductor
+        self.txt_holder: TextObjectsHolder = game.text_objects_holder
         self.surface = screen
 
         # positional stuff
@@ -46,9 +48,10 @@ class Player:
         if key in DirectionalValues.DIRECTION_DICT:
             self.held_direction_keys.append(key)
 
-        if self.can_do_action():
-            self.direction = DirectionalValues.DIRECTION_DICT[self.held_direction_keys[0]]
-            self.move()
+            # action
+            if self.can_do_action():
+                self.direction = DirectionalValues.DIRECTION_DICT[self.held_direction_keys[0]]
+                self.move()
 
     def on_key_up(self, key):
         if key in self.held_direction_keys:
@@ -72,7 +75,7 @@ class Player:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
             self.shadow.add_offset_goal(len(self.animator.current_ot_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
 
-        # todo: send beat event, after player movement, to conductor (or could be something / somewhere else, plans change)
+        # todo: send beat event, after player movement, to conductor
 
         self.moving = False
 
@@ -145,11 +148,14 @@ class Player:
 
     def can_do_action(self) -> bool:
         """ Returns true if the player is allowed to do an action, results vary in and out of combat """
-        is_ready_to_action: bool = (not self.miss_next_beat
-                                    and not self.moving
-                                    and not self.animator.current_ot_anim_ss
+        # skip
+        if self.miss_next_beat:
+            self.miss_next_beat = False  # reset TODO: reset this on the next 'auto' beat as well
+            return False
+
+        # checks
+        is_ready_to_action: bool = (not self.moving and not self.animator.current_ot_anim_ss
                                     and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved)
-        self.miss_next_beat = False  # reset TODO: reset this on the next 'auto' beat as well
 
         # out of combat movement
         if not self.conductor.is_in_combat:
@@ -167,5 +173,6 @@ class Player:
 
     def missed_beat(self):
         # todo: add floating text
+        self.txt_holder.add_text_object("Missed beat", pg.Vector2(self.position.x, self.position.y - 23))
         self.miss_next_beat = True
         self.logger.add_log(f"Missed beat", 2)

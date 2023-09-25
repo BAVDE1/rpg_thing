@@ -1,9 +1,19 @@
 import pygame as pg
 
 
+class SpriteSheet:
+    """ Holder for animation sprite sheets (ss) """
+    def __init__(self, constant_identifier, split_sheet):
+        self.identifier = constant_identifier
+        self.sprite_sheet = split_sheet
+        self.length = len(split_sheet)
+
+    def __eq__(self, other):
+        return self.identifier == other.identifier
+
+
 class BasicSprite(pg.sprite.Sprite):
     """ Sprite object to hold basic sprites """
-
     def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
         pg.sprite.Sprite.__init__(self)
 

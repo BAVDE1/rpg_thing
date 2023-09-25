@@ -62,5 +62,6 @@ class Conductor:
         self.bpm = new_bpm
 
     def set_bpm(self, new_bpm):
+        # TODO: not working as expected
         self.bpm = new_bpm
         self.sec_per_beat = 60 / self.bpm

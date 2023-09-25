@@ -11,7 +11,7 @@ class Logger:
         self.screen = screen
 
         self.font = pg.font.SysFont("consolas", 13)
-        self.logs_cap = 6
+        self.logs_cap = 16
         self.log_num = 0
 
         self.logs_group = pg.sprite.Group()

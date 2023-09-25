@@ -3,6 +3,7 @@ import pygame as pg
 from constants import GameUnits, DirectionalValues, PlayerValues
 from texture_constants import PlayerTextures
 from rendering.split_sheet import split_sheet
+from rendering.sprites_holder import SpriteSheet
 from rendering.shadow import Shadow
 from rendering.animator import Animator
 
@@ -28,9 +29,11 @@ class Player:
         self.shadow = None
         self.current_texture = None
 
-        self.animator = Animator(self.game.conductor, [PlayerTextures.PLAYER_IDLE, self.ss_idle], pg.Vector2(0, 0), False,
-                                 [PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)],
-                                 [PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8)])
+        jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8))
+        jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8))
+        self.animator = Animator(self.game.logger, self.game.conductor, pg.Vector2(0, 0),
+                                 SpriteSheet(PlayerTextures.PLAYER_IDLE, self.ss_idle),
+                                 jump_horizontal_ss, jump_vertical_ss)
 
     def on_beat(self):
         """ Called on the beat """
@@ -52,7 +55,7 @@ class Player:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim horizontal
         else:
             self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
-            self.shadow.add_offset_goal(len(self.animator.current_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
+            self.shadow.add_offset_goal(len(self.animator.current_ot_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
 
         # todo: send beat event, after player movement, to conductor (or could be something / somewhere else, plans change)
 
@@ -115,4 +118,4 @@ class Player:
 
     def can_move(self) -> bool:
         """ Returns true if the player is allowed to move """
-        return not self.moving and not self.animator.current_anim_ss and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved
+        return not self.moving and not self.animator.current_ot_anim_ss and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved

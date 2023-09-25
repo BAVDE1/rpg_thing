@@ -9,6 +9,7 @@ class Conductor:
         self.logger = logger
 
         self.is_conducting = False
+        self.is_in_combat = True
 
         self.combat_song = ""
         self.passive_song = ""
@@ -23,13 +24,25 @@ class Conductor:
     def update(self):
         if self.is_conducting:
             if time.time() >= self.next_beat_time:
-                self.total_song_beats += 1
+                self.beat()
 
-                self.prev_beat_time = self.next_beat_time
-                self.next_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_beats)
-                self.game.on_conductor_beat()
+    def beat(self):
+        """ Shadow beats, exactly on time """
+        self.total_song_beats += 1
 
-                self.logger.add_log(f"beat ({self.total_song_beats}): {self.prev_beat_time}")
+        self.prev_beat_time = self.next_beat_time
+        self.next_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_beats)
+
+        # self.logger.add_log(f"{self.total_song_beats}: {self.prev_beat_time}")
+        self.logger.add_log(f"sb {self.total_song_beats}", 0)
+
+        self.game.on_conductor_beat()
+
+    def player_beat(self):
+        """ Beats when player does action """
+
+    def auto_beat(self):
+        """ Auto beats if the player misses it """
 
     def start_conducting(self):
         """ Call to start up the conductor, will fail if no music or bpm has been set """

@@ -42,35 +42,38 @@ class Game:
     def events(self):
         """ For events in event queue """
         for event in pg.event.get():
+            # close game
             if event.type == pg.QUIT or self.keys[pg.K_ESCAPE]:
-                self.running = False  # close game
-            if event.type in (pg.KEYDOWN, pg.KEYUP):
+                self.running = False
+
+            # player inputs
+            if event.type == pg.KEYDOWN:
                 self.keys = pg.key.get_pressed()  # update keys
 
-                if event.type == pg.KEYDOWN:
-                    input_handler.player_key_down(self.player, event.key)
+                self.player.on_key_down(event.key)
 
-                    # dev thingos
-                    if self.keys[pg.K_p]:
-                        bpm = self.conductor.bpm
-                        bpm = 60 if bpm == 120 else 120 if bpm > 120 else 180
-                        self.conductor.set_bpm(bpm)
-                        self.logger.add_log(f"bpm = {bpm}")
+                # dev thingos
+                if self.keys[pg.K_p]:
+                    bpm = self.conductor.bpm
+                    bpm = 60 if bpm == 120 else 120 if bpm > 120 else 180
+                    self.conductor.set_bpm(bpm)
+                    self.logger.add_log(f"bpm = {bpm}")
 
-                    if self.keys[pg.K_m]:  # set idle anim
-                        texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE_DEBUG).convert_alpha()
-                        ss_idle = split_sheet(texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
-                        self.player.animator.change_idle_anim(set_to_default=False, new_idle_ss=SpriteSheet(PlayerTextures.PLAYER_IDLE_DEBUG, ss_idle))
-                        self.logger.add_log("Debug idle: enabled")
+                if self.keys[pg.K_m]:  # set idle anim
+                    texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE_DEBUG).convert_alpha()
+                    ss_idle = split_sheet(texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
+                    self.player.animator.change_idle_anim(set_to_default=False, new_idle_ss=SpriteSheet(PlayerTextures.PLAYER_IDLE_DEBUG, ss_idle))
+                    self.logger.add_log("Debug idle: enabled")
 
-                    if self.keys[pg.K_n]:  # reset idle anim
-                        self.player.animator.change_idle_anim(set_to_default=True)
-                        self.logger.add_log("Debug idle: disabled")
-                elif event.type == pg.KEYUP:
-                    input_handler.player_key_up(event.key)
+                if self.keys[pg.K_n]:  # reset idle anim
+                    self.player.animator.change_idle_anim(set_to_default=True)
+                    self.logger.add_log("Debug idle: disabled")
+            elif event.type == pg.KEYUP:
+                self.keys = pg.key.get_pressed()  # update keys
+                self.player.on_key_up(event.key)
 
     def functionality(self):
-        input_handler.sprint_manager(self.player)
+        self.player.sprint_manager()
 
         # conductor
         self.conductor.update()
@@ -79,7 +82,7 @@ class Game:
         """ Called (on frame) once the level and entities are fully loaded """
         self.logger.add_log(f"level loaded")
 
-        self.conductor.set_music("ph", "ph", 120)
+        self.conductor.set_music("ph", "ph", 140)
         self.conductor.start_conducting()
 
     def on_conductor_beat(self):

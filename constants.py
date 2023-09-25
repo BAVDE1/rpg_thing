@@ -60,6 +60,9 @@ class DirectionalValues:
 
 
 class PlayerValues:
+    BEAT_GIVE_BEFORE = 0.1  # time given on either side of a beat
+    BEAT_GIVE_AFTER = 0.2
+
     MOVEMENT_PAUSE = .15  # 0.15
     HOLD_TIME_TO_SPRINT = .2
 

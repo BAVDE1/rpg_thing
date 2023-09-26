@@ -1,3 +1,5 @@
+import math
+import random
 import time
 import pygame as pg
 import rendering.render_handler as renderer
@@ -40,6 +42,12 @@ class Game:
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
         self.level = Level(self.screen_canvas, LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
 
+        # screen shake
+        self.is_shaking = False
+        self.shake_amp = 0
+        self.shake_start = 0
+        self.shake_end = 0
+
     def events(self):
         """ For events in event queue """
         for event in pg.event.get():
@@ -54,6 +62,9 @@ class Game:
                 self.player.on_key_down(event.key)
 
                 # dev thingos
+                if self.keys[pg.K_v]:
+                    self.shake_screen(random.randint(8, 10), 0.3)
+
                 if self.keys[pg.K_t]:
                     self.text_objects_holder.add_text_object("abcdefghijklmnopqrstuvwxyz", pg.Vector2(self.player.position.x, self.player.position.y - 23))
 
@@ -102,6 +113,25 @@ class Game:
         if is_auto_beat:
             self.player.miss_next_beat = False  # reset
 
+    def shake_screen(self, amp, secs):
+        if not self.is_shaking:
+            self.is_shaking = True
+            self.shake_amp = amp
+
+            self.shake_start = time.time()
+            self.shake_end = time.time() + secs
+
+            self.logger.add_log(f"Shake screen, amp: {self.shake_amp}", 2)
+
+    def get_screen_shake(self):
+        if not self.is_shaking:
+            return 0
+
+        percent = (time.time() - self.shake_start) / (self.shake_end - self.shake_start)
+        if percent >= 1:
+            self.is_shaking = False
+        return (self.shake_amp - self.shake_amp * percent) * math.sin((self.shake_amp * 2) * time.time())
+
     def render(self):
         fill_col = (0, 5, 5)
         self.final_screen.fill(fill_col)
@@ -111,7 +141,7 @@ class Game:
             renderer.render_active_level(self, self.player, self.level, self.text_objects_holder)
 
         # scale to proper resolution
-        self.final_screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0))
+        self.final_screen.blit(pg.transform.scale(self.screen_canvas, (GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL)), (0, 0 + self.get_screen_shake()))
 
         # only for debugging
         self.logger.render_logs()

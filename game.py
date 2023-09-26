@@ -35,7 +35,7 @@ class Game:
 
         # set after requirements
         self.conductor = Conductor(self, self.logger)  # before entities
-        self.text_objects_holder = TextObjectsHolder(self, self.screen_canvas)
+        self.text_objects_holder = TextObjectsHolder(self.screen_canvas)
 
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
         self.level = Level(self.screen_canvas, LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
@@ -55,7 +55,11 @@ class Game:
 
                 # dev thingos
                 if self.keys[pg.K_t]:
-                    self.text_objects_holder.add_text_object("abcdefghijklmnopqrstuvwxyz", self.player.position)
+                    self.text_objects_holder.add_text_object("abcdefghijklmnopqrstuvwxyz", pg.Vector2(self.player.position.x, self.player.position.y - 23))
+
+                if self.keys[pg.K_c]:
+                    self.conductor.is_in_combat = not self.conductor.is_in_combat
+                    self.logger.add_log(f"Combat enabled: {self.conductor.is_in_combat}")
 
                 if self.keys[pg.K_p]:
                     bpm = self.conductor.bpm
@@ -86,12 +90,17 @@ class Game:
         """ Called (on frame) once the level and entities are fully loaded """
         self.logger.add_log(f"level loaded")
 
-        self.conductor.set_music("ph", "ph", 140)
+        self.conductor.set_music("ph", "ph", 120)
         self.conductor.start_conducting()
 
-    def on_conductor_beat(self):
-        """ Called when the conductor sends a beat """
-        self.player.on_beat()
+    def on_shadow_beat(self):
+        """ Called when the conductor sends a perfect beat """
+        self.player.on_shadow_beat()
+
+    def on_beat(self, is_auto_beat):
+        """ Called on the actual beat """
+        if is_auto_beat:
+            self.player.miss_next_beat = False  # reset
 
     def render(self):
         fill_col = (0, 5, 5)

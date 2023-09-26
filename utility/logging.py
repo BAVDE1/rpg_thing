@@ -16,7 +16,7 @@ class Logger:
     def __init__(self, screen: pg.surface.Surface):
         self.screen = screen
 
-        self.colour_list = [(120, 120, 120), (255, 255, 0), (255, 0, 0)]
+        self.colour_tier_list = [(120, 120, 120), (255, 255, 0), (255, 0, 0)]
 
         self.font = pg.font.SysFont("consolas", 13)
         self.logs_cap = 16
@@ -27,9 +27,9 @@ class Logger:
 
         self.update_log_group()
 
-    def add_log(self, text: str, col: int = 1):
+    def add_log(self, text: str, tier: int = 1):
         self.log_num += 1
-        self.logs.insert(0, LogItem(f"{self.log_num} | {text}", self.colour_list[col]))
+        self.logs.insert(0, LogItem(f"{self.log_num} | {text}", self.colour_tier_list[tier]))
 
         # remove last item from list
         if len(self.logs) > self.logs_cap:

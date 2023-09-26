@@ -10,6 +10,7 @@ class TextObjectsHolder:
 
     def add_text_object(self, text: str, pos: pg.Vector2,
                         colour: tuple = (255, 255, 255), lifetime=1, move_by: pg.Vector2 = pg.Vector2(0, -10), fade=True):
+        """ Creates a new text object """
         txt_obj = TextObject(text, colour, pos, lifetime, move_by, fade)
         txt_obj.add(self.text_objects_group)
 
@@ -36,6 +37,7 @@ class TextObject(pg.sprite.Sprite):
         self.rect = pg.rect.Rect(self.og_pos.x, self.og_pos.y, 0, 0)
 
     def update(self):
+        """ Update this before rendering """
         # delete
         if time.time() >= self.die_time:
             self.kill()

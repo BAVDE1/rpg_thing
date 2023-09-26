@@ -1,6 +1,6 @@
 import time
-
 from utility.logging import Logger
+from constants import PlayerValues
 
 
 class Conductor:
@@ -16,33 +16,62 @@ class Conductor:
 
         self.bpm = 300  # preset so not errors & fast when loading (in update()) animator, reset in on_level_fully_loaded() in Game
         self.song_started_time = time.time()
-        self.next_beat_time = time.time()
+        self.next_shadow_beat_time = time.time()
+        self.prev_shadow_beat_time = time.time()
+        self.total_song_shadow_beats = 0
+
+        self.has_performed_beat = False
+        self.has_triggered_before_beat = False
+        self.has_triggerd_after_beat = False
         self.prev_beat_time = time.time()
         self.total_song_beats = 0
         self.sec_per_beat = 0
 
     def update(self):
+        """ Call every frame """
         if self.is_conducting:
-            if time.time() >= self.next_beat_time:
-                self.beat()
+            # start of allowed beat time
+            if not self.has_triggered_before_beat and time.time() >= self.next_shadow_beat_time - PlayerValues.BEAT_GIVE_BEFORE:
+                self.has_triggered_before_beat = True
+                self.has_performed_beat = False
 
-    def beat(self):
-        """ Shadow beats, exactly on time """
-        self.total_song_beats += 1
+            # perfect on-time beat
+            if time.time() >= self.next_shadow_beat_time:
+                self.shadow_beat()
 
-        self.prev_beat_time = self.next_beat_time
-        self.next_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_beats)
+                self.has_triggerd_after_beat = False
 
-        # self.logger.add_log(f"{self.total_song_beats}: {self.prev_beat_time}")
-        self.logger.add_log(f"sb {self.total_song_beats}", 0)
+            # end of allowed beat time
+            if not self.has_triggerd_after_beat and time.time() >= self.prev_shadow_beat_time + PlayerValues.BEAT_GIVE_AFTER:
+                self.has_triggerd_after_beat = True
 
-        self.game.on_conductor_beat()
+                # auto beats if the player misses a beat
+                if not self.has_performed_beat:
+                    self.beat(is_auto_beat=True)
 
-    def player_beat(self):
-        """ Beats when player does action """
+                self.has_triggered_before_beat = False
 
-    def auto_beat(self):
-        """ Auto beats if the player misses it """
+    def shadow_beat(self):
+        """ Shadow beats, these are exactly on time """
+        self.total_song_shadow_beats += 1
+
+        self.prev_shadow_beat_time = self.next_shadow_beat_time
+        self.next_shadow_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_shadow_beats)
+
+        self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
+
+        self.game.on_shadow_beat()
+
+    def beat(self, is_auto_beat=False):
+        """ The actual beat, triggered by player or auto beat if the player missed the beat """
+        if not self.has_performed_beat:
+            self.has_performed_beat = True
+            self.total_song_beats += 1
+            self.prev_beat_time = time.time()
+
+            self.logger.add_log(f"{self.total_song_beats} {'auto ' if is_auto_beat else ''}beat")
+
+            self.game.on_beat(is_auto_beat)
 
     def start_conducting(self):
         """ Call to start up the conductor, will fail if no music or bpm has been set """
@@ -51,8 +80,8 @@ class Conductor:
 
         if not self.is_conducting:
             self.song_started_time = time.time()
-            self.next_beat_time = time.time()
-            self.prev_beat_time = time.time()
+            self.next_shadow_beat_time = time.time()
+            self.prev_shadow_beat_time = time.time()
             self.sec_per_beat = 60 / self.bpm
 
             self.is_conducting = True

@@ -41,10 +41,10 @@ class Animator:
 
         self.update()  # init
 
-    def on_beat(self):
-        """ Call on the beat """
+    def on_shadow_beat(self):
+        """ Called on the perfect beat """
         self.restart_idle()
-        self.prev_idle_start = self.conductor.prev_beat_time
+        self.prev_idle_start = self.conductor.prev_shadow_beat_time
 
     def change_idle_anim(self, set_to_default, new_idle_ss: SpriteSheet | None = None):
         """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored later. """

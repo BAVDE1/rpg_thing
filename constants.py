@@ -72,6 +72,6 @@ class PlayerValues:
 # TEMPORARY
 class LevelLocations:
     LEVEL_LAYER_SEPERATOR = "*"
-    OVERWORLD = "assets/levels/overworld/overworld.txt"
-    OVERWORLD_00 = "assets/levels/overworld/overworld_00.txt"
-    OVERWORLD_01 = "assets/levels/overworld/overworld_01.txt"
+    OVERWORLD = "assets/areas/overworld/overworld.txt"
+    OVERWORLD_00 = "assets/areas/overworld/overworld_00.txt"
+    OVERWORLD_01 = "assets/areas/overworld/overworld_01.txt"

@@ -7,7 +7,7 @@ from constants import GameUnits, EDITING_TAG
 import os
 import pygame as pg
 
-LEVELS_DIR = "./assets/levels/"
+LEVELS_DIR = "assets/areas/"
 KEYBOARD_NUMS = {pg.K_1: 1, pg.K_2: 2, pg.K_3: 3, pg.K_4: 4, pg.K_5: 5, pg.K_6: 6, pg.K_7: 7, pg.K_8: 8, pg.K_9: 9}
 
 
@@ -171,7 +171,7 @@ class LevelEditorMain:
 
     def open_area_select(self):
         self.heading_text = "Area Select"
-        areas = sorted(os.listdir(str(LEVELS_DIR)))
+        areas = sorted(os.listdir(LEVELS_DIR))
         for i in range(len(areas)):
             self.add_button(areas[i], pg.Vector2(0, 35 + (25 * i)), BTNOperation(BTN_AREA_SEL, areas[i]), size=20)
 
@@ -179,7 +179,7 @@ class LevelEditorMain:
 
     def open_level_select(self):
         self.heading_text = f"Level Select ({self.selected_area})"
-        levels = sorted(os.listdir(str(LEVELS_DIR + self.selected_area)))  # list of files
+        levels = sorted(os.listdir(f"{LEVELS_DIR}{self.selected_area}"))  # list of files
 
         skipped = 0  # takes away from 'i'
         for i, level_file in enumerate(levels):

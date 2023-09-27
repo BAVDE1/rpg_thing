@@ -218,7 +218,7 @@ class LevelEditor:
                           self.position.y + self.display_text.get_height() * (self.size * 2))
 
     def load_lvl(self) -> Level:
-        return Level(self.screen, self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE,
+        return Level(self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE,
                      pos_offset=self.lvl_pos, size=self.size)
 
     def render(self):
@@ -230,8 +230,8 @@ class LevelEditor:
             self.editing_file.render()
 
         # level
-        self.level.render_level()
-        self.level.render_level_foreground()
+        self.level.render_level(self.screen)
+        self.level.render_level_foreground(self.screen)
 
         # tile selection
         self.hotbar.render()

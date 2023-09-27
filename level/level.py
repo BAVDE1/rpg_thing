@@ -16,7 +16,7 @@ def parse_level_file(level_source):
 
     with open(level_source) as file:
         for line in file:
-            line = line.strip().replace("[", "").replace("]", "")
+            line = line.strip().strip("[").strip("]")
 
             # seperator
             if line == LevelLocations.LEVEL_LAYER_SEPERATOR:
@@ -59,9 +59,8 @@ def store_layer(layer: list, layer_lines):
 
 
 class Level:
-    def __init__(self, surface, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
+    def __init__(self, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
         self.is_initialised = False
-        self.surface = surface
         self.pos_offset = pos_offset
         self.size = size
 
@@ -107,16 +106,16 @@ class Level:
             # finish
             self.is_initialised = True
 
-    def render_level(self):
+    def render_level(self, surface):
         """ Called every frame """
         if self.is_initialised:
-            self.ground_layer_group.draw(self.surface)
-            self.top_layer_group.draw(self.surface)
+            self.ground_layer_group.draw(surface)
+            self.top_layer_group.draw(surface)
 
-    def render_level_foreground(self):
+    def render_level_foreground(self, surface):
         """ Called every frame (after other things have been rendered) """
         if self.is_initialised:
-            self.outline_layer_group.draw(self.surface)
+            self.outline_layer_group.draw(surface)
 
     def store_group(self, group: pg.sprite.Group, layer_lines):
         """ Converts ascii chars from layer_lines into valid TileSprites and stores them into the given group """
@@ -172,7 +171,7 @@ class Level:
                     f_tile_sprite.add(self.outline_layer_group)
 
     def create_scaled_sprite(self, sprite) -> pg.surface.Surface:
-        """ Returns given sprite scaled to levels' size """
+        """ Returns given sprite scaled to areas' size """
         return pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
 
     def create_tile_pos(self, sprite: pg.surface.Surface, row, column) -> pg.Vector2:
@@ -189,3 +188,6 @@ class Level:
                 tile_pos = self.create_tile_pos(self.create_scaled_sprite(TileTextures.GRASS_SPRITE), row_n, column_n)
                 li.append((tile_pos.x, tile_pos.y, GameUnits.UNIT * self.size, GameUnits.UNIT * self.size, column_n, row_n))
         return li
+
+    def __repr__(self):
+        return f"Level({self.level_source})"

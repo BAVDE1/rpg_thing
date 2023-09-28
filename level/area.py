@@ -2,7 +2,6 @@ import pygame as pg
 import os
 from level.level import Level
 from constants import GameUnits, DirectionalValues
-from utility.screen_movers import ScreenLerper
 
 AREAS_DIR = "./assets/areas"
 
@@ -64,31 +63,47 @@ class Area:
 
     def change_level_by_direction(self, directional_value):
         """ Changes level by cardinal direction. Raises errors if the move is invalid. """
-        n, s, e, w = DirectionalValues.NORTH, DirectionalValues.SOUTH, DirectionalValues.EAST, DirectionalValues.WEST
+        if directional_value:
+            n, s, e, w = DirectionalValues.NORTH, DirectionalValues.SOUTH, DirectionalValues.EAST, DirectionalValues.WEST
 
-        # incorrect direction value
-        if directional_value not in (n, s, e, w):
-            raise IndexError(f"Directional value '{directional_value}', is not allowed. Please only use 'NORTH', 'SOUTH', 'EAST' or 'WEST'")
+            # incorrect direction value
+            if directional_value not in (n, s, e, w):
+                raise IndexError(f"Directional value '{directional_value}', is not allowed. Please only use 'NORTH', 'SOUTH', 'EAST' or 'WEST'")
 
-        on_row = 0
-        on_col = 0
-        for r, row in enumerate(self.area_layout):
-            for c, col in enumerate(row):
-                if self.area_layout[r][c] == self.current_lvl_num:
-                    on_row = r
-                    on_col = c
-                    break
+            # get current level position in layout file
+            on_row = 0
+            on_col = 0
+            for r, row in enumerate(self.area_layout):
+                for c, col in enumerate(row):
+                    if self.area_layout[r][c] == self.current_lvl_num:
+                        on_row = r
+                        on_col = c
+                        break
 
-        if directional_value in (n, s):
-            on_row += AREA_LAYOUT_ADDITIONS[directional_value]
-            lerp_vec = pg.Vector2(0, 10)
-        else:
-            on_col += AREA_LAYOUT_ADDITIONS[directional_value]
-            lerp_vec = pg.Vector2(10, 0)
-        new_lvl_num = self.area_layout[on_row][on_col]
+            # choose direction & lvl num
+            if directional_value in (n, s):
+                on_row += AREA_LAYOUT_ADDITIONS[directional_value]
+                lerp_vec = pg.Vector2(0, 10)
+            else:
+                on_col += AREA_LAYOUT_ADDITIONS[directional_value]
+                lerp_vec = pg.Vector2(10, 0)
+            new_lvl_num = self.area_layout[on_row][on_col]
 
-        # lerp
-        self.game.screen_lerper.lerp_screen(lerp_vec, 0.3, True, False if AREA_LAYOUT_ADDITIONS[directional_value] > 0 else True)
+            # lerp
+            self.game.screen_lerper.lerp_screen(lerp_vec, 0.3, True, False if AREA_LAYOUT_ADDITIONS[directional_value] > 0 else True)
 
-        self.current_lvl_num = new_lvl_num
-        self.level = self.levels_dict[self.current_lvl_num]
+            # set new level
+            self.current_lvl_num = new_lvl_num
+            self.level = self.levels_dict[self.current_lvl_num]
+            self.game.on_level_change()
+
+    def change_level_if_needed(self, player_relative_pos: pg.Vector2):
+        """ Changes the level if it needs to. Returns the direction the level is changed, or None
+            Should be called every time the player moves """
+        direction = None
+        if player_relative_pos.y in DirectionalValues.LEVEL_EDGE_Y:
+            direction = DirectionalValues.LEVEL_EDGE_Y[player_relative_pos.y]
+        elif player_relative_pos.x in DirectionalValues.LEVEL_EDGE_X:
+            direction = DirectionalValues.LEVEL_EDGE_X[player_relative_pos.x]
+        self.change_level_by_direction(direction)
+        return direction

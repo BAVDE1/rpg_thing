@@ -1,3 +1,4 @@
+import copy
 import time
 import pygame as pg
 from constants import GameUnits, DirectionalValues, PlayerValues
@@ -7,13 +8,17 @@ from rendering.sprites_holder import SpriteSheet
 from rendering.shadow import Shadow
 from rendering.animator import Animator
 from utility.text_object import TextObjectsHolder
+from utility.logging import Logger
+from conductor.conductor import Conductor
+from level.area import Area
 
 
 class Player:
     def __init__(self, game, screen: pg.Surface, centre_screen):
-        self.logger = game.logger
-        self.conductor = game.conductor
+        self.logger: Logger = game.logger
+        self.conductor: Conductor = game.conductor
         self.txt_holder: TextObjectsHolder = game.text_objects_holder
+        self.area: Area = game.area
         self.surface = screen
 
         # positional stuff
@@ -78,7 +83,12 @@ class Player:
 
         self.moving = False
 
-        # beat the actual beat
+        # change level (changes and then assigns)
+        level_change_dir = self.area.change_level_if_needed(self.get_relative_pos())
+        if level_change_dir:
+            self.set_pos_on_lvl_change(level_change_dir)
+
+        # beat the actual beat. After player movement
         self.conductor.beat()
 
     def sprint_manager(self):
@@ -136,11 +146,10 @@ class Player:
         if not self.shadow and self.current_texture is not None:
             self.shadow = Shadow(self.surface, self.get_sprite(), self.position, self.logger)
 
-    def set_pos(self, x, y):
-        """ Sets player position & sprite pos instantly """
+    def set_pos(self, new_pos: pg.Vector2):
+        """ Sets player position instantly """
         self.moving = True
-        self.position.x = x
-        self.position.y = y
+        self.position = new_pos
         self.last_moved = time.time()
         self.moving = False
 
@@ -164,9 +173,7 @@ class Player:
             return can_perform_action
 
         # in-combat movement
-        before = self.conductor.next_shadow_beat_time - PlayerValues.BEAT_GIVE_BEFORE
-        after = self.conductor.prev_shadow_beat_time + PlayerValues.BEAT_GIVE_AFTER
-        if time.time() < after or time.time() > before:
+        if self.conductor.is_now_within_allowed_beat():
             return can_perform_action
 
         # missed an in-combat beat
@@ -178,3 +185,28 @@ class Player:
         self.miss_next_beat = True
 
         self.logger.add_log(f"Missed beat", 2)
+
+    def set_pos_on_lvl_change(self, direction):
+        """ Sets the player's position based upon a level change direction """
+        # deepcopy required here otherwise the updated rel_pos will be updating the vector2 in the constant dict as well (idk its weird)
+        rel_pos = copy.deepcopy(PlayerValues.LVL_CHANGE_DIR_TO_POS)[direction]
+
+        # set empty values
+        rel_pos.y = self.get_relative_pos().y if rel_pos.y == 0 else rel_pos.y
+        rel_pos.x = self.get_relative_pos().x if rel_pos.x == 0 else rel_pos.x
+
+        self.set_pos(self.get_pos_from_relative(rel_pos))
+
+    def get_relative_pos(self) -> pg.Vector2:
+        """ Returns the smallest int of the players' current position """
+        return pg.Vector2(
+            (self.position.x - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
+            self.position.y / GameUnits.UNIT
+        )
+
+    def get_pos_from_relative(self, rel_pos: pg.Vector2 | None = None) -> pg.Vector2:
+        """ Returns the players actual position from a relative """
+        if not rel_pos:
+            rel_pos = self.get_relative_pos()
+        return pg.Vector2((rel_pos.x * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET,
+                          rel_pos.y * GameUnits.UNIT)

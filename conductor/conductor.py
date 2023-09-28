@@ -21,8 +21,8 @@ class Conductor:
         self.total_song_shadow_beats = 0
 
         self.has_performed_beat = False
-        self.has_triggered_before_beat = False
-        self.has_triggerd_after_beat = False
+        self.has_triggered_start_beat = False
+        self.has_triggerd_end_beat = False
         self.prev_beat_time = time.time()
         self.total_song_beats = 0
         self.sec_per_beat = 0
@@ -31,25 +31,25 @@ class Conductor:
         """ Call every frame """
         if self.is_conducting:
             # start of allowed beat time
-            if not self.has_triggered_before_beat and time.time() >= self.next_shadow_beat_time - PlayerValues.BEAT_GIVE_BEFORE:
-                self.has_triggered_before_beat = True
+            if not self.has_triggered_start_beat and time.time() >= self.next_shadow_beat_time - PlayerValues.BEAT_GIVE_BEFORE:
+                self.has_triggered_start_beat = True
                 self.has_performed_beat = False
 
             # perfect on-time beat
             if time.time() >= self.next_shadow_beat_time:
                 self.shadow_beat()
 
-                self.has_triggerd_after_beat = False
+                self.has_triggerd_end_beat = False
 
             # end of allowed beat time
-            if not self.has_triggerd_after_beat and time.time() >= self.prev_shadow_beat_time + PlayerValues.BEAT_GIVE_AFTER:
-                self.has_triggerd_after_beat = True
+            if not self.has_triggerd_end_beat and time.time() >= self.prev_shadow_beat_time + PlayerValues.BEAT_GIVE_AFTER:
+                self.has_triggerd_end_beat = True
 
                 # auto beats if the player misses a beat
                 if not self.has_performed_beat:
                     self.beat(is_auto_beat=True)
 
-                self.has_triggered_before_beat = False
+                self.has_triggered_start_beat = False
 
     def shadow_beat(self):
         """ Shadow beats, these are exactly on time """
@@ -58,7 +58,7 @@ class Conductor:
         self.prev_shadow_beat_time = self.next_shadow_beat_time
         self.next_shadow_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_shadow_beats)
 
-        self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
+        # self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
 
         self.game.on_shadow_beat()
 
@@ -69,9 +69,9 @@ class Conductor:
             self.has_performed_beat = True
             self.prev_beat_time = time.time()
 
-            if self.is_in_combat:
-                self.game.on_beat(is_auto_beat)
+            self.game.on_beat(is_auto_beat)
 
+            if self.is_in_combat:
                 self.logger.add_log(f"{self.total_song_beats} {'auto ' if is_auto_beat else ''}beat")
 
     def start_conducting(self):
@@ -108,3 +108,11 @@ class Conductor:
         # TODO: not working as expected
         self.bpm = new_bpm
         self.sec_per_beat = 60 / self.bpm
+
+    def is_now_within_allowed_beat(self):
+        """ Returns whether now is within the beats' give """
+        if self.has_triggered_start_beat and not self.has_performed_beat:
+            return True
+        if self.has_performed_beat and not self.has_triggerd_end_beat:
+            return True
+        return False

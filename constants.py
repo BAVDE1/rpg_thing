@@ -3,7 +3,6 @@ import pygame as pg
 EDITING_TAG = " - editing"
 
 
-# Screen
 class GameUnits:
     CAPTION = "rpg thing"
     LVL_WIDTH = 14  # +1 to include level edge (+0.5 for each edge)
@@ -14,7 +13,7 @@ class GameUnits:
     RES_H = UNIT * LVL_HEIGHT
     SIDE_GIVE = RES_H * .75  # give amount beside the level
     RES_W = RES_H + SIDE_GIVE
-    
+
     LEVEL_OFFSET = SIDE_GIVE * .5
 
 
@@ -58,6 +57,16 @@ class DirectionalValues:
         RIGHT: (GameUnits.UNIT, 0)
     }
 
+    LEVEL_EDGE_Y = {
+        0: NORTH,
+        GameUnits.LVL_HEIGHT: SOUTH,
+    }
+
+    LEVEL_EDGE_X = {
+        0: WEST,
+        GameUnits.LVL_WIDTH: EAST
+    }
+
 
 class PlayerValues:
     BEAT_GIVE_BEFORE = 0.14  # time given to perform an action on either side of a beat
@@ -67,6 +76,13 @@ class PlayerValues:
     HOLD_TIME_TO_SPRINT = .2
 
     PLAYER_MOVE_ANIM_SPEED = .125  # .125
+
+    LVL_CHANGE_DIR_TO_POS = {
+        DirectionalValues.NORTH: pg.Vector2(0, 13),
+        DirectionalValues.SOUTH: pg.Vector2(0, 1),
+        DirectionalValues.EAST: pg.Vector2(1, 0),
+        DirectionalValues.WEST: pg.Vector2(13, 0)
+    }
 
 
 # TEMPORARY

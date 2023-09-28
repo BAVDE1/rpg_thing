@@ -4,7 +4,7 @@ import time
 import pygame as pg
 import rendering.render_handler as renderer
 
-from constants import GameUnits, LevelLocations, DirectionalValues
+from constants import GameUnits, DirectionalValues
 from rendering.split_sheet import split_sheet
 from rendering.sprites_holder import SpriteSheet
 from utility.text_object import TextObjectsHolder
@@ -12,7 +12,7 @@ from texture_constants import PlayerTextures
 from conductor.conductor import Conductor
 from utility.logging import Logger
 from entity.player import Player
-from utility.screen_movers import ScreenShaker, ScreenLerper
+from utility.interpolators import SineShake, ExponentialLerp
 from level.area import Area
 
 
@@ -39,14 +39,13 @@ class Game:
         # set after requirements
         self.conductor = Conductor(self, self.logger)  # before entities
         self.text_objects_holder = TextObjectsHolder(self.screen_canvas)
-
-        self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
-        # self.level = Level(LevelLocations.OVERWORLD_00, pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
         self.area = Area(self, "overworld")
 
+        self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
+
         # screen movers
-        self.screen_shaker = ScreenShaker()
-        self.screen_lerper = ScreenLerper()
+        self.screen_shaker = SineShake()
+        self.screen_lerper = ExponentialLerp()
 
     def events(self):
         """ For events in event queue """
@@ -125,6 +124,9 @@ class Game:
         """ Called on the actual beat """
         if is_auto_beat:
             self.player.miss_next_beat = False  # reset
+
+    def on_level_change(self):
+        """ Called right after the level gets changed """
 
     def render(self):
         fill_col = (0, 5, 5)

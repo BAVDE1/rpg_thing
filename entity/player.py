@@ -1,16 +1,18 @@
 import copy
 import time
+
 import pygame as pg
+
+from conductor.conductor import Conductor
 from constants import GameUnits, DirectionalValues, PlayerValues
-from texture_constants import PlayerTextures
+from level.area import Area
+from rendering.animator import Animator
+from rendering.shadow import Shadow
 from rendering.split_sheet import split_sheet
 from rendering.sprites_holder import SpriteSheet
-from rendering.shadow import Shadow
-from rendering.animator import Animator
-from utility.text_object import TextObjectsHolder
+from texture_constants import PlayerTextures
 from utility.logging import Logger
-from conductor.conductor import Conductor
-from level.area import Area
+from utility.text_object import TextObjectsHolder
 
 
 class Player:
@@ -83,15 +85,15 @@ class Player:
 
         self.moving = False
 
-        # change level (changes and then assigns)
-        level_change_dir = self.area.change_level_if_needed(self.get_relative_pos())
-        if level_change_dir:
+        # change level (changes, then assigns, then checks if)
+        if level_change_dir := self.area.change_level_if_needed(self.get_relative_pos()):
             self.set_pos_on_lvl_change(level_change_dir)
 
         # beat the actual beat. After player movement
         self.conductor.beat()
 
     def sprint_manager(self):
+        """ Used for holding movement keys when not in combat """
         if not self.conductor.is_in_combat:
             if len(self.held_direction_keys) > 0:
                 if DirectionalValues.DIRECTION_DICT.get(self.held_direction_keys[0]) and self.can_do_action():
@@ -188,7 +190,7 @@ class Player:
 
     def set_pos_on_lvl_change(self, direction):
         """ Sets the player's position based upon a level change direction """
-        # deepcopy required here otherwise the updated rel_pos will be updating the vector2 in the constant dict as well (idk its weird)
+        # deepcopy required here otherwise the updated rel_pos will be updating the vector2 in the constant dict
         rel_pos = copy.deepcopy(PlayerValues.LVL_CHANGE_DIR_TO_POS)[direction]
 
         # set empty values

@@ -1,6 +1,7 @@
 import time
-from utility.logging import Logger
+
 from constants import PlayerValues
+from utility.logging import Logger
 
 
 class Conductor:
@@ -58,7 +59,8 @@ class Conductor:
         self.prev_shadow_beat_time = self.next_shadow_beat_time
         self.next_shadow_beat_time = self.song_started_time + (self.sec_per_beat * self.total_song_shadow_beats)
 
-        # self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
+        if self.is_in_combat:
+            self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
 
         self.game.on_shadow_beat()
 

@@ -13,7 +13,8 @@ class Logger:
     The logger is for displaying messages withing the frame to the screen like a one-way chat box
     Used for debugging
     """
-    def __init__(self, screen: pg.surface.Surface):
+    def __init__(self, game, screen: pg.surface.Surface):
+        self.game = game
         self.screen = screen
 
         self.colour_tier_list = [(120, 120, 120), (255, 255, 0), (255, 0, 0)]
@@ -45,4 +46,5 @@ class Logger:
             text_sprite.add(self.logs_group)
 
     def render_logs(self):
-        self.logs_group.draw(self.screen)
+        if self.game.dev_mode:
+            self.logs_group.draw(self.screen)

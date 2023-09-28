@@ -1,7 +1,9 @@
-import pygame as pg
 import os
-from level.level import Level
+
+import pygame as pg
+
 from constants import GameUnits, DirectionalValues
+from level.level import Level
 
 AREAS_DIR = "./assets/areas"
 
@@ -95,11 +97,12 @@ class Area:
             # set new level
             self.current_lvl_num = new_lvl_num
             self.level = self.levels_dict[self.current_lvl_num]
-            self.game.on_level_change()
+            self.game.on_level_change(directional_value)
 
     def change_level_if_needed(self, player_relative_pos: pg.Vector2):
-        """ Changes the level if it needs to. Returns the direction the level is changed, or None
-            Should be called every time the player moves """
+        """ Changes the level if it needs to.\n
+            Returns the direction the level is changed, or None.\n
+            Should be called every time the player moves, or gets moved. """
         direction = None
         if player_relative_pos.y in DirectionalValues.LEVEL_EDGE_Y:
             direction = DirectionalValues.LEVEL_EDGE_Y[player_relative_pos.y]

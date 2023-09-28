@@ -13,16 +13,16 @@ class SineShake:
         self.shake_end = 0
 
     def shake_screen(self, amp, secs):
-        """ Set a shake """
-        if not self.is_shaking:
-            self.is_shaking = True
-            self.shake_amp = amp
+        """ Set a shake.\n
+            amp = amplitude """
+        self.is_shaking = True
+        self.shake_amp = amp
 
-            self.shake_start = time.time()
-            self.shake_end = time.time() + secs
+        self.shake_start = time.time()
+        self.shake_end = time.time() + secs
 
     def get_value(self):
-        """ Returns the current value that should be added to the screens' position """
+        """ Returns the current value that can be added to a variable """
         if self.is_shaking:
             percent = (time.time() - self.shake_start) / (self.shake_end - self.shake_start)
             if percent >= 1:
@@ -50,17 +50,16 @@ class ExponentialLerp:
         """ Set a lerp.\n
             Lerping_from takes away from the lerp_to over time.\n
             Decay makes exponential go from fast to slow. """
-        if not self.is_lerping:
-            self.is_lerping = True
-            self.is_lerping_from = lerping_from
-            self.decay = decay
+        self.is_lerping = True
+        self.is_lerping_from = lerping_from
+        self.decay = decay
 
-            self.lerp_to = lerp_to
-            self.lerp_start = time.time()
-            self.lerp_end = time.time() + secs
+        self.lerp_to = lerp_to
+        self.lerp_start = time.time()
+        self.lerp_end = time.time() + secs
 
     def get_value(self) -> pg.Vector2:
-        """ Returns the current value that should be added to the vector2 position of the screen """
+        """ Returns the current value that can be added to a variable """
         if self.is_lerping:
             percent = (time.time() - self.lerp_start) / (self.lerp_end - self.lerp_start)
             if percent >= 1:

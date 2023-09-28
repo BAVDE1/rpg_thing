@@ -35,11 +35,21 @@ class DirectionalValues:
     SOUTH_EAST = "dir_se"
     SOUTH_WEST = "dir_sw"
 
-    OPP_DIR = {
+    OPPOSITE_DIR = {
         UP: DOWN,
         DOWN: UP,
         LEFT: RIGHT,
-        RIGHT: LEFT
+        RIGHT: LEFT,
+
+        NORTH: SOUTH,
+        SOUTH: NORTH,
+        EAST: WEST,
+        WEST: EAST,
+
+        NORTH_EAST: SOUTH_WEST,
+        SOUTH_WEST: NORTH_EAST,
+        NORTH_WEST: SOUTH_EAST,
+        SOUTH_EAST: NORTH_WEST
     }
 
     DIRECTION_DICT = {

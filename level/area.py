@@ -85,10 +85,10 @@ class Area:
             # choose direction & lvl num
             if directional_value in (n, s):
                 on_row += AREA_LAYOUT_ADDITIONS[directional_value]
-                lerp_vec = pg.Vector2(0, 10)
+                lerp_vec = pg.Vector2(0, (5 * GameUnits.RES_MUL))
             else:
                 on_col += AREA_LAYOUT_ADDITIONS[directional_value]
-                lerp_vec = pg.Vector2(10, 0)
+                lerp_vec = pg.Vector2((5 * GameUnits.RES_MUL), 0)
             new_lvl_num = self.area_layout[on_row][on_col]
 
             # lerp
@@ -101,7 +101,7 @@ class Area:
 
     def change_level_if_needed(self, player_relative_pos: pg.Vector2):
         """ Changes the level if it needs to.\n
-            Returns the direction the level is changed, or None.\n
+            Returns the direction the level is changed after the level gets changed, or None.\n
             Should be called every time the player moves, or gets moved. """
         direction = None
         if player_relative_pos.y in DirectionalValues.LEVEL_EDGE_Y:

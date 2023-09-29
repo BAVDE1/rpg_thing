@@ -62,7 +62,7 @@ class Shadow:
 
     def update_shadow_elements(self, position: pg.Vector2):
         """ Splits the image into horizontal strips, and stores into group.
-        WARNING: updating this too often is heavy on performance, SHADOW_QUALITY can be turned down to help as well
+            WARNING: updating this too often is heavy on performance, SHADOW_QUALITY can be turned down to help as well
         """
         blank_col = (0, 0, 0, 0)
         color_key = self.sprite.get_colorkey()

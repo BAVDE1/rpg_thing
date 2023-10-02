@@ -1,4 +1,5 @@
 import pygame as pg
+from constants import GameUnits
 
 
 class SpriteSheet:
@@ -27,3 +28,8 @@ class BasicSprite(pg.sprite.Sprite):
 
 class TileSprite(BasicSprite):
     """ Sprite object to hold tile sprites information """
+    def __init__(self, sprite_img: pg.surface.Surface, pos: pg.Vector2, sprite_offset_pos: pg.Vector2 = pg.Vector2(0, 0)):
+        BasicSprite.__init__(self, sprite_img, pos, sprite_offset_pos)
+
+        self.relative_pos = pg.Vector2(((pos.x - GameUnits.LEVEL_X_OFFSET) - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
+                                       (pos.y - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT)

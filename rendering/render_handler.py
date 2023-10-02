@@ -8,7 +8,7 @@ def render_active_level(game, surface, player: Player, area: Area, txt_holder: T
     # initialise
     if not player.is_player_loaded() or not area.level.is_initialised:
         while not player.is_player_loaded():
-            player.render_player()
+            player.render_player(surface)
         while not area.level.is_initialised:  # isn't needed here, but just in case
             area.level.initialise_level()
 
@@ -16,7 +16,7 @@ def render_active_level(game, surface, player: Player, area: Area, txt_holder: T
         game.on_level_fully_loaded()
 
     area.level.render_level(surface)
-    player.render_player()
+    player.render_player(surface)
     area.level.render_level_foreground(surface)
 
     txt_holder.render()

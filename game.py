@@ -46,7 +46,7 @@ class Game:
         self.conductor = Conductor(self, self.logger)  # before entities
         self.area = Area(self, "overworld")
 
-        self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
+        self.player = Player(self)
 
         # screen movers
         self.screen_shaker = SineShake()

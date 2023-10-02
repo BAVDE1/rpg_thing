@@ -76,6 +76,9 @@ class Level:
         self.ground_layer_group = pg.sprite.Group()
         self.outline_layer_group = pg.sprite.Group()
 
+        # collide-able positions
+        self.wall_positions = []
+
         # initializes level
         self.load_or_reload_level(self.level_source)
 
@@ -99,8 +102,9 @@ class Level:
     def initialise_level(self):
         if not self.is_initialised:
             # create tiles & fill groups
-            self.store_group(self.ground_layer_group, self.ground_layer_lines)
-            self.store_group(self.top_layer_group, self.top_layer_lines)
+            self.store_group(self.ground_layer_group, self.ground_layer_lines, store_empty_as_walls=True)
+            self.store_group(self.top_layer_group, self.top_layer_lines, store_tiles_as_walls=True)
+            print(self.wall_positions)
             self.store_outline(True)
 
             # finish
@@ -117,16 +121,22 @@ class Level:
         if self.is_initialised:
             self.outline_layer_group.draw(surface)
 
-    def store_group(self, group: pg.sprite.Group, layer_lines):
+    def store_group(self, group: pg.sprite.Group, layer_lines, store_empty_as_walls=False, store_tiles_as_walls=False):
         """ Converts ascii chars from layer_lines into valid TileSprites and stores them into the given group """
         for row_n, line in enumerate(layer_lines):
             for column_n, chars in enumerate(line.split(",")):
                 if raw_sprite := ASCII_TO_SPRITE[chars] if chars in ASCII_TO_SPRITE else None:
-                    raw_sprite = self.create_scaled_sprite(raw_sprite)
-                    t_pos = self.create_tile_pos(raw_sprite, row_n, column_n)
+                    raw_sprite = self.create_scaled_tile_sprite(raw_sprite)
+                    t_pos = self.create_tile_pos(row_n, column_n)
 
                     tile_sprite = TileSprite(raw_sprite, t_pos)
+
+                    if store_tiles_as_walls:
+                        self.wall_positions.append(tile_sprite.relative_pos)
+
                     tile_sprite.add(group)
+                elif store_empty_as_walls:
+                    self.wall_positions.append(TileSprite(TileTextures.GRASS_SPRITE, self.create_tile_pos(row_n, column_n)).relative_pos)
 
     def store_outline(self, store_fade=False):
         """ Used to determine and put sprites into the outline group """
@@ -155,8 +165,8 @@ class Level:
                 }
 
                 if raw_sprite := outline_decider(cardinal_dic):
-                    raw_sprite = self.create_scaled_sprite(raw_sprite)
-                    t_pos = self.create_tile_pos(raw_sprite, row_n, column_n)
+                    raw_sprite = self.create_scaled_tile_sprite(raw_sprite)
+                    t_pos = self.create_tile_pos(row_n, column_n)
 
                     tile_sprite = TileSprite(raw_sprite, t_pos)
                     tile_sprite.add(self.outline_layer_group)
@@ -164,28 +174,28 @@ class Level:
                 # store fade tiles after other tiles, so it renders on top
                 if store_fade and (column_n == 0 or column_n == len(line) - 1):  # only on the level sides atm
                     f_raw_sprite = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if column_n == 0 else TileTextures.FADE_SPRITE
-                    f_raw_sprite = self.create_scaled_sprite(f_raw_sprite)
-                    f_pos = self.create_tile_pos(f_raw_sprite, row_n, column_n)
+                    f_raw_sprite = self.create_scaled_tile_sprite(f_raw_sprite)
+                    f_pos = self.create_tile_pos(row_n, column_n)
 
                     f_tile_sprite = TileSprite(f_raw_sprite, f_pos)
                     f_tile_sprite.add(self.outline_layer_group)
 
-    def create_scaled_sprite(self, sprite) -> pg.surface.Surface:
+    def create_scaled_tile_sprite(self, sprite) -> pg.surface.Surface:
         """ Returns given sprite scaled to areas' size """
         return pg.transform.scale(sprite, (sprite.get_width() * self.size, sprite.get_height() * self.size))
 
-    def create_tile_pos(self, sprite: pg.surface.Surface, row, column) -> pg.Vector2:
+    def create_tile_pos(self, row: int, column: int) -> pg.Vector2:
         """ Returns Vector2 of a given sprites position depending upon row, column and level size """
         return pg.Vector2(
-            (((column * GameUnits.UNIT) - sprite.get_width() / 2) * self.size) + self.pos_offset.x,
-            (((row * GameUnits.UNIT) - sprite.get_height() / 2) * self.size) + self.pos_offset.y)
+            (((column * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
+            (((row * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.y)
 
     def generate_tile_rects(self) -> list[tuple]:
         """ Generates and returns a list of tile rects: 0=x, 1=y, 2=width, 3=height, 4=row, 5=column (used in level editor) """
         li: list[tuple] = []
         for row_n in range(GameUnits.LVL_HEIGHT + 1):
             for column_n in range(GameUnits.LVL_WIDTH + 1):
-                tile_pos = self.create_tile_pos(self.create_scaled_sprite(TileTextures.GRASS_SPRITE), row_n, column_n)
+                tile_pos = self.create_tile_pos(row_n, column_n)
                 li.append((tile_pos.x, tile_pos.y, GameUnits.UNIT * self.size, GameUnits.UNIT * self.size, column_n, row_n))
         return li
 

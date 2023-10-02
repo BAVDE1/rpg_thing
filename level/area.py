@@ -61,7 +61,7 @@ class Area:
         """ Stores levels in area dictionary """
         for level_num in self.level_files_dict:
             self.levels_dict[level_num] = Level(f"{self.area_dir}/{self.level_files_dict[level_num]}",
-                                                pos_offset=pg.Vector2(GameUnits.LEVEL_OFFSET, 0))
+                                                pos_offset=pg.Vector2(GameUnits.LEVEL_X_OFFSET, 0))
 
     def change_level_by_direction(self, directional_value):
         """ Changes level by cardinal direction. Raises errors if the move is invalid. """

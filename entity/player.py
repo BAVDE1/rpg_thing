@@ -13,20 +13,20 @@ from rendering.sprites_holder import SpriteSheet
 from texture_constants import PlayerTextures
 from utility.logging import Logger
 from utility.text_object import TextObjectsHolder
+from level.area import Area
 
 
 class Player:
-    def __init__(self, game, screen: pg.Surface, centre_screen):
+    def __init__(self, game):
         self.logger: Logger = game.logger
         self.conductor: Conductor = game.conductor
         self.txt_holder: TextObjectsHolder = game.text_objects_holder
         self.area: Area = game.area
-        self.surface = screen
 
         # positional stuff
         self.direction = DirectionalValues.UP
         self.held_direction_keys = []
-        self.position = pg.Vector2(centre_screen[0], centre_screen[1])
+        self.position = pg.Vector2(game.screen_canvas.get_rect().center)
 
         self.miss_next_beat = False
         self.moving = False
@@ -69,11 +69,16 @@ class Player:
             Sends the beat event to the conductor. """
         self.moving = True
 
+        # addition to players position
         x = DirectionalValues.DIRECTION_MOV[self.direction][0]
         y = DirectionalValues.DIRECTION_MOV[self.direction][1]
-        self.position = pg.Vector2(self.position.x + x, self.position.y + y)
-        self.last_moved = time.time()
 
+        # set position
+        new_pos = pg.Vector2(self.position.x + x, self.position.y + y)
+        if self.get_relative_pos(new_pos) not in self.area.level.wall_positions:
+            self.position = new_pos
+
+        self.last_moved = time.time()
         self.flipped = True if self.direction == DirectionalValues.LEFT else False if self.direction == DirectionalValues.RIGHT else self.flipped
 
         # move animation
@@ -105,26 +110,26 @@ class Player:
             elif len(self.held_direction_keys) == 0 and self.sprinting:
                 self.sprinting = False  # stop sprint
 
-    def render_player(self):
+    def render_player(self, surface):
         # holds function until player is loaded
         while not self.is_player_loaded():
             self.load_player()
 
-        # updates
+        # on animation updated, calls on_sprite_updated, resets bool
         self.animator.update()
         if self.animator.has_changed_texture:
             self.on_sprite_updated()
             self.animator.has_changed_texture = False
 
         sprite = self.get_sprite()
-        blit = ((self.position.x - sprite.get_width() / 2) + self.animator.offset.x,
-                (self.position.y - sprite.get_height() / 2) + self.animator.offset.y)
+        blit = pg.Vector2((self.position.x - sprite.get_width() / 2) + self.animator.offset.x,
+                          (self.position.y - sprite.get_height() / 2) + self.animator.offset.y)
 
         # shadow
-        self.shadow.draw()
+        self.shadow.draw(surface)
 
         # player
-        self.surface.blit(sprite, blit)
+        surface.blit(sprite, pg.Vector2(blit.x, blit.y + PlayerValues.PLAYER_Y_OFFSET))
 
     def on_sprite_updated(self):
         """ Called when sprite updates its texture """
@@ -133,9 +138,8 @@ class Player:
         self.shadow.update_shadow(self.position, self.get_sprite(), self.animator.offset)
 
     def get_sprite(self) -> pg.surface.Surface:
-        """ Always use this to get the player sprite """
-        flipped_sprite = pg.transform.flip(self.current_texture, True if self.flipped else False, False)
-        return flipped_sprite
+        """ Always use this to get the player sprite. Just flips the sprite if it needs to """
+        return pg.transform.flip(self.current_texture, True if self.flipped else False, False)
 
     def load_player(self):
         """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded.
@@ -146,7 +150,7 @@ class Player:
             return
 
         if not self.shadow and self.current_texture is not None:
-            self.shadow = Shadow(self.surface, self.get_sprite(), self.position, self.logger)
+            self.shadow = Shadow(self.get_sprite(), self.position, self.logger)
 
     def set_pos(self, new_pos: pg.Vector2):
         """ Sets player position instantly """
@@ -199,14 +203,16 @@ class Player:
 
         self.set_pos(self.get_pos_from_relative(rel_pos))
 
-    def get_relative_pos(self) -> pg.Vector2:
+    def get_relative_pos(self, pos=None) -> pg.Vector2:
         """ Returns the smallest int of the players' current position """
-        return pg.Vector2((self.position.x - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
-                          self.position.y / GameUnits.UNIT)
+        if not pos:
+            pos = self.position
+        return pg.Vector2((pos.x - GameUnits.LEVEL_X_OFFSET) / GameUnits.UNIT,
+                          pos.y / GameUnits.UNIT)
 
     def get_pos_from_relative(self, rel_pos: pg.Vector2 | None = None) -> pg.Vector2:
         """ Returns the players actual position from a relative """
         if not rel_pos:
             rel_pos = self.get_relative_pos()
-        return pg.Vector2((rel_pos.x * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET,
+        return pg.Vector2((rel_pos.x * GameUnits.UNIT) + GameUnits.LEVEL_X_OFFSET,
                           rel_pos.y * GameUnits.UNIT)

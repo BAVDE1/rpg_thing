@@ -24,7 +24,7 @@ class TextObject(pg.sprite.Sprite):
     def __init__(self, text: str, colour: tuple, pos: pg.Vector2, lifetime, move_by: pg.Vector2, fade: bool, sin_amp):
         pg.sprite.Sprite.__init__(self)
 
-        self.font = pg.font.SysFont("monotype", 10)
+        self.font = pg.font.SysFont("consolas", 9)
 
         self.created_time = time.time()
         self.die_time = self.created_time + lifetime

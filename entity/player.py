@@ -193,18 +193,16 @@ class Player:
         # deepcopy required here otherwise the updated rel_pos will be updating the vector2 in the constant dict
         rel_pos = copy.deepcopy(PlayerValues.LVL_CHANGE_DIR_TO_POS)[direction]
 
-        # set empty values
-        rel_pos.y = self.get_relative_pos().y if rel_pos.y == 0 else rel_pos.y
-        rel_pos.x = self.get_relative_pos().x if rel_pos.x == 0 else rel_pos.x
+        # set the empty values
+        rel_pos.y = self.get_relative_pos().y if not rel_pos.y else rel_pos.y
+        rel_pos.x = self.get_relative_pos().x if not rel_pos.x else rel_pos.x
 
         self.set_pos(self.get_pos_from_relative(rel_pos))
 
     def get_relative_pos(self) -> pg.Vector2:
         """ Returns the smallest int of the players' current position """
-        return pg.Vector2(
-            (self.position.x - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
-            self.position.y / GameUnits.UNIT
-        )
+        return pg.Vector2((self.position.x - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
+                          self.position.y / GameUnits.UNIT)
 
     def get_pos_from_relative(self, rel_pos: pg.Vector2 | None = None) -> pg.Vector2:
         """ Returns the players actual position from a relative """

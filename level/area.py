@@ -92,7 +92,7 @@ class Area:
             new_lvl_num = self.area_layout[on_row][on_col]
 
             # lerp
-            self.game.screen_lerper.lerp_screen(lerp_vec, 0.3, True, False if AREA_LAYOUT_ADDITIONS[directional_value] > 0 else True)
+            self.game.screen_lerper.set_lerp(lerp_vec, 0.3, True, False if AREA_LAYOUT_ADDITIONS[directional_value] > 0 else True)
 
             # set new level
             self.current_lvl_num = new_lvl_num

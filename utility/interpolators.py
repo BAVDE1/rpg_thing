@@ -12,7 +12,7 @@ class SineShake:
         self.shake_start = 0
         self.shake_end = 0
 
-    def shake_screen(self, amp, secs):
+    def set_shake(self, amp, secs):
         """ Set a shake.\n
             amp = amplitude """
         self.is_shaking = True
@@ -46,7 +46,7 @@ class ExponentialLerp:
         self.lerp_start = 0
         self.lerp_end = 0
 
-    def lerp_screen(self, lerp_to: pg.Vector2, secs, lerping_from=False, decay=False):
+    def set_lerp(self, lerp_to: pg.Vector2, secs, lerping_from=False, decay=False):
         """ Set a lerp.\n
             Lerping_from takes away from the lerp_to over time.\n
             Decay makes exponential go from fast to slow. """
@@ -59,7 +59,7 @@ class ExponentialLerp:
         self.lerp_end = time.time() + secs
 
     def get_value(self) -> pg.Vector2:
-        """ Returns the current value that can be added to a variable """
+        """ Returns the current vector value that can be added to a variable, or (0, 0) """
         if self.is_lerping:
             percent = (time.time() - self.lerp_start) / (self.lerp_end - self.lerp_start)
             if percent >= 1:

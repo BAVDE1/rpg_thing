@@ -1,4 +1,6 @@
+import math
 import random
+import time
 
 import pygame as pg
 
@@ -39,8 +41,9 @@ class Game:
 
         # set after requirements
         self.logger = Logger(self, self.final_screen)
-        self.conductor = Conductor(self, self.logger)  # before entities
         self.text_objects_holder = TextObjectsHolder(self.screen_canvas)
+
+        self.conductor = Conductor(self, self.logger)  # before entities
         self.area = Area(self, "overworld")
 
         self.player = Player(self, self.screen_canvas, self.screen_canvas.get_rect().center)
@@ -77,10 +80,10 @@ class Game:
         """ Called when dev_mode is active and a key is pressed / released """
         # zx: screen movement
         if self.keys[pg.K_z]:
-            self.screen_shaker.shake_screen((5 * GameUnits.RES_MUL), 0.3)
+            self.screen_shaker.set_shake((5 * GameUnits.RES_MUL), 0.3)
             self.logger.add_log(f"Shake screen, amp: {self.screen_shaker.shake_amp}", 2)
         if self.keys[pg.K_x]:
-            self.screen_lerper.lerp_screen(pg.Vector2((5 * GameUnits.RES_MUL), 0), 0.3, True)
+            self.screen_lerper.set_lerp(pg.Vector2((5 * GameUnits.RES_MUL), 0), 0.3, True)
             self.logger.add_log(f"Lerp screen, amp: {self.screen_lerper.lerp_to}", 2)
 
         # 1234: switch level (n, s, e, w)
@@ -128,7 +131,7 @@ class Game:
         self.conductor.update()
 
     def on_level_fully_loaded(self):
-        """ Called (on frame) once the level and entities are fully loaded """
+        """ Called once the level and entities are fully loaded """
         self.logger.add_log(f"level loaded")
 
         self.conductor.set_music("placeholder", "placeholder", 120)

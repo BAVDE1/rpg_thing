@@ -111,7 +111,6 @@ class Level:
             self.store_group(self.ground_layer_group, self.ground_layer_lines, store_empty_as_walls=True)
             self.store_group(self.top_layer_group, self.top_layer_lines, store_tiles_as_walls=True)
             self.store_entities()
-            print(self.entities)
             self.store_outline(True)
 
             # finish

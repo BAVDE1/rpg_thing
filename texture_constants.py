@@ -55,14 +55,14 @@ class RenderValues:
 
 
 class PlayerTextures:
-    PLAYER_IDLE = "assets/textures/player_idle.png"
-    PLAYER_JUMP_HORIZONTAL = "assets/textures/player_jump_horizontal.png"
-    PLAYER_JUMP_VERTICAL = "assets/textures/player_jump_vertical.png"
-    PLAYER_IDLE_DEBUG = "assets/textures/player_idle_debug.png"
+    PLAYER_IDLE = "assets/textures/player/player_idle.png"
+    PLAYER_JUMP_HORIZONTAL = "assets/textures/player/player_jump_horizontal.png"
+    PLAYER_JUMP_VERTICAL = "assets/textures/player/player_jump_vertical.png"
+    PLAYER_IDLE_DEBUG = "assets/textures/player/player_idle_debug.png"
 
 
 class EntityTextures:
-    PLACEHOLDER = "assets/textures/player_idle.png"
+    PLACEHOLDER = PlayerTextures.PLAYER_IDLE
 
 
 def get_outline_tileset_dict(tileset_sprites):

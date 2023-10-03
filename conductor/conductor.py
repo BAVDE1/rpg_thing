@@ -62,7 +62,7 @@ class Conductor:
         if self.is_in_combat:
             self.logger.add_log(f"{self.total_song_shadow_beats} sb", 0)
 
-        self.game.on_shadow_beat()
+        self.game.on_shadow_beat(self.prev_shadow_beat_time)
 
     def beat(self, is_auto_beat=False):
         """ The actual beat, triggered by player or auto beat if the player missed the beat """
@@ -85,7 +85,7 @@ class Conductor:
             self.song_started_time = time.time()
             self.next_shadow_beat_time = time.time()
             self.prev_shadow_beat_time = time.time()
-            self.sec_per_beat = 60 / self.bpm
+            self.set_bpm()
 
             self.is_conducting = True
             self.logger.add_log(f"conductor started ({self.sec_per_beat} / sec)")
@@ -106,10 +106,13 @@ class Conductor:
         self.passive_song = passive_song_file
         self.bpm = new_bpm
 
-    def set_bpm(self, new_bpm):
+    def set_bpm(self, new_bpm=None):
         # TODO: not working as expected
+        if not new_bpm:
+            new_bpm = self.bpm
         self.bpm = new_bpm
         self.sec_per_beat = 60 / self.bpm
+        self.game.on_bpm_change(self.sec_per_beat)
 
     def is_now_within_allowed_beat(self):
         """ Returns whether now is within the beats' give """

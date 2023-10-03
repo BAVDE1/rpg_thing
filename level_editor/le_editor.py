@@ -231,6 +231,7 @@ class LevelEditor:
 
         # level
         self.level.render_level(self.screen)
+        self.level.render_entities(self.screen)
         self.level.render_level_foreground(self.screen)
 
         # tile selection

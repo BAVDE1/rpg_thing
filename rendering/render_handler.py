@@ -3,19 +3,20 @@ from entity.player import Player
 from utility.text_object import TextObjectsHolder
 
 
+is_loaded = False
+
+
 def render_active_level(game, surface, player: Player, area: Area, txt_holder: TextObjectsHolder):
     """ Renders an active player, level & its entities """
-    # initialise
-    if not player.is_player_loaded() or not area.level.is_initialised:
-        while not player.is_player_loaded():
-            player.render_player(surface)
-        while not area.level.is_initialised:  # isn't needed here, but just in case
-            area.level.initialise_level()
+    global is_loaded
 
-        # called once everything is loaded
+    # on load
+    if not is_loaded:
         game.on_level_fully_loaded()
+        is_loaded = True
 
     area.level.render_level(surface)
+    area.level.render_entities(surface)
     player.render_player(surface)
     area.level.render_level_foreground(surface)
 

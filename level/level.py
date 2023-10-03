@@ -1,6 +1,7 @@
 from constants import GameUnits, DirectionalValues, LevelLocations
 from texture_constants import get_outline_tileset_dict, TileTextures, ASCII_TO_SPRITE
 from rendering.sprites_holder import TileSprite
+from entity.base_entity import ASCII_TO_ENTITY, BaseEntity
 import os
 import pygame as pg
 
@@ -66,21 +67,22 @@ class Level:
 
         self.level_source = level_source
 
-        self.whole_level = None
-        self.top_layer_lines = None
-        self.entity_layer_lines = None
-        self.ground_layer_lines = None
+        self.whole_level = parse_level_file(self.level_source)
+        self.top_layer_lines = self.whole_level[0]
+        self.entity_layer_lines = self.whole_level[1]
+        self.ground_layer_lines = self.whole_level[2]
 
         self.top_layer_group = pg.sprite.Group()
-        self.entity_layer_group = pg.sprite.Group()
         self.ground_layer_group = pg.sprite.Group()
         self.outline_layer_group = pg.sprite.Group()
 
         # collide-able positions
         self.wall_positions = []
 
+        self.entities: list[BaseEntity] = []
+
         # initializes level
-        self.load_or_reload_level(self.level_source)
+        self.initialise_level()
 
     def load_or_reload_level(self, new_level_source=None):
         """ Reloads level with the option of using a different level file """
@@ -88,6 +90,7 @@ class Level:
             self.level_source = new_level_source
 
         self.is_initialised = False
+
         self.whole_level = parse_level_file(self.level_source)
         self.top_layer_lines = self.whole_level[0]
         self.entity_layer_lines = self.whole_level[1]
@@ -97,6 +100,9 @@ class Level:
         self.ground_layer_group.empty()
         self.outline_layer_group.empty()
 
+        self.wall_positions = []
+        self.entities: list[BaseEntity] = []
+
         self.initialise_level()
 
     def initialise_level(self):
@@ -104,7 +110,8 @@ class Level:
             # create tiles & fill groups
             self.store_group(self.ground_layer_group, self.ground_layer_lines, store_empty_as_walls=True)
             self.store_group(self.top_layer_group, self.top_layer_lines, store_tiles_as_walls=True)
-            print(self.wall_positions)
+            self.store_entities()
+            print(self.entities)
             self.store_outline(True)
 
             # finish
@@ -115,6 +122,10 @@ class Level:
         if self.is_initialised:
             self.ground_layer_group.draw(surface)
             self.top_layer_group.draw(surface)
+
+    def render_entities(self, surface):
+        for entity in self.entities:
+            entity.render(surface)
 
     def render_level_foreground(self, surface):
         """ Called every frame (after other things have been rendered) """
@@ -137,6 +148,14 @@ class Level:
                     tile_sprite.add(group)
                 elif store_empty_as_walls:
                     self.wall_positions.append(TileSprite(TileTextures.GRASS_SPRITE, self.create_tile_pos(row_n, column_n)).relative_pos)
+
+    def store_entities(self):
+        for row_n, line in enumerate(self.entity_layer_lines):
+            for column_n, chars in enumerate(line.split(",")):
+                if raw_entity := ASCII_TO_ENTITY[chars] if chars in ASCII_TO_ENTITY else None:
+                    pos = self.create_tile_pos(row_n, column_n)
+
+                    self.entities.append(raw_entity(pos))
 
     def store_outline(self, store_fade=False):
         """ Used to determine and put sprites into the outline group """
@@ -200,4 +219,4 @@ class Level:
         return li
 
     def __repr__(self):
-        return f"Level({self.level_source})"
+        return f"Level({self.level_source}, entities_alive:{len(self.entities)})"

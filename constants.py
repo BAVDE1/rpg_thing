@@ -17,6 +17,8 @@ class GameUnits:
     LEVEL_X_OFFSET = SIDE_GIVE * .5
     LEVEL_OFFSET = -(UNIT / 2)
 
+    ENTITY_Y_OFFSET = -8
+
 
 class DirectionalValues:
     UP = "dir_up"
@@ -86,7 +88,6 @@ class PlayerValues:
     MOVEMENT_PAUSE = .15  # 0.15
     HOLD_TIME_TO_SPRINT = .2
 
-    PLAYER_Y_OFFSET = -8
     PLAYER_MOVE_ANIM_SPEED = .125  # .125
 
     LVL_CHANGE_DIR_TO_POS = {

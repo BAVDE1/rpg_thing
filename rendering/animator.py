@@ -9,11 +9,10 @@ no_anim_error = "Cannot animate '{}' because there are no animations registered.
 
 
 class Animator:
-    def __init__(self, logger, conductor: Conductor, idle_offset: pg.Vector2, idle_ss: SpriteSheet, *one_time_ss: SpriteSheet):
-        self.logger = logger
-        self.conductor = conductor
+    def __init__(self, idle_ss: SpriteSheet, idle_offset: pg.Vector2, *one_time_ss: SpriteSheet):
         self.texture_obj = None
         self.has_changed_texture = False  # updates to true on texture change (and should be back to false within the frame)
+        self.bpm = 0
 
         self.idling = True
         self.idle_ss = idle_ss
@@ -41,10 +40,13 @@ class Animator:
 
         self.update()  # init
 
-    def on_shadow_beat(self):
+    def on_shadow_beat(self, prev_shadow_beat_time):
         """ Called on the perfect beat """
         self.restart_idle()
-        self.prev_idle_start = self.conductor.prev_shadow_beat_time
+        self.prev_idle_start = prev_shadow_beat_time
+
+    def on_bpm_change(self, new_bpm):
+        self.bpm = new_bpm
 
     def change_idle_anim(self, set_to_default, new_idle_ss: SpriteSheet | None = None):
         """ Used to change the current idle animation to another animation. The default idle animation is saved and can be restored later. """
@@ -66,7 +68,7 @@ class Animator:
     def update(self):
         """ Should be called every frame """
         if self.idling:  # idle
-            next_idle_frame_time = self.prev_idle_start + self.conductor.sec_per_beat * (self.idle_frame / (self.idle_len + 1))
+            next_idle_frame_time = self.prev_idle_start + self.bpm * (self.idle_frame / (self.idle_len + 1))
             if time.time() >= next_idle_frame_time and self.idle_frame != self.idle_frame_prev:  # time more than when next idle frame should tick
                 # reset offset (changed because of a one time anim)
                 if self.offset != self.idle_offset:

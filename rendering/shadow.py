@@ -1,5 +1,5 @@
 import utility.logging
-from constants import PlayerValues
+from constants import GameUnits
 from texture_constants import RenderValues
 from rendering.sprites_holder import BasicSprite
 import pygame as pg
@@ -50,9 +50,8 @@ class OffsetGoal:
 
 
 class Shadow:
-    def __init__(self, sprite: pg.surface.Surface, position: pg.Vector2, logger: utility.logging.Logger):
-        self.logger = logger
-        self.sprite = sprite
+    def __init__(self, sprite: pg.surface.Surface, position: pg.Vector2):
+        self.sprite: pg.surface.Surface = sprite
 
         self.shadow_offset: pg.Vector2 = pg.Vector2(0, 0)
         self.shadow_offset_goal: OffsetGoal | None = None
@@ -104,7 +103,7 @@ class Shadow:
                     pos = pg.Vector2(pos.x + self.shadow_offset_goal.get_current_offset().x,
                                      pos.y + self.shadow_offset_goal.get_current_offset().y)
 
-                shadow_strips.append(BasicSprite(horizontal_strip, pg.Vector2(pos.x, pos.y + PlayerValues.PLAYER_Y_OFFSET)))
+                shadow_strips.append(BasicSprite(horizontal_strip, pg.Vector2(pos.x, pos.y + GameUnits.ENTITY_Y_OFFSET)))
         self.shadow_strips_group.empty()
         self.shadow_strips_group.add(*shadow_strips)
 

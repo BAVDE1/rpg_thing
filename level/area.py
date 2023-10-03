@@ -22,6 +22,7 @@ def check_exists(path: str, not_found_msg: str) -> bool:
 
 
 def get_lvl_files(area: str, area_path_dir: str) -> dict:
+    """ Returns a dict of level nums and their file paths """
     di = {}
 
     files_in_area = sorted(os.listdir(area_path_dir))
@@ -110,3 +111,13 @@ class Area:
             direction = DirectionalValues.LEVEL_EDGE_X[player_relative_pos.x]
         self.change_level_by_direction(direction)
         return direction
+
+    def on_shadow_beat(self, prev_shadow_beat_time):
+        for level in self.levels_dict.values():
+            for entity in level.entities:
+                entity.on_shadow_beat(prev_shadow_beat_time)
+
+    def on_bpm_change(self, new_bpm):
+        for level in self.levels_dict.values():
+            for entity in level.entities:
+                entity.on_bpm_change(new_bpm)

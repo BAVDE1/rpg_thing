@@ -5,7 +5,6 @@ import pygame as pg
 
 from conductor.conductor import Conductor
 from constants import GameUnits, DirectionalValues, PlayerValues
-from level.area import Area
 from rendering.animator import Animator
 from rendering.shadow import Shadow
 from rendering.split_sheet import split_sheet
@@ -34,22 +33,24 @@ class Player:
         self.last_moved = time.time()
 
         # texture stuff
-        self.texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(self.texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
-
         self.flipped = False
-        self.shadow = None
-        self.current_texture = None
+        texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE).convert_alpha()
+        self.ss_idle = split_sheet(texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
 
         jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8))
         jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8))
-        self.animator = Animator(self.logger, self.conductor, pg.Vector2(0, 0),
-                                 SpriteSheet(PlayerTextures.PLAYER_IDLE, self.ss_idle),
+        self.animator = Animator(SpriteSheet(PlayerTextures.PLAYER_IDLE, self.ss_idle), pg.Vector2(0, 0),
                                  jump_horizontal_ss, jump_vertical_ss)
 
-    def on_shadow_beat(self):
+        self.current_texture = self.animator.texture_obj
+        self.shadow = Shadow(self.get_sprite(), self.position)
+
+    def on_shadow_beat(self, prev_shadow_beat_time):
         """ Called on the perfect beat """
-        self.animator.on_shadow_beat()
+        self.animator.on_shadow_beat(prev_shadow_beat_time)
+
+    def on_bpm_change(self, new_bpm):
+        self.animator.on_bpm_change(new_bpm)
 
     def on_key_down(self, key):
         if key in DirectionalValues.DIRECTION_DICT:
@@ -111,11 +112,6 @@ class Player:
                 self.sprinting = False  # stop sprint
 
     def render_player(self, surface):
-        # holds function until player is loaded
-        while not self.is_player_loaded():
-            self.load_player()
-
-        # on animation updated, calls on_sprite_updated, resets bool
         self.animator.update()
         if self.animator.has_changed_texture:
             self.on_sprite_updated()
@@ -129,7 +125,7 @@ class Player:
         self.shadow.draw(surface)
 
         # player
-        surface.blit(sprite, pg.Vector2(blit.x, blit.y + PlayerValues.PLAYER_Y_OFFSET))
+        surface.blit(sprite, pg.Vector2(blit.x, blit.y + GameUnits.ENTITY_Y_OFFSET))
 
     def on_sprite_updated(self):
         """ Called when sprite updates its texture """
@@ -141,27 +137,12 @@ class Player:
         """ Always use this to get the player sprite. Just flips the sprite if it needs to """
         return pg.transform.flip(self.current_texture, True if self.flipped else False, False)
 
-    def load_player(self):
-        """ Used to initialise player textures, will continue to be called as long as the player is not yet loaded.
-            Probably needs to be called twice before player is fully loaded? Maybe? """
-        if not self.current_texture:
-            self.animator.update()
-            self.current_texture = self.animator.texture_obj
-            return
-
-        if not self.shadow and self.current_texture is not None:
-            self.shadow = Shadow(self.get_sprite(), self.position, self.logger)
-
     def set_pos(self, new_pos: pg.Vector2):
         """ Sets player position instantly """
         self.moving = True
         self.position = new_pos
         self.last_moved = time.time()
         self.moving = False
-
-    def is_player_loaded(self) -> bool:
-        """ Returns whether player has fully loaded in (add more checks later). Call player.Render() to load """
-        return self.current_texture and self.shadow
 
     def can_do_action(self) -> bool:
         """ Returns true if the player is allowed to do an action, results will vary in and out of combat """

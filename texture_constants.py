@@ -1,5 +1,5 @@
 from rendering.split_sheet import split_sheet
-from constants import GameUnits, DirectionalValues
+from constants import DirectionalValues
 import pygame as pg
 
 
@@ -59,6 +59,10 @@ class PlayerTextures:
     PLAYER_JUMP_HORIZONTAL = "assets/textures/player_jump_horizontal.png"
     PLAYER_JUMP_VERTICAL = "assets/textures/player_jump_vertical.png"
     PLAYER_IDLE_DEBUG = "assets/textures/player_idle_debug.png"
+
+
+class EntityTextures:
+    PLACEHOLDER = "assets/textures/player_idle.png"
 
 
 def get_outline_tileset_dict(tileset_sprites):

@@ -137,17 +137,18 @@ class Game:
         self.conductor.set_music("placeholder", "placeholder", 120)
         self.conductor.start_conducting()
 
-    def on_shadow_beat(self, prev_shadow_beat_time):
+    def on_shadow_beat(self, shadow_beat_time):
         """ Called when the conductor sends a perfect beat """
-        self.player.on_shadow_beat(prev_shadow_beat_time)
-        self.area.on_shadow_beat(prev_shadow_beat_time)
+        self.player.on_shadow_beat(shadow_beat_time)
+        self.area.on_shadow_beat(shadow_beat_time)
 
     def on_bpm_change(self, new_bpm):
         self.player.on_bpm_change(new_bpm)
         self.area.on_bpm_change(new_bpm)
 
-    def on_beat(self, is_auto_beat):
+    def on_beat(self, beat_time, is_auto_beat):
         """ Called on the actual beat """
+        self.area.on_beat(beat_time)
         if is_auto_beat:
             self.player.miss_next_beat = False  # reset
 

@@ -71,10 +71,10 @@ class Conductor:
             self.has_performed_beat = True
             self.prev_beat_time = time.time()
 
-            self.game.on_beat(is_auto_beat)
-
             if self.is_in_combat:
                 self.logger.add_log(f"{self.total_song_beats} {'auto ' if is_auto_beat else ''}beat")
+
+            self.game.on_beat(self.prev_beat_time, is_auto_beat)
 
     def start_conducting(self):
         """ Call to start up the conductor, will fail if no music or bpm has been set """

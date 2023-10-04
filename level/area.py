@@ -61,7 +61,7 @@ class Area:
     def load_levels(self):
         """ Stores levels in area dictionary """
         for level_num in self.level_files_dict:
-            self.levels_dict[level_num] = Level(f"{self.area_dir}/{self.level_files_dict[level_num]}",
+            self.levels_dict[level_num] = Level(self.game, f"{self.area_dir}/{self.level_files_dict[level_num]}",
                                                 pos_offset=pg.Vector2(GameUnits.LEVEL_X_OFFSET, 0))
 
     def change_level_by_direction(self, directional_value):
@@ -112,12 +112,18 @@ class Area:
         self.change_level_by_direction(direction)
         return direction
 
-    def on_shadow_beat(self, prev_shadow_beat_time):
-        for level in self.levels_dict.values():
-            for entity in level.entities:
-                entity.on_shadow_beat(prev_shadow_beat_time)
+    def on_shadow_beat(self, shadow_beat_time):
+        """ Call entities in current level """
+        for entity in self.level.entities:
+            entity.on_shadow_beat(shadow_beat_time)
+
+    def on_beat(self, beat_time):
+        """ Call entities in current level """
+        for entity in self.level.entities:
+            entity.on_beat(beat_time)
 
     def on_bpm_change(self, new_bpm):
+        """ Call all entities on all levels in the area """
         for level in self.levels_dict.values():
             for entity in level.entities:
                 entity.on_bpm_change(new_bpm)

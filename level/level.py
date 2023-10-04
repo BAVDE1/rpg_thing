@@ -60,8 +60,9 @@ def store_layer(layer: list, layer_lines):
 
 
 class Level:
-    def __init__(self, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
+    def __init__(self, game, level_source, pos_offset: pg.Vector2 = pg.Vector2(0, 0), size=1):
         self.is_initialised = False
+        self.game = game
         self.pos_offset = pos_offset
         self.size = size
 
@@ -77,7 +78,7 @@ class Level:
         self.outline_layer_group = pg.sprite.Group()
 
         # collide-able positions
-        self.wall_positions = []
+        self.relative_wall_positions = []
 
         self.entities: list[BaseEntity] = []
 
@@ -100,7 +101,7 @@ class Level:
         self.ground_layer_group.empty()
         self.outline_layer_group.empty()
 
-        self.wall_positions = []
+        self.relative_wall_positions = []
         self.entities: list[BaseEntity] = []
 
         self.initialise_level()
@@ -142,19 +143,19 @@ class Level:
                     tile_sprite = TileSprite(raw_sprite, t_pos)
 
                     if store_tiles_as_walls:
-                        self.wall_positions.append(tile_sprite.relative_pos)
+                        self.relative_wall_positions.append(tile_sprite.relative_pos)
 
                     tile_sprite.add(group)
                 elif store_empty_as_walls:
-                    self.wall_positions.append(TileSprite(TileTextures.GRASS_SPRITE, self.create_tile_pos(row_n, column_n)).relative_pos)
+                    self.relative_wall_positions.append(TileSprite(TileTextures.GRASS_SPRITE, self.create_tile_pos(row_n, column_n)).relative_pos)
 
     def store_entities(self):
         for row_n, line in enumerate(self.entity_layer_lines):
             for column_n, chars in enumerate(line.split(",")):
                 if raw_entity := ASCII_TO_ENTITY[chars] if chars in ASCII_TO_ENTITY else None:
-                    pos = self.create_tile_pos(row_n, column_n)
+                    pos = self.create_entity_pos(row_n, column_n)
 
-                    self.entities.append(raw_entity(pos))
+                    self.entities.append(raw_entity(self.game, pos))
 
     def store_outline(self, store_fade=False):
         """ Used to determine and put sprites into the outline group """
@@ -207,6 +208,12 @@ class Level:
         return pg.Vector2(
             (((column * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x,
             (((row * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.y)
+
+    def create_entity_pos(self, row: int, column: int) -> pg.Vector2:
+        """ Returns Vector2 of a given sprites position depending upon row, column and level size """
+        return pg.Vector2(
+            ((((column * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.x) + GameUnits.UNIT / 2,
+            ((((row * GameUnits.UNIT) + GameUnits.LEVEL_OFFSET) * self.size) + self.pos_offset.y) + GameUnits.UNIT / 2)
 
     def generate_tile_rects(self) -> list[tuple]:
         """ Generates and returns a list of tile rects: 0=x, 1=y, 2=width, 3=height, 4=row, 5=column (used in level editor) """

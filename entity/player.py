@@ -28,19 +28,20 @@ class Player:
         self.position = pg.Vector2(game.screen_canvas.get_rect().center)
 
         self.miss_next_beat = False
-        self.moving = False
+        self.is_performing_action = False
         self.sprinting = False
-        self.last_moved = time.time()
+        self.last_action_time = time.time()
 
         # texture stuff
         self.flipped = False
-        texture_idle = pg.image.load(PlayerTextures.PLAYER_IDLE).convert_alpha()
-        self.ss_idle = split_sheet(texture_idle, (GameUnits.UNIT, GameUnits.UNIT), 4)
 
-        jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_HORIZONTAL).convert_alpha(), (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8))
-        jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, split_sheet(pg.image.load(PlayerTextures.PLAYER_JUMP_VERTICAL).convert_alpha(), (GameUnits.UNIT, GameUnits.UNIT * 3), 8))
-        self.animator = Animator(SpriteSheet(PlayerTextures.PLAYER_IDLE, self.ss_idle), pg.Vector2(0, 0),
-                                 jump_horizontal_ss, jump_vertical_ss)
+        jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
+        jump_horizontal_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL_STUNTED, (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
+        jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, (GameUnits.UNIT, GameUnits.UNIT * 3), 8)
+        jump_vertical_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL_STUNTED, (GameUnits.UNIT, GameUnits.UNIT * 3), 8)
+
+        self.animator = Animator(SpriteSheet(PlayerTextures.PLAYER_IDLE, (GameUnits.UNIT, GameUnits.UNIT), 4), pg.Vector2(0, 0),
+                                 jump_horizontal_ss, jump_horizontal_stunted_ss, jump_vertical_ss, jump_vertical_stunted_ss)
 
         self.current_texture = self.animator.texture_obj
         self.shadow = Shadow(self.get_sprite(), self.position)
@@ -59,55 +60,69 @@ class Player:
             # action
             if self.can_do_action():
                 self.direction = DirectionalValues.DIRECTION_DICT[self.held_direction_keys[0]]
-                self.move()
+                self.do_action()
 
     def on_key_up(self, key):
         if key in self.held_direction_keys:
             self.held_direction_keys.remove(key)
 
-    def move(self):
-        """ Moves player 1 tile in its current direction
+    def do_action(self):
+        """ Performs players action based on stuff.
             Sends the beat event to the conductor. """
-        self.moving = True
-
-        # addition to players position
+        self.is_performing_action = True
         x = DirectionalValues.DIRECTION_MOV[self.direction][0]
         y = DirectionalValues.DIRECTION_MOV[self.direction][1]
 
-        # set position
-        new_pos = pg.Vector2(self.position.x + x, self.position.y + y)
-        if self.get_relative_pos(new_pos) not in self.area.level.wall_positions:
-            self.position = new_pos
+        # PERFORM ACTIONS HERE
+        self.move_or_collide(x, y)
 
-        self.last_moved = time.time()
+        # after action
+        self.last_action_time = time.time()
         self.flipped = True if self.direction == DirectionalValues.LEFT else False if self.direction == DirectionalValues.RIGHT else self.flipped
+        self.is_performing_action = False
 
-        # move animation
-        if x:
-            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim horizontal
-        else:
-            self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT), reverse=y > 0)  # jump anim vertical
-            self.shadow.add_offset_goal(len(self.animator.current_ot_anim_ss), pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
-
-        self.moving = False
-
-        # change level (changes, then assigns, then checks if)
+        # change level (if: changes, then assigns, then checks)
         if level_change_dir := self.area.change_level_if_needed(self.get_relative_pos()):
             self.set_pos_on_lvl_change(level_change_dir)
 
         # beat the actual beat. After player movement
         self.conductor.beat()
 
+    def move_or_collide(self, x, y):
+        """ Move to tile facing, or collide """
+        new_pos = pg.Vector2(self.position.x + x, self.position.y + y)
+        if self.get_relative_pos(new_pos) not in self.area.level.relative_wall_positions:
+            self.position = new_pos
+            # move animation
+            if x:
+                self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED,
+                                           offset=pg.Vector2(-x / 2, -GameUnits.UNIT / 2))  # jump anim horizontal
+            else:
+                self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL, PlayerValues.PLAYER_MOVE_ANIM_SPEED,
+                                           offset=pg.Vector2(0, 0 if y < 0 else -GameUnits.UNIT),
+                                           reverse=y > 0)  # jump anim vertical
+                self.shadow.add_offset_goal(len(self.animator.current_ot_anim_ss),
+                                            pg.Vector2(GameUnits.UNIT / 2, -GameUnits.UNIT / 2), y > 0)
+        else:
+            # collision animation
+            if x:
+                self.animator.do_animation(PlayerTextures.PLAYER_JUMP_HORIZONTAL_STUNTED,
+                                           PlayerValues.PLAYER_MOVE_ANIM_SPEED,
+                                           offset=pg.Vector2(x / 2, -GameUnits.UNIT / 2))
+            else:
+                self.animator.do_animation(PlayerTextures.PLAYER_JUMP_VERTICAL_STUNTED,
+                                           PlayerValues.PLAYER_MOVE_ANIM_SPEED, offset=pg.Vector2(0, -GameUnits.UNIT))
+
     def sprint_manager(self):
         """ Used for holding movement keys when not in combat """
         if not self.conductor.is_in_combat:
             if len(self.held_direction_keys) > 0:
                 if DirectionalValues.DIRECTION_DICT.get(self.held_direction_keys[0]) and self.can_do_action():
-                    if not self.sprinting and time.time() - self.last_moved > PlayerValues.HOLD_TIME_TO_SPRINT:
+                    if not self.sprinting and time.time() - self.last_action_time > PlayerValues.HOLD_TIME_TO_SPRINT:
                         self.sprinting = True  # start sprint
                     elif self.sprinting:
                         self.direction = DirectionalValues.DIRECTION_DICT[self.held_direction_keys[0]]
-                        self.move()  # continue sprint
+                        self.do_action()  # continue sprint
             elif len(self.held_direction_keys) == 0 and self.sprinting:
                 self.sprinting = False  # stop sprint
 
@@ -117,15 +132,14 @@ class Player:
             self.on_sprite_updated()
             self.animator.has_changed_texture = False
 
-        sprite = self.get_sprite()
-        blit = pg.Vector2((self.position.x - sprite.get_width() / 2) + self.animator.offset.x,
-                          (self.position.y - sprite.get_height() / 2) + self.animator.offset.y)
-
         # shadow
         self.shadow.draw(surface)
 
         # player
-        surface.blit(sprite, pg.Vector2(blit.x, blit.y + GameUnits.ENTITY_Y_OFFSET))
+        pos = pg.Vector2((self.position.x - self.get_sprite().get_width() / 2) + self.animator.offset.x,
+                          (self.position.y - self.get_sprite().get_height() / 2) + self.animator.offset.y)
+        surface.blit(self.get_sprite(), pg.Vector2(pos.x, pos.y + GameUnits.ENTITY_Y_OFFSET))
+        pg.draw.rect(surface, (255, 0, 0), pg.rect.Rect(self.position.x, self.position.y, 3, 3), 2)
 
     def on_sprite_updated(self):
         """ Called when sprite updates its texture """
@@ -139,10 +153,10 @@ class Player:
 
     def set_pos(self, new_pos: pg.Vector2):
         """ Sets player position instantly """
-        self.moving = True
+        self.is_performing_action = True
         self.position = new_pos
-        self.last_moved = time.time()
-        self.moving = False
+        self.last_action_time = time.time()
+        self.is_performing_action = False
 
     def can_do_action(self) -> bool:
         """ Returns true if the player is allowed to do an action, results will vary in and out of combat """
@@ -151,9 +165,9 @@ class Player:
             return False
 
         # checks
-        can_perform_action: bool = (not self.moving
+        can_perform_action: bool = (not self.is_performing_action
                                     and not self.animator.current_ot_anim_ss
-                                    and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_moved)
+                                    and time.time() - PlayerValues.MOVEMENT_PAUSE > self.last_action_time)
 
         # out of combat movement
         if not self.conductor.is_in_combat:

@@ -21,6 +21,11 @@ def four_way_rotated_tile(char, sprite):
         single_tile(f"{char}*{i}", rotate_90(sprite, -i))
 
 
+def wall_map_tiles(char, sprites: list):
+    for i, sprite in enumerate(sprites):
+        single_tile(f"{char}^{i}", sprite)
+
+
 class TileTextures:
     """ Register new textures here """
     # SINGLE
@@ -31,7 +36,7 @@ class TileTextures:
     PLACEHOLDER_DIR_TILE = pg.image.load("assets/textures/tiles/devart/dir_tile.png")
 
     # WALLS TIMESET
-    GRASS_WALLS_TILESET_IMAGES = split_sheet("assets/textures/tiles/grass_walls_tileset.png", columns=4, rows=6)
+    GRASS_WALLS_TILESET_IMAGES = split_sheet("assets/textures/tiles/grass_walls_tileset.png", columns=8, rows=3, remove_end_splits=1)
 
     # OUTLINES TILESET
     LEAVES_TILESET_IMAGES = split_sheet("assets/textures/tiles/leaves_tileset.png", columns=5, rows=5)
@@ -40,6 +45,7 @@ class TileTextures:
 def register_tiles():
     """ Register new tiles here """
     single_tile('Gr', TileTextures.GRASS_IMAGE)
+    wall_map_tiles('Gw', TileTextures.GRASS_WALLS_TILESET_IMAGES)
 
     # placeholders
     four_way_rotated_tile('Dt', TileTextures.PLACEHOLDER_DIR_TILE)

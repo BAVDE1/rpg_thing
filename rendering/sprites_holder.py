@@ -5,9 +5,9 @@ from constants import GameUnits
 
 class SpriteSheet:
     """ Holder for animation sprite sheets (ss) """
-    def __init__(self, texture_path, size: tuple, columns: int):
+    def __init__(self, texture_path, size: pg.Vector2, columns: int):
         self.identifier = texture_path
-        self.sprite_sheet = split_sheet(pg.image.load(texture_path).convert_alpha(), size, columns)
+        self.sprite_sheet = split_sheet(pg.image.load(texture_path).convert_alpha(), columns, split_size=size)
         self.length = len(self.sprite_sheet)
 
     def __eq__(self, other):

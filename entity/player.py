@@ -7,7 +7,6 @@ from conductor.conductor import Conductor
 from constants import GameUnits, DirectionalValues, PlayerValues
 from rendering.animator import Animator
 from rendering.shadow import Shadow
-from rendering.split_sheet import split_sheet
 from rendering.sprites_holder import SpriteSheet
 from texture_constants import PlayerTextures
 from utility.logging import Logger
@@ -35,12 +34,12 @@ class Player:
         # texture stuff
         self.flipped = False
 
-        jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
-        jump_horizontal_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL_STUNTED, (GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
-        jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, (GameUnits.UNIT, GameUnits.UNIT * 3), 8)
-        jump_vertical_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL_STUNTED, (GameUnits.UNIT, GameUnits.UNIT * 3), 8)
+        jump_horizontal_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL, pg.Vector2(GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
+        jump_horizontal_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_HORIZONTAL_STUNTED, pg.Vector2(GameUnits.UNIT * 2, GameUnits.UNIT * 2), 8)
+        jump_vertical_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL, pg.Vector2(GameUnits.UNIT, GameUnits.UNIT * 3), 8)
+        jump_vertical_stunted_ss = SpriteSheet(PlayerTextures.PLAYER_JUMP_VERTICAL_STUNTED, pg.Vector2(GameUnits.UNIT, GameUnits.UNIT * 3), 8)
 
-        self.animator = Animator(SpriteSheet(PlayerTextures.PLAYER_IDLE, (GameUnits.UNIT, GameUnits.UNIT), 4), pg.Vector2(0, 0),
+        self.animator = Animator(SpriteSheet(PlayerTextures.PLAYER_IDLE, pg.Vector2(GameUnits.UNIT, GameUnits.UNIT), 4), pg.Vector2(0, 0),
                                  jump_horizontal_ss, jump_horizontal_stunted_ss, jump_vertical_ss, jump_vertical_stunted_ss)
 
         self.current_texture = self.animator.texture_obj

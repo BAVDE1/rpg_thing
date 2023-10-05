@@ -23,23 +23,26 @@ def four_way_rotated_tile(char, sprite):
 
 class TileTextures:
     """ Register new textures here """
-    FADE_SPRITE = pg.image.load("assets/textures/tiles/fade_tile.png")
-
-    GRASS_SPRITE = pg.image.load("assets/textures/tiles/grass.png")
+    # SINGLE
+    FADE_IMAGE = pg.image.load("assets/textures/tiles/fade_tile.png")
+    GRASS_IMAGE = pg.image.load("assets/textures/tiles/grass.png")
 
     PLACEHOLDER_TILE = pg.image.load("assets/textures/tiles/tile_placeholder.png")
-    DIR_TILE = pg.image.load("assets/textures/tiles/devart/dir_tile.png")
+    PLACEHOLDER_DIR_TILE = pg.image.load("assets/textures/tiles/devart/dir_tile.png")
 
-    LEAVES_TILESET_SPRITE = pg.image.load("assets/textures/tiles/leaves_tileset.png")
-    LEAVES_TILESET_SPRITES = split_sheet(LEAVES_TILESET_SPRITE, (20, 20), 5, 5)
+    # WALLS TIMESET
+    GRASS_WALLS_TILESET_IMAGES = split_sheet("assets/textures/tiles/grass_walls_tileset.png", columns=4, rows=6)
+
+    # OUTLINES TILESET
+    LEAVES_TILESET_IMAGES = split_sheet("assets/textures/tiles/leaves_tileset.png", columns=5, rows=5)
 
 
 def register_tiles():
     """ Register new tiles here """
-    single_tile('Gr', TileTextures.GRASS_SPRITE)
+    single_tile('Gr', TileTextures.GRASS_IMAGE)
 
-    four_way_rotated_tile('Dt', TileTextures.DIR_TILE)
-
+    # placeholders
+    four_way_rotated_tile('Dt', TileTextures.PLACEHOLDER_DIR_TILE)
     single_tile('Pt', TileTextures.PLACEHOLDER_TILE)
 
 

@@ -83,7 +83,7 @@ class PlaceholderEntity(BaseEntity):
 
         # texture stuff
         self.flipped = False
-        self.animator = Animator(SpriteSheet(EntityTextures.PLACEHOLDER, (GameUnits.UNIT, GameUnits.UNIT), 4), pg.Vector2(0, 0))
+        self.animator = Animator(SpriteSheet(EntityTextures.PLACEHOLDER, pg.Vector2(GameUnits.UNIT, GameUnits.UNIT), 4), pg.Vector2(0, 0))
 
         self.current_texture = self.animator.texture_obj
         self.shadow = Shadow(self.get_sprite(), self.position)

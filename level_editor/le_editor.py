@@ -218,7 +218,7 @@ class LevelEditor:
                           self.position.y + self.display_text.get_height() * (self.size * 2))
 
     def load_lvl(self) -> Level:
-        return Level(self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE,
+        return Level(self, self.opened_level_file if not self.editing_file_exists() else self.EDITING_LEVEL_FILE,
                      pos_offset=self.lvl_pos, size=self.size)
 
     def render(self):

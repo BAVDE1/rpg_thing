@@ -35,7 +35,7 @@ def parse_level_file(level_source):
 def outline_decider(dic: dict):
     """ Returns suitable outline for tiles' position depending upon its surrounding tiles.
     Returns None if no suitable outline is found """
-    outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_SPRITES)
+    outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_IMAGES)
 
     sprite_to_add = None
     for sprite in outlines.keys():
@@ -147,7 +147,7 @@ class Level:
 
                     tile_sprite.add(group)
                 elif store_empty_as_walls:
-                    self.relative_wall_positions.append(TileSprite(TileTextures.GRASS_SPRITE, self.create_tile_pos(row_n, column_n)).relative_pos)
+                    self.relative_wall_positions.append(TileSprite(TileTextures.GRASS_IMAGE, self.create_tile_pos(row_n, column_n)).relative_pos)
 
     def store_entities(self):
         for row_n, line in enumerate(self.entity_layer_lines):
@@ -192,7 +192,7 @@ class Level:
 
                 # store fade tiles after other tiles, so it renders on top
                 if store_fade and (column_n == 0 or column_n == len(line) - 1):  # only on the level sides atm
-                    f_raw_sprite = pg.transform.flip(TileTextures.FADE_SPRITE, 1, 0) if column_n == 0 else TileTextures.FADE_SPRITE
+                    f_raw_sprite = pg.transform.flip(TileTextures.FADE_IMAGE, 1, 0) if column_n == 0 else TileTextures.FADE_IMAGE
                     f_raw_sprite = self.create_scaled_tile_sprite(f_raw_sprite)
                     f_pos = self.create_tile_pos(row_n, column_n)
 

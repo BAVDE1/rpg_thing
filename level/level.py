@@ -34,7 +34,7 @@ def parse_level_file(level_source):
 
 def outline_decider(dic: dict):
     """ Returns suitable outline for tiles' position depending upon its surrounding tiles.
-    Returns None if no suitable outline is found """
+        Returns None if no suitable outline is found """
     outlines = get_outline_tileset_dict(TileTextures.LEAVES_TILESET_IMAGES)
 
     sprite_to_add = None
@@ -75,6 +75,7 @@ class Level:
 
         self.top_layer_group = pg.sprite.Group()
         self.ground_layer_group = pg.sprite.Group()
+        self.ground_grid_group = pg.sprite.Group()
         self.outline_layer_group = pg.sprite.Group()
 
         # collide-able positions
@@ -111,6 +112,7 @@ class Level:
             # create tiles & fill groups
             self.store_group(self.ground_layer_group, self.ground_layer_lines, store_empty_as_walls=True)
             self.store_group(self.top_layer_group, self.top_layer_lines, store_tiles_as_walls=True)
+            self.store_grid()
             self.store_entities()
             self.store_outline(True)
 
@@ -148,6 +150,17 @@ class Level:
                     tile_sprite.add(group)
                 elif store_empty_as_walls:
                     self.relative_wall_positions.append(TileSprite(TileTextures.GRASS_IMAGE, self.create_tile_pos(row_n, column_n)).relative_pos)
+
+    def store_grid(self):
+        for r in range(GameUnits.LVL_HEIGHT):
+            for c in range(GameUnits.LVL_WIDTH):
+                if c % 2 == 0:
+                    if (r + 1) % 2 == 0:
+                        self.ground_grid_group.add(pg.sprite.)
+                        print(r, c)
+                else:
+                    if r % 2 == 0:
+                        print(r, c)
 
     def store_entities(self):
         for row_n, line in enumerate(self.entity_layer_lines):

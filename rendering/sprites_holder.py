@@ -34,3 +34,9 @@ class TileSprite(BasicSprite):
 
         self.relative_pos = pg.Vector2(((pos.x - GameUnits.LEVEL_X_OFFSET) - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT,
                                        (pos.y - GameUnits.LEVEL_OFFSET) / GameUnits.UNIT)
+
+
+class GridSprite(BasicSprite):
+    """ disco grid! """
+    def update(self, *args, **kwargs):
+        self.rect.move(GameUnits.UNIT, 0)

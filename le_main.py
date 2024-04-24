@@ -7,6 +7,7 @@ from constants import GameUnits, EDITING_TAG
 import os
 import pygame as pg
 
+level_editor = None
 LEVELS_DIR = "assets/areas/"
 KEYBOARD_NUMS = {pg.K_1: 1, pg.K_2: 2, pg.K_3: 3, pg.K_4: 4, pg.K_5: 5, pg.K_6: 6, pg.K_7: 7, pg.K_8: 8, pg.K_9: 9}
 
@@ -66,7 +67,7 @@ class LevelEditorMain:
                     layer = self.lvl_editor.selected_layer
                     if self.keys[pg.K_UP] or self.keys[pg.K_w]:
                         self.lvl_editor.change_selected_layer(layer - 1)
-                    if self.keys[pg.K_DOWN] or self.keys[pg.K_s]:
+                    if self.keys[pg.K_DOWN] or (self.keys[pg.K_s] and not self.keys[pg.K_LCTRL]):
                         self.lvl_editor.change_selected_layer(layer + 1)
 
                     is_inv_open = self.lvl_editor.tile_inv.is_open
@@ -304,10 +305,13 @@ class LevelEditorMain:
 
 
 def main():
+    global level_editor
+
     pg.init()
     pg.display.set_mode([GameUnits.RES_W * GameUnits.RES_MUL, GameUnits.RES_H * GameUnits.RES_MUL])
     pg.font.init()
-    LevelEditorMain().main_loop()
+    level_editor = LevelEditorMain()
+    level_editor.main_loop()
     pg.quit()
 
 

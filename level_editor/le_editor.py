@@ -259,7 +259,6 @@ class LevelEditor:
         self.add_button(" e ", pg.Vector2((self.screen.get_width() / 2) - 30, self.screen.get_height() - 50), BTNOperation(BTN_LAYER_OPTION, 1), size=20)
         self.add_button(" g ", pg.Vector2((self.screen.get_width() / 2) - 30, self.screen.get_height() - 30), BTNOperation(BTN_LAYER_OPTION, 2), size=20)
 
-
     def add_button(self, display_text: str, pos: pg.Vector2, operation: BTNOperation, size=30, image=None, override_size=None):
         self.buttons.append(
             Button(screen=self.screen, display_text=display_text, image=image, pos=pos,

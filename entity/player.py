@@ -181,7 +181,7 @@ class Player:
         return False
 
     def missed_beat(self):
-        self.txt_holder.add_text_object("Missed beat", pg.Vector2(self.position.x, self.position.y - 23))
+        self.txt_holder.add_text_object("Missed beat", pg.Vector2(self.position.x, self.position.y - 30))
         self.miss_next_beat = True
 
         self.logger.add_log(f"Missed beat", 2)

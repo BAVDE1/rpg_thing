@@ -99,7 +99,7 @@ class Game:
         # v: text object
         if self.keys[pg.K_v]:
             self.text_objects_holder.add_text_object("abcdefghijklmnopqrstuvwxyz 1234567890",
-                                                     pg.Vector2(self.player.position.x, self.player.position.y - 23))
+                                                     pg.Vector2(self.player.position.x, self.player.position.y - 30))
 
         # c: toggle combat
         if self.keys[pg.K_c]:
